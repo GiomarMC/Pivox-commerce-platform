@@ -1,0 +1,684 @@
+<app-flow-header [currentStep]="1" [showSunatStep]="false" />
+
+<div class="page-content venta-wrap">
+  <div class="venta-layout">
+
+    <!-- ══ Columna izquierda: Catálogo ══ -->
+    <div class="venta-catalog" (scroll)="onCatalogScroll($event)">
+
+      <!-- Search -->
+      <div class="search-wrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          [(ngModel)]="busqueda"
+          (ngModelChange)="onBusquedaChange()"
+          placeholder="Buscar por nombre o código..."
+          class="search-input"
+        />
+      </div>
+
+      @if (svc.state().errorMessage) {
+        <div class="error-banner" style="margin-bottom:1rem">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+          </svg>
+          {{ svc.state().errorMessage }}
+        </div>
+      }
+
+      @if (svc.state().isLoading) {
+        <div class="producto-grid">
+          @for (i of [1,2,3,4,5,6,8,9,10]; track i) {
+            <div class="cat-card cat-skel">
+              <div class="cat-img-placeholder" style="background:#F3F4F6"></div>
+              <div class="cat-info">
+                <div class="cat-skel-line w3"></div>
+                <div class="cat-skel-line w2"></div>
+                <div class="cat-skel-line w1"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (svc.state().productos.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+            </svg>
+          </div>
+          <p class="empty-title">Sin productos</p>
+          <p class="empty-desc">No se encontraron productos disponibles</p>
+        </div>
+      } @else {
+        <div class="producto-grid">
+          @for (p of svc.state().productos; track p.productoId) {
+            <div
+              class="cat-card"
+              [class.cat-in-cart]="estaEnCarrito(p.productoId)"
+              [class.cat-sin-stock]="+p.cantidadDisponible <= 0"
+              (click)="onTapProducto(p)"
+            >
+              <div class="cat-img-wrap">
+                @if (p.imagen) {
+                  <img [src]="p.imagen" [alt]="p.nombre" class="cat-img" />
+                } @else {
+                  <div class="cat-img-placeholder">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                    </svg>
+                  </div>
+                }
+
+                @if (estaEnCarrito(p.productoId)) {
+                  <div class="cat-overlay-check">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                }
+
+                <span [class]="(+p.cantidadDisponible > 0) ? 'cat-stock-badge cat-stock-ok' : 'cat-stock-badge cat-stock-empty'">
+                  {{ +p.cantidadDisponible > 0 ? 'En stock' : 'Sin stock' }}
+                </span>
+
+                @if (+p.cantidadAveriada > 0) {
+                  <span class="cat-averiado-badge">{{ +p.cantidadAveriada | number:'1.0-3' }} averiado</span>
+                }
+              </div>
+
+              <div class="cat-info">
+                <p class="cat-nombre">{{ p.nombre }}</p>
+                <p class="cat-codigo">{{ p.codigo }}</p>
+                <div class="cat-stock-row">
+                  <span class="cat-disponible">{{ +p.cantidadDisponible | number:'1.0-3' }} {{ getUnidadLabel(p.unidadMedida) }}</span>
+                </div>
+                <p class="cat-precio">S/ {{ p.precioVentaMercado }}</p>
+                <div class="cat-badges">
+                  @if (p.tieneConFactura && !p.tieneSinFactura) {
+                    <span class="badge-success badge">Con factura</span>
+                  } @else if (!p.tieneConFactura && p.tieneSinFactura) {
+                    <span class="badge-warning badge">Sin factura</span>
+                    @if (esSunat()) {
+                      <span class="badge-warning badge" title="Puede requerir sustitución">⚠ SUNAT</span>
+                    }
+                  } @else if (p.tieneConFactura && p.tieneSinFactura) {
+                    <span class="badge-info badge">Con y sin factura</span>
+                    @if (esSunat()) {
+                      <span class="badge-warning badge" title="Parte del stock sin factura">⚠ Mixto</span>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (svc.state().isLoadingMore) {
+          <div class="load-more-wrap"><div class="loading-spinner"></div></div>
+        }
+      }
+    </div>
+
+    <!-- ══ Columna derecha: Panel de venta (desktop) ══ -->
+    <div class="venta-panel">
+      <ng-container *ngTemplateOutlet="panelContent"></ng-container>
+    </div>
+
+  </div><!-- /venta-layout -->
+</div><!-- /venta-wrap -->
+
+<!-- Float bar (mobile) -->
+@if (carritoSvc.count() > 0) {
+  <div class="venta-float-bar" (click)="mostrarSheet.set(true)">
+    <div class="float-left">
+      <span class="float-count">{{ carritoSvc.count() }} producto(s)</span>
+    </div>
+    <div class="float-right">
+      <span class="float-total">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </div>
+  </div>
+}
+
+<!-- Bottom sheet (mobile) -->
+@if (mostrarSheet()) {
+  <div class="sheet-backdrop" (click)="mostrarSheet.set(false)">
+    <div class="sheet-panel" (click)="$event.stopPropagation()">
+      <div class="sheet-handle"></div>
+      <ng-container *ngTemplateOutlet="panelContent"></ng-container>
+    </div>
+  </div>
+}
+
+<!-- ══ Template del panel (compartido entre desktop y mobile sheet) ══ -->
+<ng-template #panelContent>
+
+  <!-- ZONA A: Tipo de venta — siempre visible -->
+  <div class="panel-zone-top">
+    <div class="panel-card">
+      <div class="panel-section">
+        <p class="panel-section-title">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+            <line x1="7" y1="7" x2="7.01" y2="7"/>
+          </svg>
+          Tipo de venta
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+          <button type="button" (click)="seleccionarTipoVenta('NORMAL')" [class]="chipClass(tipoVentaActual() === 'NORMAL')">Normal</button>
+          <button type="button" (click)="seleccionarTipoVenta('CREDITO')" [class]="chipClass(tipoVentaActual() === 'CREDITO')">Crédito</button>
+          <button type="button" (click)="seleccionarTipoVenta('SUNAT')" [class]="chipClass(tipoVentaActual() === 'SUNAT')">SUNAT</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ZONA B: Pasos — indicador anclado, contenido scrollea internamente -->
+  <div class="panel-zone-middle">
+
+    <!-- Indicador anclado -->
+    <div class="panel-steps-wrap">
+    <div class="panel-steps">
+      <button type="button" (click)="panelStep.set(1)" class="panel-step-btn">
+        <span [class]="'panel-step-bubble ' + (panelStep() === 1 ? 'panel-step-bubble-active' : 'panel-step-bubble-done')">
+          @if (panelStep() === 2) {
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          } @else {
+            1
+          }
+        </span>
+        <span [class]="'panel-step-label ' + (panelStep() === 1 ? 'panel-step-label-active' : 'panel-step-label-done')">Productos</span>
+        @if (carritoSvc.count() > 0 && panelStep() === 1) {
+          <span class="panel-items-count">{{ carritoSvc.count() }}</span>
+        }
+      </button>
+      <div [class]="'panel-step-line ' + (panelStep() === 2 ? 'panel-step-line-done' : '')"></div>
+      <button type="button" [disabled]="carritoSvc.count() === 0" (click)="nextStep()" class="panel-step-btn">
+        <span [class]="'panel-step-bubble ' + (panelStep() === 2 ? 'panel-step-bubble-active' : 'panel-step-bubble-inactive')">2</span>
+        <span [class]="'panel-step-label ' + (panelStep() === 2 ? 'panel-step-label-active' : '')">Pago</span>
+      </button>
+    </div>
+    </div><!-- /panel-steps-wrap -->
+
+    <!-- STEP 1: Lista de productos -->
+    @if (panelStep() === 1) {
+      <div class="panel-step-content">
+
+      @if (carritoSvc.count() === 0) {
+        <div class="panel-card">
+          <div class="panel-empty">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+              <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+              <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+            </svg>
+            <p class="panel-empty-title">Carrito vacío</p>
+            <p class="panel-empty-desc">Selecciona productos del catálogo</p>
+          </div>
+        </div>
+      }
+
+      @if (carritoSvc.count() > 0) {
+        <div class="panel-card">
+          <div class="panel-items-header">
+            <p class="panel-section-title" style="margin:0">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+              </svg>
+              Productos
+            </p>
+            <span class="panel-items-count">{{ carritoSvc.count() }}</span>
+          </div>
+          <div class="panel-items">
+            @for (item of carritoSvc.items(); track item.productoId + '-' + item.esAveriado; let idx = $index) {
+              <div [class]="'panel-item' + (item.esAveriado ? ' panel-item-averiado' : '')">
+
+                <!-- Fila superior: imagen + info + eliminar -->
+                <div style="display:flex;align-items:flex-start;gap:0.625rem">
+                  @if (item.imagen) {
+                    <img [src]="item.imagen" [alt]="item.nombre" class="panel-item-img" />
+                  } @else {
+                    <div class="panel-item-img-ph">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      </svg>
+                    </div>
+                  }
+                  <div style="flex:1;min-width:0">
+                    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.375rem">
+                      <p class="panel-item-name">{{ item.nombre }}</p>
+                      <button type="button" (click)="eliminar(item)" class="panel-item-del" title="Eliminar">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                    </div>
+                    <p class="panel-item-meta">{{ item.codigo }}</p>
+
+                    <!-- Lote chip -->
+                    <button type="button" (click)="abrirModalLote(item, idx)" class="lote-chip">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      </svg>
+                      {{ fechaLlegadaDelLote(item) ?? 'Automático' }}
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+
+                    @if (item.esAveriado) {
+                      <div class="averiado-chip">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+                          <line x1="12" y1="9" x2="12" y2="13"/>
+                        </svg>
+                        Averiado
+                        <button type="button" (click)="toggleAveriado(item, false)" title="Cambiar a normal"
+                          style="margin-left:2px;background:none;border:none;cursor:pointer;color:#D97706;display:flex;align-items:center;padding:0">
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                          </svg>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- Advertencias de stock -->
+                @if (item.cantidad > item.stockDisponible) {
+                  <p class="panel-item-warn">Stock insuficiente. Disponible: {{ item.stockDisponible | number:'1.0-3' }}</p>
+                }
+                @if ((stockPorTipo().get(item.productoId)?.sinFactura ?? 0) > 0 &&
+                     (stockPorTipo().get(item.productoId)?.conFactura ?? 0) > 0) {
+                  <p class="panel-item-info">
+                    {{ stockPorTipo().get(item.productoId)?.conFactura | number:'1.0-3' }} c/factura ·
+                    {{ stockPorTipo().get(item.productoId)?.sinFactura | number:'1.0-3' }} s/factura
+                  </p>
+                }
+                @if (esSunat() && loteEsSinFactura(item)) {
+                  <p class="panel-item-sunat-warn">⚠ Lote sin factura — puede requerir sustitución SUNAT</p>
+                }
+
+                <!-- Controles de cantidad y precio -->
+                <div class="panel-item-controls">
+                  <div class="panel-ctrl-group">
+                    <label class="panel-ctrl-label">Cantidad</label>
+                    <div style="display:flex;align-items:center;gap:0.3rem">
+                      <button type="button" (click)="decrementar(item)" class="qty-btn">−</button>
+                      <input type="number" [value]="item.cantidad" (change)="onCantidadChange(item, $event)" min="0.001" step="0.001" class="qty-input" />
+                      <button type="button" (click)="incrementar(item)" class="qty-btn" style="color:#1F2A7C">+</button>
+                    </div>
+                  </div>
+                  <div class="panel-ctrl-group">
+                    <label class="panel-ctrl-label">Precio</label>
+                    <input type="number" [value]="item.precioUnitario" (change)="onPrecioChange(item, $event)" min="0" step="0.01" class="price-input" />
+                  </div>
+                  <div class="panel-ctrl-subtotal">
+                    <label class="panel-ctrl-label">Subtotal</label>
+                    <p class="panel-item-subtotal">S/ {{ (item.cantidad * item.precioUnitario) | number:'1.2-2' }}</p>
+                  </div>
+                </div>
+
+              </div>
+            }
+          </div><!-- /panel-items -->
+        </div><!-- /panel-card productos -->
+      }
+
+      </div><!-- /panel-step-content -->
+    }<!-- /step 1 -->
+
+    <!-- STEP 2: Configuración de pago -->
+    @if (panelStep() === 2) {
+      <div class="panel-step-content">
+      <form [formGroup]="form" style="display:contents">
+
+        <!-- Card: Cliente (si crédito o SUNAT) — primero para que el dropdown caiga hacia abajo -->
+        @if (isCredito() || isSunat()) {
+          <div class="panel-card">
+            <div class="panel-section" style="overflow:visible">
+              <p class="panel-section-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Cliente
+                <span style="font-size:0.68rem;color:#9CA3AF;text-transform:none;letter-spacing:0;font-weight:400;margin-left:0.25rem">
+                  {{ clienteObligatorio() ? '(obligatorio)' : '(opcional)' }}
+                </span>
+              </p>
+
+              <div class="rv-toggle" style="margin-bottom:0.75rem">
+                <button type="button" (click)="setUsarClienteNuevo(false)"
+                  [class]="'rv-toggle-btn' + (!form.get('usarClienteNuevo')?.value ? ' rv-toggle-btn-active' : '')">
+                  Existente
+                </button>
+                <button type="button" (click)="setUsarClienteNuevo(true)"
+                  [class]="'rv-toggle-btn' + (form.get('usarClienteNuevo')?.value ? ' rv-toggle-btn-active' : '')">
+                  Nuevo
+                </button>
+              </div>
+
+              @if (!form.get('usarClienteNuevo')?.value) {
+                <app-cliente-search
+                  [tipoComprobante]="tipoComprobante()"
+                  (clienteSeleccionado)="onClienteSeleccionado($event)"
+                  (limpiar)="onLimpiarCliente()"
+                />
+              } @else {
+                <div formGroupName="clienteNuevo" style="display:flex;flex-direction:column;gap:0.625rem">
+                  <div class="field-group">
+                    <label class="field-label">Tipo documento</label>
+                    <select formControlName="tipoDocumento" class="field-select">
+                      <option value="1">DNI</option>
+                      <option value="6">RUC</option>
+                      <option value="7">Pasaporte</option>
+                    </select>
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">N° documento</label>
+                    <input formControlName="numeroDocumento" type="text" class="field-input" />
+                    @if (form.get('clienteNuevo.numeroDocumento')?.errors?.['rucInvalido']) {
+                      <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">RUC debe tener 11 dígitos</p>
+                    }
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Nombre / Razón social</label>
+                    <input formControlName="nombre" type="text" class="field-input" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Teléfono{{ isCredito() ? ' *' : ' (opcional)' }}</label>
+                    <input formControlName="telefono" type="tel" class="field-input" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Email{{ isCredito() ? ' *' : ' (opcional)' }}</label>
+                    <input formControlName="email" type="email" class="field-input" />
+                  </div>
+                  <div class="field-group">
+                    <label class="field-label">Dirección{{ isCredito() ? ' *' : ' (opcional)' }}</label>
+                    <input formControlName="direccion" type="text" class="field-input" />
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Card: Método de pago (si no es crédito) -->
+        @if (!isCredito()) {
+          <div class="panel-card">
+            <div class="panel-section">
+              <p class="panel-section-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                  <rect x="1" y="4" width="22" height="16" rx="2"/>
+                  <line x1="1" y1="10" x2="23" y2="10"/>
+                </svg>
+                Método de pago
+              </p>
+              <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+                @for (v of metodoPagoValues; track v) {
+                  <button type="button" (click)="form.patchValue({ metodoPago: v })" [class]="chipClass(metodoPago() === v)">
+                    {{ getMetodoPagoLabel(v) }}
+                  </button>
+                }
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Card: Tipo de comprobante (solo SUNAT) -->
+        @if (isSunat()) {
+          <div class="panel-card">
+            <div class="panel-section">
+              <p class="panel-section-title">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                  <polyline points="14 2 14 8 20 8"/>
+                </svg>
+                Comprobante
+              </p>
+              <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
+                @for (v of tipoComprobanteValues; track v) {
+                  <button type="button" (click)="form.patchValue({ tipoComprobante: v })" [class]="chipClass(tipoComprobante() === v)">
+                    {{ getTipoComprobanteLabel(v) }}
+                  </button>
+                }
+              </div>
+              @if (form.get('tipoComprobante')?.touched && !tipoComprobante()) {
+                <p style="font-size:0.72rem;color:#DC2626;margin:0.5rem 0 0">Selecciona un tipo de comprobante</p>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Errores de validación -->
+        @if (stockError() || (form.errors?.['clienteRequeridoCredito'] && form.touched) ||
+             (form.errors?.['facturaRequiereRuc'] && form.touched) ||
+             (form.errors?.['boletaNoAdmiteRuc'] && form.touched) ||
+             ventaSvc.state().errorMessage) {
+          <div style="display:flex;flex-direction:column;gap:0.375rem">
+            @if (stockError()) {
+              <div class="error-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                {{ stockError() }}
+              </div>
+            }
+            @if (form.errors?.['clienteRequeridoCredito'] && form.touched) {
+              <div class="error-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                Se requiere un cliente para ventas a crédito.
+              </div>
+            }
+            @if (form.errors?.['facturaRequiereRuc'] && form.touched) {
+              <div class="error-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                La Factura requiere un cliente con RUC (11 dígitos).
+              </div>
+            }
+            @if (form.errors?.['boletaNoAdmiteRuc'] && form.touched) {
+              <div class="error-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                La Boleta no admite RUC como documento.
+              </div>
+            }
+            @if (ventaSvc.state().errorMessage) {
+              <div class="error-banner">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                </svg>
+                {{ ventaSvc.state().errorMessage }}
+              </div>
+            }
+          </div>
+        }
+
+      </form>
+      </div><!-- /panel-step-content -->
+    }<!-- /step 2 -->
+
+  </div><!-- /panel-zone-middle -->
+
+  <!-- ZONA C: Total + acción — SIEMPRE VISIBLE -->
+  @if (carritoSvc.count() > 0) {
+    <div class="panel-zone-bottom">
+      <div class="panel-card panel-card-total">
+        <div class="panel-total-section">
+          <div class="panel-total-row">
+            <span class="panel-total-label">Total</span>
+            <span class="panel-total-value">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
+          </div>
+          @if (panelStep() === 1) {
+            <button
+              type="button"
+              (click)="nextStep()"
+              class="btn-primary w-full"
+              style="font-size:1rem;font-weight:800;letter-spacing:-0.01em"
+            >
+              Siguiente &nbsp; S/ {{ carritoSvc.total() | number:'1.2-2' }}
+            </button>
+          } @else {
+            <div style="display:flex;gap:0.5rem">
+              <button type="button" (click)="panelStep.set(1)" class="panel-back-btn">
+                Volver
+              </button>
+              <button
+                type="button"
+                (click)="pagar()"
+                [disabled]="ventaSvc.state().isSaving || hayStockInsuficiente()"
+                class="btn-primary"
+                style="flex:1;font-size:1rem;font-weight:800;letter-spacing:-0.01em"
+              >
+                @if (ventaSvc.state().isSaving) {
+                  <span class="loading-spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;width:14px;height:14px"></span>
+                  Procesando…
+                } @else {
+                  Pagar &nbsp; S/ {{ carritoSvc.total() | number:'1.2-2' }}
+                }
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+</ng-template>
+
+<!-- Modal post-pago: propuesta SUNAT -->
+@if (modalActivo() === 'propuesta') {
+  <div class="venta-modal-backdrop" (click)="$event.stopPropagation()">
+    <div class="venta-modal-container">
+      <app-propuesta-sunat
+        [isModal]="true"
+        (propuestaConfirmada)="onPropuestaConfirmada()"
+        (carritoRecuperado)="cerrarModal()"
+        (ventaCancelada)="onVentaCancelada()"
+      />
+    </div>
+  </div>
+}
+
+<!-- Modal post-pago: comprobante -->
+@if (modalActivo() === 'comprobante') {
+  <div class="venta-modal-backdrop" (click)="$event.stopPropagation()">
+    <div class="venta-modal-container">
+      <app-comprobante-venta
+        [isModal]="true"
+        (nuevaVentaEvent)="cerrarModal()"
+      />
+    </div>
+  </div>
+}
+
+<!-- Modal: elegir normal o averiado -->
+@if (modalProducto()) {
+  <div class="modal-backdrop" (click)="modalProducto.set(null)">
+    <div class="modal-sheet" (click)="$event.stopPropagation()">
+      <p class="modal-title">{{ modalProducto()!.nombre }}</p>
+      <p class="modal-subtitle">Este producto tiene unidades en mal estado. ¿Cuál deseas agregar?</p>
+      <div class="modal-options">
+        <button type="button" class="modal-option modal-ok" (click)="seleccionarTipoModal(false)">
+          <div class="modal-opt-icon modal-opt-icon-ok">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="modal-opt-label">Buen estado</p>
+            <p class="modal-opt-note">{{ +modalProducto()!.cantidadDisponible | number:'1.0-3' }} {{ getUnidadLabel(modalProducto()!.unidadMedida) }} disponibles</p>
+          </div>
+        </button>
+        <button type="button" class="modal-option modal-warn" (click)="seleccionarTipoModal(true)">
+          <div class="modal-opt-icon modal-opt-icon-warn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+            </svg>
+          </div>
+          <div>
+            <p class="modal-opt-label">Averiado</p>
+            <p class="modal-opt-note">{{ +modalProducto()!.cantidadAveriada | number:'1.0-3' }} {{ getUnidadLabel(modalProducto()!.unidadMedida) }} disponibles</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal: selector de lote -->
+@if (modalLoteData()) {
+  <div class="lote-modal-backdrop" (click)="modalLoteData.set(null)">
+    <div class="lote-modal-sheet" (click)="$event.stopPropagation()">
+      <p style="font-size:0.9rem;font-weight:700;color:#111827;margin:0 0 1rem;text-align:center">
+        Lote · {{ modalLoteData()!.item.nombre }}
+      </p>
+
+      <!-- Opción automática (FIFO) -->
+      <button
+        type="button"
+        (click)="seleccionarLote(null)"
+        [class]="'lote-option ' + (modalLoteData()!.item.loteProductoId === null ? 'lote-option-active-green' : '')"
+      >
+        <div style="display:flex;align-items:flex-start;gap:0.75rem">
+          <div [class]="'lote-dot ' + (modalLoteData()!.item.loteProductoId === null ? 'dot-green' : 'dot-zinc')"></div>
+          <div style="flex:1">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
+              <p style="font-size:0.82rem;font-weight:700;color:#111827;margin:0">Automático (FIFO)</p>
+              @if (loteFifaConFactura()) {
+                <span class="badge badge-success" style="font-size:0.65rem">Con factura</span>
+              } @else {
+                <span class="badge badge-warning" style="font-size:0.65rem">Sin factura</span>
+              }
+            </div>
+            @if (loteFifaFecha()) {
+              <p style="font-size:0.72rem;color:#6B7280;margin:0.15rem 0 0">Llegada: {{ loteFifaFecha() }}</p>
+            }
+          </div>
+        </div>
+      </button>
+
+      <!-- Lotes específicos -->
+      @for (lote of otrosLotes(); track lote.id) {
+        <button
+          type="button"
+          (click)="seleccionarLote(lote.id)"
+          [class]="'lote-option ' + (modalLoteData()!.item.loteProductoId === lote.id ? 'lote-option-active-navy' : '')"
+        >
+          <div style="display:flex;align-items:flex-start;gap:0.75rem">
+            <div [class]="'lote-dot ' + (modalLoteData()!.item.loteProductoId === lote.id ? 'dot-navy' : 'dot-zinc')"></div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem">
+                <p style="font-size:0.82rem;font-weight:700;color:#111827;margin:0">Lote #{{ lote.id }}</p>
+                @if (lote.conFactura) {
+                  <span class="badge badge-success" style="font-size:0.65rem">Con factura</span>
+                } @else {
+                  <span class="badge badge-warning" style="font-size:0.65rem">Sin factura</span>
+                }
+              </div>
+              <p style="font-size:0.72rem;color:#6B7280;margin:0.15rem 0 0">
+                Llegada: {{ lote.fecha }} · Stock: {{ lote.stock | number:'1.0-3' }}
+              </p>
+            </div>
+          </div>
+        </button>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,65 @@
+.hub-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+@media (min-width: 640px) {
+  .hub-grid { flex-direction: row; }
+  .hub-card { flex: 1; }
+}
+
+.hub-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #fff;
+  border: 1px solid #E2E6F0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.hub-card:hover {
+  border-color: #1F2A7C;
+  box-shadow: 0 4px 20px rgba(31,42,124,0.1);
+  transform: translateY(-1px);
+}
+
+.hub-card:active { transform: scale(0.99); }
+
+.hub-icon-wrap {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hub-info { flex: 1; min-width: 0; }
+
+.hub-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 0.2rem;
+}
+
+.hub-desc {
+  font-size: 0.8rem;
+  color: #6B7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.hub-arrow {
+  width: 18px;
+  height: 18px;
+  color: #9CA3AF;
+  flex-shrink: 0;
+}

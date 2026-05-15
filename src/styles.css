@@ -1,3 +1,166 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-primary:       #4F46E5;
+  --color-primary-hover: #4338CA;
+  --color-primary-muted: #EEF2FF;
+
+  --color-accent:        #F59E0B;
+  --color-accent-hover:  #D97706;
+  --color-accent-muted:  #FFF7ED;
+
+  --color-surface:  #FFFFFF;
+  --color-bg:       #EAECF0;
+  --color-border:   #D1D5DB;
+
+  --color-success:       #059669;
+  --color-success-muted: #D1FAE5;
+  --color-error:         #DC2626;
+  --color-error-muted:   #FEE2E2;
+  --color-warning:       #D97706;
+  --color-warning-muted: #FEF3C7;
+  --color-info:          #0284C7;
+  --color-info-muted:    #E0F2FE;
+}
+
+/* ─── backward-compat CSS vars (used by existing inline templates) ─── */
+:root {
+  --color-text-primary:    #111827;
+  --color-text-secondary:  #6B7280;
+  --color-text-tertiary:   #9CA3AF;
+  --color-text-disabled:   #D1D5DB;
+  --color-bg-light:        #EAECF0;
+  --color-bg-white:        #FFFFFF;
+  --color-bg-secondary:    #FAFAFA;
+  --color-border-light:    #D1D5DB;
+  --color-primary-light:   #4338CA;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background-color: var(--color-bg);
+  color: #111827;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── Shared component layer ─── */
+@layer components {
+
+  /* Buttons */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 text-white rounded-lg text-sm font-semibold
+           active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+    background: #4F46E5;
+    box-shadow: 0 1px 3px rgba(79,70,229,0.2), 0 4px 12px rgba(79,70,229,0.15);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: #4338CA;
+    box-shadow: 0 2px 6px rgba(79,70,229,0.25), 0 6px 16px rgba(79,70,229,0.2);
+    transform: translateY(-1px);
+  }
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-border text-zinc-700 rounded-lg
+           text-sm font-medium hover:border-zinc-300 hover:bg-zinc-50 active:scale-[0.98] transition-all duration-150
+           disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-danger {
+    @apply inline-flex items-center gap-2 px-4 py-2.5 bg-error/10 border border-error/20 text-error rounded-lg
+           text-sm font-medium hover:bg-error hover:text-white active:scale-[0.98] transition-all duration-150;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-3 py-2 text-zinc-600 rounded-lg text-sm font-medium
+           hover:bg-zinc-100 active:scale-[0.98] transition-all duration-150;
+  }
+  .btn-back {
+    @apply inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors mb-3;
+  }
+
+  /* Form fields */
+  .field-group  { @apply flex flex-col gap-1.5; }
+  .field-label  { @apply text-sm font-medium text-zinc-700; }
+  .field-input  {
+    @apply w-full px-3.5 py-2.5 text-sm border border-border rounded-lg bg-white text-zinc-900
+           placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary
+           transition-colors;
+  }
+  .field-select {
+    @apply w-full px-3.5 py-2.5 text-sm border border-border rounded-lg bg-white text-zinc-900
+           focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors;
+  }
+  .field-textarea {
+    @apply w-full px-3.5 py-2.5 text-sm border border-border rounded-lg bg-white text-zinc-900
+           placeholder-zinc-400 resize-none focus:outline-none focus:ring-2 focus:ring-primary/20
+           focus:border-primary transition-colors;
+  }
+  .field-error  { @apply text-xs text-error mt-1; }
+  .field-hint   { @apply text-xs text-zinc-500 mt-1; }
+
+  /* Banners */
+  .error-banner {
+    @apply flex items-start gap-3 p-4 bg-error-muted border border-error/20 rounded-xl text-sm text-error;
+  }
+  .success-banner {
+    @apply flex items-start gap-3 p-4 bg-success-muted border border-success/20 rounded-xl text-sm text-success;
+  }
+  .info-banner {
+    @apply flex items-start gap-3 p-4 bg-info-muted border border-info/20 rounded-xl text-sm text-info;
+  }
+  .warning-banner {
+    @apply flex items-start gap-3 p-4 bg-warning-muted border border-warning/20 rounded-xl text-sm text-warning;
+  }
+
+  /* Badges — base class sets layout; color variants set background/text only */
+  .badge         { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold; }
+  .badge-primary { background: var(--color-primary-muted); color: var(--color-primary); }
+  .badge-success { background: color-mix(in srgb, var(--color-success) 12%, transparent); color: var(--color-success); }
+  .badge-error   { background: color-mix(in srgb, var(--color-error) 10%, transparent);   color: var(--color-error); }
+  .badge-warning { background: color-mix(in srgb, var(--color-warning) 12%, transparent); color: var(--color-warning); }
+  .badge-info    { background: color-mix(in srgb, var(--color-info) 12%, transparent);    color: var(--color-info); }
+  .badge-zinc    { background: #F4F4F5; color: #52525B; }
+
+  /* Page skeleton */
+  .page-content  { @apply px-4 sm:px-6 lg:px-8 py-4 sm:py-5 max-w-7xl mx-auto; }
+  .page-header   { @apply flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4; }
+  .page-title    { @apply text-xl font-bold text-zinc-900 tracking-tight; }
+  .page-subtitle { @apply text-sm text-zinc-500 mt-0.5; }
+  .section-title { @apply text-base font-semibold text-zinc-900 mb-4; }
+
+  /* Card */
+  .card {
+    @apply bg-white rounded-xl border border-border;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+  }
+  .card-accent {
+    @apply bg-white rounded-xl border border-border;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    border-left: 3px solid var(--color-accent);
+  }
+
+  /* Stat block */
+  .stat-block { @apply flex flex-col; }
+  .stat-value  { @apply text-2xl font-extrabold tracking-tight text-zinc-900; }
+  .stat-label  { @apply text-xs font-medium text-zinc-500 mt-0.5; }
+
+  /* States */
+  .empty-state { @apply flex flex-col items-center justify-center py-16 text-center; }
+  .loading-spinner {
+    @apply w-5 h-5 border-2 border-zinc-200 border-t-primary rounded-full animate-spin;
+  }
+
+  /* Toggle chips */
+  .chip {
+    @apply px-3.5 py-1.5 rounded-full text-sm font-medium border border-border text-zinc-600
+           hover:border-primary hover:text-primary transition-colors cursor-pointer;
+  }
+  .chip-active {
+    @apply px-3.5 py-1.5 rounded-full text-sm font-medium bg-primary text-white cursor-pointer;
+  }
+}

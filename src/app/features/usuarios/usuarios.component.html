@@ -1,0 +1,167 @@
+<div class="page-content">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Usuarios</h1>
+      <p class="page-subtitle">Gestiona tu equipo de trabajo</p>
+    </div>
+    @if (isDueno()) {
+      <a routerLink="/invitation/new" class="btn-primary">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Invitar
+      </a>
+    }
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-bar">
+    <select (change)="onRolChange($event)" class="field-select filter-select">
+      @for (r of roles; track r.value) {
+        <option [value]="r.value ?? ''">{{ r.label }}</option>
+      }
+    </select>
+    <div class="search-wrap-inline">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon-inline">
+        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        [(ngModel)]="busqueda"
+        placeholder="Buscar por nombre o correo..."
+        class="field-input search-field"
+      />
+    </div>
+  </div>
+
+  <!-- Invitation link banner -->
+  @if (svc.state().invitationLink) {
+    <div class="invitation-banner">
+      <div class="invitation-content">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+        </svg>
+        <span class="invitation-link">{{ svc.state().invitationLink }}</span>
+      </div>
+      <button (click)="copiarLink()" class="btn-primary" style="font-size:0.8rem;padding:0.4rem 0.875rem;white-space:nowrap">
+        Copiar
+      </button>
+    </div>
+  }
+
+  @if (svc.state().errorMessage) {
+    <div class="error-banner mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ svc.state().errorMessage }}
+    </div>
+  }
+
+  @if (svc.state().isLoading) {
+    <ul class="user-list">
+      @for (i of [1,2,3,4]; track i) {
+        <li class="user-card u-skel">
+          <div class="user-avatar" style="background:#F3F4F6"></div>
+          <div style="flex:1">
+            <div class="u-skel-line short"></div>
+            <div class="u-skel-line medium"></div>
+          </div>
+        </li>
+      }
+    </ul>
+  } @else if (usuariosFiltrados.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrap">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+          <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+          <circle cx="9" cy="7" r="4"/>
+          <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+      </div>
+      <p class="empty-title">Sin usuarios</p>
+      <p class="empty-desc">No hay usuarios con estos filtros</p>
+    </div>
+  } @else {
+    <ul class="user-list">
+      @for (u of usuariosFiltrados; track u.id) {
+        <li class="user-card">
+          <div class="user-avatar" [class.user-avatar-pending]="esPendiente(u)">
+            {{ (esPendiente(u) ? u.usuarioEmail : u.usuarioNombre)[0]?.toUpperCase() ?? '?' }}
+          </div>
+
+          <div class="user-info">
+            <p class="user-name">{{ esPendiente(u) ? u.usuarioEmail : u.usuarioNombre }}</p>
+            <div class="user-meta-badges">
+              <span class="badge-primary badge">{{ u.rolDisplay }}</span>
+              <span [class]="esPendiente(u) ? 'badge-warning badge' : u.usuarioIsActive ? 'badge-success badge' : 'badge-error badge'">
+                {{ esPendiente(u) ? 'Pendiente' : u.usuarioIsActive ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+            <p class="user-tienda">{{ u.tiendaNombre }}</p>
+          </div>
+
+          @if (isDueno() && !esMiCuenta(u)) {
+            <div class="user-actions">
+              @if (u.rol !== Roles.dueno) {
+                <button class="btn-secondary" style="font-size:0.78rem;padding:0.3rem 0.65rem" (click)="abrirEdicion(u)">Editar</button>
+              }
+              @if (!esPendiente(u)) {
+                <button class="btn-secondary" style="font-size:0.78rem;padding:0.3rem 0.65rem" (click)="toggleEstado(u)">
+                  {{ u.usuarioIsActive ? 'Desactivar' : 'Activar' }}
+                </button>
+              }
+              @if (esPendiente(u)) {
+                <button class="btn-secondary" style="font-size:0.78rem;padding:0.3rem 0.65rem" (click)="reenviarInvitacion(u)">Reenviar</button>
+              }
+            </div>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+<!-- Edit dialog -->
+@if (editando) {
+  <div class="dialog-backdrop" (click)="editando = null">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h3 class="dialog-title">Editar — {{ editando.usuarioNombre }}</h3>
+        <button class="dialog-close" (click)="editando = null">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (editando.rol !== Roles.dueno) {
+        <div class="field-group">
+          <label class="field-label">Rol</label>
+          <select [(ngModel)]="editRol" class="field-select">
+            <option value="ADMINISTRADOR">Administrador</option>
+            <option value="TRABAJADOR">Trabajador</option>
+          </select>
+        </div>
+      }
+
+      <div class="field-group">
+        <label class="field-label">Salario</label>
+        <input type="number" [(ngModel)]="editSalario" placeholder="ej: 1500.00" step="0.01" class="field-input" />
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn-secondary" (click)="editando = null">Cancelar</button>
+        <button class="btn-primary" (click)="guardarEdicion()" [disabled]="svc.state().isEditing">
+          @if (svc.state().isEditing) {
+            <span class="loading-spinner" style="border-color:#fff3;border-top-color:#fff;width:14px;height:14px"></span>
+            Guardando...
+          } @else {
+            Guardar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

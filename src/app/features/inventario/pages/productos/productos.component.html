@@ -1,0 +1,288 @@
+<div class="page-content">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Productos y Stock</h1>
+      <p class="page-subtitle">Catálogo disponible · precios del lote FIFO actual</p>
+    </div>
+  </div>
+
+  <!-- Search bar -->
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      (ngModelChange)="onBusquedaChange()"
+      placeholder="Buscar por nombre o código..."
+      class="search-input"
+    />
+  </div>
+
+  @if (catalogoSvc.state().errorMessage) {
+    <div class="error-banner" style="margin-bottom:1rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ catalogoSvc.state().errorMessage }}
+    </div>
+  }
+
+  @if (catalogoSvc.state().isLoading) {
+    <div class="producto-grid">
+      @for (i of [1,2,3,4,5,6,8]; track i) {
+        <div class="producto-card pr-skel">
+          <div class="prod-img-placeholder" style="background:#F3F4F6"></div>
+          <div class="prod-body">
+            <div class="pr-skel-line w3"></div>
+            <div class="pr-skel-line w2"></div>
+            <div class="pr-skel-line w1"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (catalogoSvc.state().productos.length === 0) {
+    <div class="empty-state">
+      <div class="empty-icon-wrap">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+          <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+        </svg>
+      </div>
+      <p class="empty-title">Sin productos</p>
+      <p class="empty-desc">No se encontraron productos con esos filtros</p>
+    </div>
+  } @else {
+    <div class="producto-grid">
+      @for (p of catalogoSvc.state().productos; track p.productoId) {
+        <div
+          class="producto-card"
+          [class.prod-selected]="productoSeleccionado()?.productoId === p.productoId"
+          (click)="seleccionar(p)"
+        >
+          @if (p.imagen) {
+            <img [src]="p.imagen" [alt]="p.nombre" class="prod-img" />
+          } @else {
+            <div class="prod-img-placeholder">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+              </svg>
+            </div>
+          }
+
+          <div class="prod-body">
+            <p class="prod-nombre">{{ p.nombre }}</p>
+            <p class="prod-codigo">{{ p.codigo }}</p>
+
+            <div class="prod-stock-row">
+              <span [class]="(+p.cantidadDisponible > 0) ? 'stock-ok' : 'stock-empty'">
+                {{ +p.cantidadDisponible > 0 ? p.cantidadDisponible + ' ' + getUnidadLabel(p.unidadMedida) : 'Sin stock' }}
+              </span>
+              @if (+p.cantidadAveriada > 0) {
+                <span class="stock-averiado">{{ p.cantidadAveriada }} averiado</span>
+              }
+            </div>
+
+            <p class="prod-precio">S/ {{ p.precioVentaMercado }}</p>
+
+            <div class="prod-badges">
+              @if (!p.isActive) {
+                <span class="badge-zinc badge">Inactivo</span>
+              }
+              @if (p.tieneConFactura && !p.tieneSinFactura) {
+                <span class="badge-success badge">Con factura</span>
+              } @else if (!p.tieneConFactura && p.tieneSinFactura) {
+                <span class="badge-warning badge">Sin factura</span>
+              } @else if (p.tieneConFactura && p.tieneSinFactura) {
+                <span class="badge-info badge">Mixto FIFO</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (catalogoSvc.state().isLoadingMore) {
+      <div class="load-more-wrap">
+        <div class="loading-spinner"></div>
+      </div>
+    }
+  }
+</div>
+
+<!-- Detail modal — centered 2-column -->
+@if (productoSeleccionado()) {
+  @let p = productoSeleccionado()!;
+  <div class="panel-backdrop" (click)="cerrarPanel()">
+    <div class="panel" (click)="$event.stopPropagation()">
+
+      <!-- Modal top header -->
+      <div class="panel-header">
+        <div class="panel-title-block">
+          <h3 class="panel-title">{{ p.nombre }}</h3>
+          <p class="panel-codigo">{{ p.codigo }}</p>
+        </div>
+        <button class="panel-close" (click)="cerrarPanel()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 2-column body -->
+      <div class="panel-body">
+
+        <!-- Left: image -->
+        <div class="panel-img-col">
+          @if (p.imagen) {
+            <img [src]="p.imagen" [alt]="p.nombre" class="panel-img" />
+          } @else {
+            <div class="panel-img-placeholder">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.25">
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+              </svg>
+            </div>
+          }
+        </div>
+
+        <!-- Right: scrollable details -->
+        <div class="panel-detail-col">
+
+          <!-- Stock section -->
+          <section class="panel-section">
+            <h4 class="panel-section-title">Stock en tienda</h4>
+            <div class="panel-stats">
+              <div class="stat stat-highlight">
+                <span class="stat-label">Disponible</span>
+                <span class="stat-value">{{ p.cantidadDisponible }} <em>{{ getUnidadLabel(p.unidadMedida) }}</em></span>
+              </div>
+              <div class="stat" [class.stat-warn]="+(p.cantidadAveriada) > 0">
+                <span class="stat-label">En mal estado</span>
+                <span class="stat-value">{{ p.cantidadAveriada }} <em>{{ getUnidadLabel(p.unidadMedida) }}</em></span>
+                @if (+p.cantidadAveriada > 0) {
+                  <span class="stat-note">Vendible con precio diferenciado</span>
+                }
+              </div>
+              <div class="stat">
+                <span class="stat-label">Total almacén</span>
+                <span class="stat-value">{{ (+p.cantidadDisponible + +p.cantidadAveriada).toFixed(3) }} <em>{{ getUnidadLabel(p.unidadMedida) }}</em></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Price section -->
+          <section class="panel-section">
+            <h4 class="panel-section-title">Precio lote FIFO</h4>
+            <p class="panel-section-note">El lote más antiguo con stock es el activo.</p>
+            <div class="panel-stats">
+              <div class="stat stat-highlight">
+                <span class="stat-label">Precio de venta</span>
+                <span class="stat-value price">S/ {{ p.precioVentaMercado }}</span>
+              </div>
+              @if (isDueno() && p.precioVentaBase != null) {
+                <div class="stat">
+                  <span class="stat-label">Precio base (mín.)</span>
+                  <span class="stat-value price">S/ {{ p.precioVentaBase }}</span>
+                </div>
+              }
+            </div>
+          </section>
+
+          <!-- SUNAT status -->
+          <section class="panel-section">
+            <h4 class="panel-section-title">Situación SUNAT</h4>
+            @if (p.tieneConFactura && !p.tieneSinFactura) {
+              <div class="sunat-badge sunat-ok">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><polyline points="20 6 9 17 4 12"/></svg>
+                Todo el stock tiene factura — ventas SUNAT se confirman automáticamente.
+              </div>
+            } @else if (!p.tieneConFactura && p.tieneSinFactura) {
+              <div class="sunat-badge sunat-warn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/><line x1="12" y1="9" x2="12" y2="13"/></svg>
+                Sin factura de compra — ventas SUNAT quedarán pendientes hasta confirmar relleno.
+              </div>
+            } @else if (p.tieneConFactura && p.tieneSinFactura) {
+              <div class="sunat-badge sunat-info">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                Mezcla de lotes con y sin factura. El estado SUNAT depende del lote FIFO activo.
+              </div>
+            }
+          </section>
+
+          <!-- Details -->
+          <section class="panel-section">
+            <h4 class="panel-section-title">Detalles</h4>
+            <div class="detail-list">
+              <div class="detail-row">
+                <span class="detail-label">Unidad</span>
+                <span class="detail-val">{{ getUnidadLabel(p.unidadMedida) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Tipo IGV</span>
+                <span class="detail-val">{{ getTipoIgvLabel(p.tipoIgv) }}</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label">Estado</span>
+                <span [class]="p.isActive ? 'detail-val text-success' : 'detail-val text-error'">
+                  {{ p.isActive ? 'Activo' : 'Inactivo' }}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Edit section (dueño only) -->
+          @if (isDueno()) {
+            <section class="panel-section panel-edit-section">
+              <h4 class="panel-section-title">Editar producto</h4>
+
+              <div class="field-group">
+                <label class="field-label">Tipo IGV</label>
+                <select [(ngModel)]="editTipoIgv" class="field-select">
+                  @for (t of tiposIgv; track t.value) {
+                    <option [value]="t.value">{{ t.label }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Estado</label>
+                <select [(ngModel)]="editIsActive" class="field-select">
+                  <option [ngValue]="true">Activo</option>
+                  <option [ngValue]="false">Inactivo</option>
+                </select>
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Imagen del producto</label>
+                <input type="file" accept="image/*" (change)="onImagenChange($event)" class="field-input" style="padding:0.4rem 0.75rem" />
+              </div>
+
+              @if (inventarioSvc.state().errorMessage) {
+                <div class="error-banner" style="margin-top:0.5rem">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+                  </svg>
+                  {{ inventarioSvc.state().errorMessage }}
+                </div>
+              }
+
+              <button class="btn-primary" style="width:100%;justify-content:center;margin-top:0.75rem" (click)="guardarProducto()" [disabled]="inventarioSvc.state().isSaving">
+                @if (inventarioSvc.state().isSaving) {
+                  <span class="loading-spinner" style="border-color:#fff3;border-top-color:#fff"></span>
+                  Guardando...
+                } @else {
+                  Guardar cambios
+                }
+              </button>
+            </section>
+          }
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+}

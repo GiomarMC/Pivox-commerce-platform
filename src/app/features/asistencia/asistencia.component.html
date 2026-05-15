@@ -1,0 +1,173 @@
+<div class="page-content">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Asistencia</h1>
+      <p class="page-subtitle">Control de entradas y salidas del equipo</p>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs-bar">
+    <button [class]="tab() === 'hoy' ? 'tab-btn tab-active' : 'tab-btn'" (click)="cambiarTab('hoy')">Hoy</button>
+    <button [class]="tab() === 'resumen' ? 'tab-btn tab-active' : 'tab-btn'" (click)="cambiarTab('resumen')">Resumen mensual</button>
+  </div>
+
+  @if (svc.state().errorMessage) {
+    <div class="error-banner mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ svc.state().errorMessage }}
+    </div>
+  }
+  @if (svc.state().successMessage) {
+    <div class="success-banner mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <polyline points="20 6 9 17 4 12"/>
+      </svg>
+      {{ svc.state().successMessage }}
+    </div>
+  }
+
+  <!-- Tab HOY -->
+  @if (tab() === 'hoy') {
+    @if (svc.state().isLoading) {
+      <ul class="asist-list">
+        @for (i of [1,2,3]; track i) {
+          <li class="asist-card as-skel">
+            <div class="asist-avatar" style="background:#F3F4F6"></div>
+            <div style="flex:1">
+              <div class="as-skel-line short"></div>
+              <div class="as-skel-line medium"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (svc.state().usuariosHoy.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <p class="empty-title">Sin trabajadores activos</p>
+        <p class="empty-desc">No hay trabajadores activos registrados hoy</p>
+      </div>
+    } @else {
+      <ul class="asist-list">
+        @for (item of svc.state().usuariosHoy; track item.usuario.id) {
+          <li class="asist-card">
+            <div class="asist-avatar">
+              {{ item.usuario.usuarioNombre[0]?.toUpperCase() ?? '?' }}
+            </div>
+
+            <div class="asist-info">
+              <p class="asist-nombre">{{ item.usuario.usuarioNombre }}</p>
+              <div class="time-pills">
+                @if (item.asistencia?.horaEntrada) {
+                  <span class="time-pill time-in">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ item.asistencia!.horaEntrada }}
+                  </span>
+                }
+                @if (item.asistencia?.horaSalida) {
+                  <span class="time-pill time-out">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    {{ item.asistencia!.horaSalida }}
+                  </span>
+                }
+                @if (!item.asistencia?.horaEntrada && !item.asistencia?.horaSalida) {
+                  <span class="time-pill time-none">Sin registro</span>
+                }
+              </div>
+            </div>
+
+            <div class="asist-actions">
+              @if (!item.asistencia?.horaEntrada) {
+                <button class="btn-entrada" (click)="marcarEntrada(item)" [disabled]="svc.state().isMarking">
+                  Entrada
+                </button>
+              } @else if (!item.asistencia?.horaSalida) {
+                <button class="btn-salida" (click)="abrirSalida(item)" [disabled]="svc.state().isMarking">
+                  Salida
+                </button>
+              } @else {
+                <span class="badge-success badge">Completo</span>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  }
+
+  <!-- Tab RESUMEN -->
+  @if (tab() === 'resumen') {
+    <div class="resumen-filters">
+      <select [value]="svc.state().mesResumen" (change)="onMesChange($event)" class="field-select">
+        @for (m of mesOpciones; track m.value) {
+          <option [value]="m.value">{{ m.label }}</option>
+        }
+      </select>
+      <select [value]="svc.state().anioResumen" (change)="onAnioChange($event)" class="field-select">
+        @for (a of anioOpciones; track a) {
+          <option [value]="a">{{ a }}</option>
+        }
+      </select>
+    </div>
+
+    @if (svc.state().isLoadingResumen) {
+      <div class="loading-state"><div class="loading-spinner"></div></div>
+    } @else if (svc.state().resumen.length === 0) {
+      <div class="empty-state">
+        <p class="empty-title">Sin datos</p>
+        <p class="empty-desc">No hay registros para este período</p>
+      </div>
+    } @else {
+      <div class="resumen-table-wrap">
+        <table class="resumen-table">
+          <thead>
+            <tr>
+              <th>Trabajador</th>
+              <th>Días</th>
+              <th>Horas</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (r of svc.state().resumen; track r.usuarioTiendaId) {
+              <tr>
+                <td>{{ r.usuarioNombre }}</td>
+                <td>{{ r.diasTrabajados }}</td>
+                <td>{{ r.horasTotales.toFixed(1) }}h</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</div>
+
+<!-- Salida dialog -->
+@if (dialogSalida) {
+  <div class="dialog-backdrop" (click)="dialogSalida = null">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <h3 class="dialog-title">Registrar salida</h3>
+      <p class="dialog-body">¿Registrar salida para <strong>{{ dialogSalida.usuario.usuarioNombre }}</strong>?</p>
+
+      <label class="checkbox-label-asist">
+        <input type="checkbox" [(ngModel)]="almuerzo" style="accent-color:#1F2A7C" />
+        <span>Incluye tiempo de almuerzo</span>
+      </label>
+
+      <div class="dialog-actions">
+        <button class="btn-secondary" (click)="dialogSalida = null">Cancelar</button>
+        <button class="btn-primary" (click)="confirmarSalida()">Confirmar salida</button>
+      </div>
+    </div>
+  </div>
+}

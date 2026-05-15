@@ -1,0 +1,251 @@
+<app-flow-header [currentStep]="2" />
+
+<div class="page-content cat-wrap">
+
+  <div class="cat-header">
+    <div>
+      <h1 class="page-title">Catálogo</h1>
+      <p class="page-subtitle">El sistema descuenta el stock automáticamente</p>
+    </div>
+    <a routerLink="/ventas/pedido" class="cart-btn">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+        <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+      </svg>
+      @if (carritoSvc.count() > 0) {
+        <span class="cart-count">{{ carritoSvc.count() }}</span>
+      }
+    </a>
+  </div>
+
+  <!-- Search -->
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+    </svg>
+    <input
+      type="text"
+      [(ngModel)]="busqueda"
+      (ngModelChange)="onBusquedaChange()"
+      placeholder="Buscar por nombre o código..."
+      class="search-input"
+    />
+  </div>
+
+  @if (svc.state().errorMessage) {
+    <div class="error-banner" style="margin-bottom:1rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ svc.state().errorMessage }}
+    </div>
+  }
+
+  <div [class]="'cat-layout' + (carritoSvc.count() > 0 ? ' cat-has-cart' : '')">
+
+    <!-- Products column -->
+    <div>
+      @if (svc.state().isLoading) {
+        <div class="producto-grid">
+          @for (i of [1,2,3,4,5,6]; track i) {
+            <div class="cat-card cat-skel">
+              <div class="cat-img-placeholder" style="background:#F3F4F6"></div>
+              <div class="cat-info">
+                <div class="cat-skel-line w3"></div>
+                <div class="cat-skel-line w2"></div>
+                <div class="cat-skel-line w1"></div>
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (svc.state().productos.length === 0) {
+        <div class="empty-state">
+          <div class="empty-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+            </svg>
+          </div>
+          <p class="empty-title">Sin productos</p>
+          <p class="empty-desc">No se encontraron productos disponibles</p>
+        </div>
+      } @else {
+        <div class="producto-grid">
+          @for (p of svc.state().productos; track p.productoId) {
+            <div
+              class="cat-card"
+              [class.cat-in-cart]="estaEnCarrito(p.productoId)"
+              [class.cat-sin-stock]="+p.cantidadDisponible <= 0"
+              (click)="onTapProducto(p)"
+            >
+              <!-- Image area -->
+              <div class="cat-img-wrap">
+                @if (p.imagen) {
+                  <img [src]="p.imagen" [alt]="p.nombre" class="cat-img" />
+                } @else {
+                  <div class="cat-img-placeholder">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                    </svg>
+                  </div>
+                }
+
+                <!-- In-cart checkmark overlay -->
+                @if (estaEnCarrito(p.productoId)) {
+                  <div class="cat-overlay-check">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3">
+                      <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                  </div>
+                }
+
+                <!-- Stock badge -->
+                <span [class]="(+p.cantidadDisponible > 0) ? 'cat-stock-badge cat-stock-ok' : 'cat-stock-badge cat-stock-empty'">
+                  {{ +p.cantidadDisponible > 0 ? 'En stock' : 'Sin stock' }}
+                </span>
+
+                @if (+p.cantidadAveriada > 0) {
+                  <span class="cat-averiado-badge">{{ +p.cantidadAveriada | number:'1.0-3' }} averiado</span>
+                }
+              </div>
+
+              <!-- Info -->
+              <div class="cat-info">
+                <p class="cat-nombre">{{ p.nombre }}</p>
+                <p class="cat-codigo">{{ p.codigo }}</p>
+
+                <div class="cat-stock-row">
+                  <span class="cat-disponible">{{ +p.cantidadDisponible | number:'1.0-3' }} {{ getUnidadLabel(p.unidadMedida) }}</span>
+                </div>
+
+                <p class="cat-precio">S/ {{ p.precioVentaMercado }}</p>
+
+                <div class="cat-badges">
+                  @if (p.tieneConFactura && !p.tieneSinFactura) {
+                    <span class="badge-success badge">Con factura</span>
+                  } @else if (!p.tieneConFactura && p.tieneSinFactura) {
+                    <span class="badge-warning badge">Sin factura</span>
+                    @if (esSunat()) {
+                      <span class="badge-warning badge" title="Para ventas SUNAT, este stock puede requerir sustitución">⚠ SUNAT</span>
+                    }
+                  } @else if (p.tieneConFactura && p.tieneSinFactura) {
+                    <span class="badge-info badge">Con y sin factura</span>
+                    @if (esSunat()) {
+                      <span class="badge-warning badge" title="Parte del stock no tiene factura — puede requerir sustitución al emitir comprobante">⚠ Mixto SUNAT</span>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        @if (svc.state().isLoadingMore) {
+          <div class="load-more-wrap"><div class="loading-spinner"></div></div>
+        }
+      }
+    </div>
+
+    <!-- Cart panel (desktop right column) -->
+    @if (carritoSvc.count() > 0) {
+      <div class="cat-cart-panel">
+        <div class="cat-cart-panel-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F2A7C" stroke-width="2">
+            <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+          </svg>
+          <span class="cat-cart-panel-title">Carrito</span>
+          <span class="cat-cart-panel-count">{{ carritoSvc.count() }}</span>
+        </div>
+        <div class="cat-cart-items">
+          @for (item of carritoSvc.items(); track item.productoId + '-' + item.esAveriado) {
+            <div class="cat-cart-item">
+              @if (item.imagen) {
+                <img [src]="item.imagen" [alt]="item.nombre" class="cat-cart-item-img" />
+              } @else {
+                <div class="cat-cart-item-ph">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                  </svg>
+                </div>
+              }
+              <div class="cat-cart-item-info">
+                <p class="cat-cart-item-name">{{ item.nombre }}</p>
+                <p class="cat-cart-item-qty">× {{ item.cantidad }}</p>
+              </div>
+              <span class="cat-cart-item-price">S/ {{ (item.cantidad * item.precioUnitario) | number:'1.2-2' }}</span>
+            </div>
+          }
+        </div>
+        <div class="cat-cart-panel-footer">
+          <div class="cat-cart-total-row">
+            <span class="cat-cart-total-label">Total</span>
+            <span class="cat-cart-total-value">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
+          </div>
+          <a routerLink="/ventas/pedido" class="btn-primary" style="text-decoration:none;text-align:center;display:flex;align-items:center;justify-content:center;gap:0.4rem">
+            Continuar al pedido
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M5 12h14M12 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    }
+
+  </div><!-- /cat-layout -->
+</div>
+
+<!-- Floating cart bar -->
+@if (carritoSvc.count() > 0) {
+  <div class="cart-float-wrap">
+    <a routerLink="/ventas/pedido" class="cart-float-bar">
+      <div class="cart-float-left">
+        <span class="cart-float-count">{{ carritoSvc.count() }} producto(s)</span>
+      </div>
+      <div class="cart-float-right">
+        <span class="cart-float-total">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </div>
+    </a>
+  </div>
+}
+
+<!-- Modal: elegir normal o averiado -->
+@if (modalProducto()) {
+  <div class="modal-backdrop" (click)="modalProducto.set(null)">
+    <div class="modal-sheet" (click)="$event.stopPropagation()">
+      <p class="modal-title">{{ modalProducto()!.nombre }}</p>
+      <p class="modal-subtitle">Este producto tiene unidades en mal estado. ¿Cuál deseas agregar?</p>
+
+      <div class="modal-options">
+        <button type="button" class="modal-option modal-ok" (click)="seleccionarTipoModal(false)">
+          <div class="modal-opt-icon modal-opt-icon-ok">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="modal-opt-label">Buen estado</p>
+            <p class="modal-opt-note">{{ modalProducto()!.cantidadDisponible }} {{ getUnidadLabel(modalProducto()!.unidadMedida) }} disponibles</p>
+          </div>
+        </button>
+
+        <button type="button" class="modal-option modal-warn" (click)="seleccionarTipoModal(true)">
+          <div class="modal-opt-icon modal-opt-icon-warn">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/>
+            </svg>
+          </div>
+          <div>
+            <p class="modal-opt-label">Averiado</p>
+            <p class="modal-opt-note">{{ modalProducto()!.cantidadAveriada }} {{ getUnidadLabel(modalProducto()!.unidadMedida) }} disponibles</p>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+}

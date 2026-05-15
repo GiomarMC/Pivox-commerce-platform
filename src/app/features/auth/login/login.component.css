@@ -1,0 +1,139 @@
+/* ─── Full-screen background ─── */
+.login-bg {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: linear-gradient(160deg, #1E1B4B 0%, #312E81 55%, #4338CA 100%);
+  position: relative;
+}
+
+.login-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+/* Soft glow accent */
+.login-bg::after {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  right: -60px;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Floating card ─── */
+.login-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2.25rem 2.5rem;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.2);
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Brand inside card ─── */
+.login-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #F0F2F8;
+}
+
+.login-brand-icon {
+  width: 44px;
+  height: 44px;
+  background: #4F46E5;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.login-brand-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111827;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Card header ─── */
+.login-card-header {
+  margin-bottom: 1.75rem;
+}
+
+.login-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #111827;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.025em;
+}
+
+.login-subtitle {
+  font-size: 0.875rem;
+  color: #6B7280;
+  margin: 0;
+}
+
+/* ─── Form ─── */
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-submit {
+  width: 100%;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  margin-top: 0.25rem;
+}
+
+/* ─── Feature strip (desktop only) ─── */
+.login-features {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+}
+
+.lf-item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  white-space: nowrap;
+}
+
+.lf-sep {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.2);
+  line-height: 1;
+}
+
+@media (max-width: 639px) {
+  .login-features { display: none; }
+  .login-card { padding: 1.75rem 1.5rem; }
+}

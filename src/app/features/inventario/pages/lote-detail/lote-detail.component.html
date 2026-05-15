@@ -1,0 +1,147 @@
+<div class="page-content" style="max-width:760px">
+
+  <div style="margin-bottom:0.25rem">
+    <a routerLink="/inventario/lotes" class="btn-back">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Lotes
+    </a>
+  </div>
+
+  @if (svc.state().errorMessage) {
+    <div class="error-banner" style="margin-bottom:1rem">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ svc.state().errorMessage }}
+    </div>
+  }
+
+  @if (svc.state().isLoading) {
+    <div class="loading-state">
+      <div class="loading-spinner"></div>
+    </div>
+  } @else if (svc.state().loteDetalle) {
+    @let lote = svc.state().loteDetalle!;
+
+    <!-- Lote header card -->
+    <div class="lote-header-card">
+      <div class="lote-header-top">
+        <div>
+          <h1 class="page-title">Lote #{{ lote.id }}</h1>
+          <p class="lote-tienda-name">{{ lote.tienda.nombreSede }}</p>
+        </div>
+        <div class="lote-header-actions">
+          <span [class]="lote.isActive ? 'badge-success badge' : 'badge-zinc badge'">
+            {{ lote.isActive ? 'Activo' : 'Inactivo' }}
+          </span>
+          @if (isDueno() && lote.isActive) {
+            <button class="btn-danger" (click)="desactivar()">Desactivar lote</button>
+          }
+        </div>
+      </div>
+
+      <div class="lote-meta-grid">
+        <div class="meta-item">
+          <span class="meta-label">Fecha de llegada</span>
+          <span class="meta-value">{{ lote.fechaLlegada }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Costo operación</span>
+          <span class="meta-value">S/ {{ lote.costoOperacion }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Costo transporte</span>
+          <span class="meta-value">S/ {{ lote.costoTransporte }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Productos</span>
+          <span class="meta-value">{{ lote.productos.length }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products section -->
+    <div class="products-section-header">
+      <h2 class="section-title" style="margin-bottom:0.25rem">Productos de este lote</h2>
+      <p class="section-note">Stock descontado según FIFO — primero el lote más antiguo con existencia.</p>
+    </div>
+
+    <div class="productos-list">
+      @for (p of lote.productos; track p.id) {
+        <div class="producto-card" [class.producto-inactivo]="!p.isActive">
+
+          <!-- Product header -->
+          <div class="producto-head">
+            <div>
+              <p class="producto-nombre">{{ p.productoNombre }}</p>
+              <p class="producto-codigo">{{ p.productoCodigo }} &middot; {{ p.unidadMedidaDisplay }}</p>
+            </div>
+            <div class="producto-badges">
+              <span [class]="p.conFactura ? 'badge-success badge' : 'badge-warning badge'">
+                {{ p.conFactura ? 'Con factura' : 'Sin factura' }}
+              </span>
+              @if (!p.isActive) {
+                <span class="badge-zinc badge">Inactivo</span>
+              }
+            </div>
+          </div>
+
+          <!-- Stock grid -->
+          <div class="stock-grid">
+            <div class="stock-item">
+              <span class="stock-label">Recibido</span>
+              <span class="stock-val">{{ p.cantidadInicial }}</span>
+            </div>
+            <div class="stock-item stock-highlight">
+              <span class="stock-label">Disponible</span>
+              <span class="stock-val">{{ p.cantidadDisponible }}</span>
+            </div>
+            <div class="stock-item" [class.stock-warn]="+(p.cantidadAveriada) > 0">
+              <span class="stock-label">Averiado</span>
+              <span class="stock-val">{{ p.cantidadAveriada }}</span>
+            </div>
+            <div class="stock-item">
+              <span class="stock-label">En mano</span>
+              <span class="stock-val">{{ p.cantidadActual }}</span>
+            </div>
+          </div>
+
+          <!-- Prices -->
+          <div class="precios-grid">
+            <div class="precio-row">
+              <span class="precio-label">Costo total pagado</span>
+              <span class="precio-val">S/ {{ p.costoTotal }}</span>
+            </div>
+            <div class="precio-row">
+              <span class="precio-label">Precio compra unit.</span>
+              <span class="precio-val precio-muted">S/ {{ p.precioCompra }}</span>
+            </div>
+            <div class="precio-row">
+              <span class="precio-label">Precio de venta</span>
+              <span class="precio-val precio-primary">S/ {{ p.precioVentaMercado }}</span>
+            </div>
+            @if (isDueno() && p.precioVentaBase != null) {
+              <div class="precio-row">
+                <span class="precio-label">Precio base (mín.)</span>
+                <span class="precio-val">S/ {{ p.precioVentaBase }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- SUNAT warning -->
+          @if (!p.conFactura && lote.isActive) {
+            <div class="warning-banner" style="margin-top:0.75rem;border-radius:9px;font-size:0.8rem">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span>Comprado sin factura. Ventas SUNAT que consuman este stock quedarán en estado <strong>Pendiente</strong> hasta confirmar un relleno.</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

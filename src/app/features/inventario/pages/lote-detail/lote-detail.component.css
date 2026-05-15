@@ -1,0 +1,131 @@
+/* Lote header */
+.lote-header-card {
+  background: #fff;
+  border: 1px solid #E2E6F0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.lote-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.lote-tienda-name {
+  font-size: 0.85rem;
+  color: #6B7280;
+  margin: 0.2rem 0 0;
+}
+
+.lote-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.lote-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.875rem;
+}
+
+@media (min-width: 480px) {
+  .lote-meta-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.meta-item { display: flex; flex-direction: column; gap: 0.2rem; }
+.meta-label { font-size: 0.72rem; color: #9CA3AF; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+.meta-value { font-size: 0.9rem; font-weight: 700; color: #111827; }
+
+/* Section */
+.products-section-header { margin-bottom: 1rem; }
+.section-note { font-size: 0.8rem; color: #9CA3AF; margin: 0; line-height: 1.5; }
+
+/* Products list */
+.productos-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.producto-card {
+  background: #fff;
+  border: 1px solid #E2E6F0;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+
+.producto-inactivo { opacity: 0.55; }
+
+.producto-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.producto-nombre { font-size: 1rem; font-weight: 700; color: #111827; margin: 0 0 0.2rem; }
+.producto-codigo { font-size: 0.78rem; color: #9CA3AF; margin: 0; }
+.producto-badges { display: flex; gap: 0.4rem; flex-shrink: 0; flex-wrap: wrap; }
+
+/* Stock grid */
+.stock-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.625rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 480px) {
+  .stock-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.stock-item {
+  background: #F9FAFB;
+  border: 1px solid #E2E6F0;
+  border-radius: 9px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stock-highlight {
+  background: #EEF0FB;
+  border-color: #1F2A7C;
+}
+
+.stock-warn {
+  background: #FEF3C7;
+  border-color: #D97706;
+}
+
+.stock-label { font-size: 0.68rem; color: #9CA3AF; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; }
+.stock-val { font-size: 1rem; font-weight: 700; color: #111827; }
+
+/* Prices */
+.precios-grid {
+  border-top: 1px solid #F3F4F6;
+  padding-top: 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.precio-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+}
+
+.precio-label { color: #6B7280; }
+.precio-val { font-weight: 600; color: #111827; }
+.precio-muted { color: #9CA3AF; font-weight: 500; }
+.precio-primary { color: #1F2A7C; font-weight: 700; }

@@ -1,0 +1,264 @@
+
+<!-- ═══ Sidebar backdrop (mobile) ═══ -->
+@if (menuOpen()) {
+  <div class="sidebar-backdrop" (click)="closeMenu()"></div>
+}
+
+<!-- ═══ App Layout ═══ -->
+<div class="app-layout">
+
+  <!-- ─── Top Bar ─── -->
+  <header class="topbar">
+
+    <!-- Left: hamburger + brand -->
+    <div class="topbar-left">
+      <button class="topbar-menu-btn" (click)="toggleMenu()" aria-label="Menú">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="4" y1="7"  x2="20" y2="7"/>
+          <line x1="4" y1="12" x2="20" y2="12"/>
+          <line x1="4" y1="17" x2="20" y2="17"/>
+        </svg>
+      </button>
+      <div class="topbar-brand-wrap">
+        <div class="topbar-brand-icon">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
+        </div>
+        <div class="topbar-brand-text">
+          <span class="topbar-brand-name">Sistema de Gestión</span>
+          @if (tiendaActiva()) {
+            <span class="topbar-tienda">{{ tiendaActiva()!.nombreSede }}</span>
+          }
+        </div>
+      </div>
+    </div>
+
+<!-- Right: notifications + profile -->
+    <div class="topbar-right">
+      <!-- Notificaciones -->
+      <div class="notif-wrap">
+        <button class="topbar-icon-btn" (click)="toggleNotifs()" aria-label="Notificaciones">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          @if (notifSvc.count() > 0) {
+            <span class="notif-badge">{{ notifSvc.count() > 9 ? '9+' : notifSvc.count() }}</span>
+          }
+        </button>
+
+        @if (panelNotifs()) {
+          <div class="notif-backdrop" (click)="panelNotifs.set(false)"></div>
+          <div class="notif-panel">
+            <div class="notif-panel-header">
+              <p class="notif-panel-title">Notificaciones</p>
+              @if (notifSvc.state().isLoading) { <div class="notif-spinner"></div> }
+            </div>
+            @if (notifSvc.state().error && notifSvc.state().items.length === 0) {
+              <p class="notif-error">{{ notifSvc.state().error }}</p>
+            } @else if (notifSvc.state().items.length === 0 && notifSvc.state().cargado && !notifSvc.state().isLoading) {
+              <div class="notif-empty">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+                <span>Todo en orden</span>
+              </div>
+            }
+            @for (n of notifSvc.state().items; track $index) {
+              <button type="button" [class]="'notif-item notif-item-' + n.tipo" (click)="irA(n.ruta)">
+                @if (n.tipo === 'sin-stock') {
+                  <div class="notif-icon notif-icon-red">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                  </div>
+                } @else if (n.tipo === 'stock-bajo') {
+                  <div class="notif-icon notif-icon-orange">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/>
+                      <polyline points="17 18 23 18 23 12"/>
+                    </svg>
+                  </div>
+                } @else {
+                  <div class="notif-icon notif-icon-blue">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                      <rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                  </div>
+                }
+                <div style="flex:1;min-width:0">
+                  <p class="notif-item-title">{{ n.titulo }}</p>
+                  <p class="notif-item-detail">{{ n.detalle }}</p>
+                </div>
+                <button type="button" class="notif-item-dismiss"
+                  (click)="$event.stopPropagation(); notifSvc.dismiss($index)"
+                  aria-label="Descartar">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </button>
+              </button>
+            }
+            @if (notifSvc.state().error && notifSvc.state().items.length > 0) {
+              <p class="notif-error">{{ notifSvc.state().error }}</p>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="topbar-profile-wrap">
+        <button class="topbar-avatar-btn" (click)="toggleProfile()">
+          <div class="topbar-avatar">{{ userMe()?.firstName?.[0]?.toUpperCase() ?? '?' }}</div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="topbar-avatar-chevron">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        @if (profileOpen()) {
+          <div class="profile-backdrop" (click)="closeProfile()"></div>
+          <div class="profile-dropdown">
+            <div class="profile-header">
+              <p class="profile-name">{{ userMe()?.firstName }} {{ userMe()?.lastName }}</p>
+              <p class="profile-role">{{ userMe()?.rol | lowercase }}</p>
+            </div>
+            @if (isDueno() && userMe() && userMe()!.tiendas.length > 1) {
+              <button class="profile-item" (click)="cambiarTienda(); closeProfile()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M16 3 20 7l-4 4"/><path d="M20 7H4M8 21l-4-4 4-4"/><path d="M4 17h16"/>
+                </svg>
+                Cambiar tienda
+              </button>
+            }
+            <button class="profile-item profile-item-danger" (click)="logout()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Cerrar sesión
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Body: Sidebar + Content ─── -->
+  <div class="shell-body">
+
+    <!-- Sidebar -->
+    <nav class="sidebar" [class.sidebar-open]="menuOpen()">
+
+      <!-- CTA Nueva Venta -->
+      <div class="nav-cta-wrap">
+        <a routerLink="/ventas" class="nav-cta" (click)="closeMenu()">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
+            <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
+          </svg>
+          Nueva Venta
+        </a>
+      </div>
+
+      <!-- Navigation links -->
+      <ul class="nav-list">
+        <li class="nav-section-label">Principal</li>
+        <li>
+          <a routerLink="/home" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span>Inicio</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/inventario" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+              <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+            </svg>
+            <span>Inventario</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/operaciones" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+              <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+            </svg>
+            <span>Operaciones</span>
+          </a>
+        </li>
+        <li>
+          <a routerLink="/finanzas" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <line x1="18" y1="20" x2="18" y2="10"/>
+              <line x1="12" y1="20" x2="12" y2="4"/>
+              <line x1="6"  y1="20" x2="6"  y2="14"/>
+            </svg>
+            <span>Finanzas</span>
+          </a>
+        </li>
+
+        @if (canViewUsuarios()) {
+          <li class="nav-section-label">Equipo</li>
+          <li>
+            <a routerLink="/usuarios" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <span>Usuarios</span>
+            </a>
+          </li>
+          <li>
+            <a routerLink="/asistencia" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span>Asistencia</span>
+            </a>
+          </li>
+        }
+
+        <li class="nav-section-label">Configuración</li>
+        <li>
+          <a routerLink="/tiendas" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+              <line x1="3" y1="6" x2="21" y2="6"/>
+              <path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+            <span>Tiendas</span>
+          </a>
+        </li>
+        @if (isDueno()) {
+          <li>
+            <a routerLink="/config/impresora" routerLinkActive="nav-active" class="nav-link" (click)="closeMenu()">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+              </svg>
+              <span>Impresora</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+    </nav>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <router-outlet />
+    </main>
+
+  </div>
+</div>

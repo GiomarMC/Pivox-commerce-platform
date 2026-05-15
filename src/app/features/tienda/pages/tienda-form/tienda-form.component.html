@@ -1,0 +1,70 @@
+<div class="page-content" style="max-width:540px">
+  <div style="margin-bottom:1.25rem">
+    <button class="btn-back" (click)="volver()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Volver
+    </button>
+    <h1 class="page-title">{{ esEdicion ? 'Editar tienda' : 'Nueva tienda' }}</h1>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card">
+    <div class="field-group">
+      <label class="field-label">Nombre de la sede <span style="color:#DC2626">*</span></label>
+      <input formControlName="nombreSede" placeholder="ej: Sede Principal" class="field-input" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Dirección <span style="color:#DC2626">*</span></label>
+      <input formControlName="direccion" placeholder="ej: Av. Lima 123" class="field-input" />
+    </div>
+
+    <div class="field-group">
+      <label class="field-label">Ubigeo <span style="color:#9CA3AF;font-weight:400;font-size:0.8rem">(opcional)</span></label>
+      <input formControlName="ubigeo" placeholder="ej: 150101" class="field-input" />
+    </div>
+
+    @if (!esEdicion) {
+      <div class="series-divider">
+        <span>Series de comprobante</span>
+      </div>
+
+      <div class="fields-row">
+        <div class="field-group">
+          <label class="field-label">Factura</label>
+          <input formControlName="serieFactura" placeholder="F001" class="field-input" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Boleta</label>
+          <input formControlName="serieBoleta" placeholder="B001" class="field-input" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Ticket</label>
+          <input formControlName="serieTicket" placeholder="T001" class="field-input" />
+        </div>
+      </div>
+    }
+
+    @if (state().errorMessage) {
+      <div class="error-banner">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+        </svg>
+        {{ state().errorMessage }}
+      </div>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary" (click)="volver()">Cancelar</button>
+      <button type="submit" class="btn-primary" [disabled]="form.invalid || state().isSaving">
+        @if (state().isSaving) {
+          <span class="loading-spinner" style="border-color:#fff3;border-top-color:#fff;width:14px;height:14px"></span>
+          Guardando...
+        } @else {
+          {{ esEdicion ? 'Actualizar' : 'Crear tienda' }}
+        }
+      </button>
+    </div>
+  </form>
+</div>

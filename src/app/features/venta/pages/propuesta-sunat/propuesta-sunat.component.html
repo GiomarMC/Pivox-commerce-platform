@@ -1,0 +1,360 @@
+@if (!isModal) {
+  <app-flow-header [currentStep]="2" [showSunatStep]="true" />
+}
+
+<div class="page-content ps-wrap">
+
+  <!-- Banner informativo -->
+  <div class="info-banner" style="margin-bottom:1.25rem">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+      <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="8"/><line x1="12" y1="12" x2="12" y2="16"/>
+    </svg>
+    <div style="flex:1">
+      <p style="font-size:0.82rem;font-weight:700;margin:0 0 0.2rem">Propuesta de facturación SUNAT</p>
+      <p style="font-size:0.75rem;line-height:1.5;margin:0 0 0.625rem">
+        Algunos productos en tu venta no tienen factura de compra. El sistema sugiere productos equivalentes
+        <strong>con factura</strong> para emitir el comprobante. Verifica el reemplazo, ajusta cantidad y precio si necesitas.
+      </p>
+      @if (!isModal) {
+        <button type="button" (click)="volverAlCarrito()" class="btn-secondary" style="font-size:0.75rem;padding:0.35rem 0.75rem">
+          Volver al carrito
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (ventaSvc.state().errorMessage) {
+    <div class="error-banner" style="margin-bottom:1rem">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+      </svg>
+      {{ ventaSvc.state().errorMessage }}
+    </div>
+  }
+
+  <div class="ps-layout">
+
+  <!-- Lista de ítems -->
+  <div class="ps-list">
+    @for (linea of lineas(); track linea.loteProductoId; let i = $index) {
+
+      <!-- ── CARD NORMAL: producto que ya tiene factura ── -->
+      @if (!linea.esRelleno) {
+        <div class="ps-card ps-card-normal">
+          <div class="ps-card-header ps-header-normal">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <span>Producto con factura disponible</span>
+          </div>
+          <div class="ps-card-body">
+            <div class="ps-producto-row">
+              @if (linea.imagenActual) {
+                <img [src]="linea.imagenActual" [alt]="linea.loteProductoNombre" class="ps-producto-img" />
+              } @else {
+                <div class="ps-producto-img-placeholder">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                    <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                  </svg>
+                </div>
+              }
+              <div class="ps-producto-info">
+                <p class="ps-producto-nombre">{{ linea.loteProductoNombre }}</p>
+                <p class="ps-producto-codigo">Lote #{{ linea.loteProductoId }}</p>
+              </div>
+            </div>
+
+            <div class="ps-inputs-row">
+              <div class="field-group">
+                <label class="field-label">Cantidad</label>
+                <input type="number" [(ngModel)]="linea.cantidadConfirmada" min="0.01" step="0.01" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Precio unit.</label>
+                <input type="number" [(ngModel)]="linea.precioConfirmado" min="0" step="0.01" class="field-input" />
+              </div>
+            </div>
+
+            <div class="ps-subtotal ps-subtotal-normal">
+              <span class="ps-subtotal-label">Subtotal</span>
+              <span class="ps-subtotal-value">S/ {{ subtotal(linea) }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ── CARD RELLENO: producto que necesita sustituto con factura ── -->
+      @if (linea.esRelleno) {
+        <div class="ps-card ps-card-relleno">
+          <div class="ps-card-header ps-header-relleno">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+            </svg>
+            <span>Producto de relleno (SUNAT)</span>
+          </div>
+          <div class="ps-card-body">
+
+            <!-- Sin relleno automático -->
+            @if (linea.loteProductoOriginalId === null) {
+              <div class="error-banner" style="margin-bottom:0.75rem">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+                  <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+                  <line x1="12" y1="9" x2="12" y2="13"/>
+                </svg>
+                <div>
+                  <p style="font-size:0.75rem;font-weight:700;margin:0 0 0.2rem;color:#DC2626">No se encontró sustituto automático</p>
+                  <p style="font-size:0.72rem;margin:0;line-height:1.4">
+                    Este producto no tiene un reemplazo con factura disponible. Debes seleccionar uno manualmente usando el botón "Cambiar", o volver al carrito y seleccionar un lote con factura.
+                  </p>
+                </div>
+              </div>
+            }
+
+            <!-- Producto original solicitado -->
+            @if (linea.nombreOriginal) {
+              <p class="ps-seccion-label">Solicitado (sin factura)</p>
+              <div class="ps-seccion-box ps-box-original">
+                <div class="ps-producto-row">
+                  @if (linea.imagenOriginal) {
+                    <img [src]="linea.imagenOriginal" [alt]="linea.nombreOriginal" class="ps-producto-img" />
+                  } @else {
+                    <div class="ps-producto-img-placeholder ps-placeholder-zinc">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                        <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                        <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                      </svg>
+                    </div>
+                  }
+                  <div class="ps-producto-info">
+                    <p class="ps-producto-nombre">{{ linea.nombreOriginal }}</p>
+                    <p class="ps-producto-meta">Producto original de la venta</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Flecha -->
+              <div class="ps-flecha-wrap">
+                <div class="ps-flecha">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/>
+                  </svg>
+                </div>
+              </div>
+            }
+
+            <!-- Producto de reemplazo (con factura) -->
+            <div class="ps-reemplazo-header">
+              <p class="ps-seccion-label" style="margin:0">Reemplazado con (con factura)</p>
+              <button type="button" class="ps-btn-cambiar" (click)="abrirSelector(i)">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M7 16V4m0 0L3 8m4-4 4 4M17 8v12m0 0 4-4m-4 4-4-4"/>
+                </svg>
+                Cambiar
+              </button>
+            </div>
+            <div class="ps-seccion-box ps-box-reemplazo">
+              <div class="ps-producto-row">
+                @if (linea.imagenActual) {
+                  <img [src]="linea.imagenActual" [alt]="linea.loteProductoNombre" class="ps-producto-img" />
+                } @else {
+                  <div class="ps-producto-img-placeholder ps-placeholder-green">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#86EFAC" stroke-width="1.5">
+                      <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                      <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                    </svg>
+                  </div>
+                }
+                <div class="ps-producto-info">
+                  <p class="ps-producto-nombre">{{ linea.loteProductoNombre }}</p>
+                  <p class="ps-producto-codigo">Lote #{{ linea.loteProductoId }}</p>
+                  @if (linea.motivo) {
+                    <p class="ps-producto-motivo">{{ linea.motivo }}</p>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <div class="ps-inputs-row">
+              <div class="field-group">
+                <label class="field-label">Cantidad</label>
+                <input type="number" [(ngModel)]="linea.cantidadConfirmada" min="0.01" step="0.01" class="field-input" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Precio unit.</label>
+                <input type="number" [(ngModel)]="linea.precioConfirmado" min="0" step="0.01" class="field-input" />
+              </div>
+            </div>
+
+            <div class="ps-subtotal ps-subtotal-relleno">
+              <span class="ps-subtotal-label">Subtotal</span>
+              <span class="ps-subtotal-value">S/ {{ subtotal(linea) }}</span>
+            </div>
+          </div>
+        </div>
+      }
+
+    }
+  </div>
+
+  <!-- Panel derecho (desktop siempre; en modal a todos los anchos) -->
+  <div [class]="'ps-panel-right' + (isModal ? ' ps-panel-right-inmodal' : '')">
+    <p class="ps-panel-right-title">Propuesta SUNAT</p>
+    <p class="ps-panel-right-meta">{{ lineas().length }} línea(s) en la propuesta</p>
+
+    @if (rellenosSinResolver() > 0) {
+      <div class="ps-panel-right-warning">
+        {{ rellenosSinResolver() }} producto(s) sin sustituto seleccionado
+      </div>
+    }
+
+    <button
+      type="button"
+      (click)="confirmar()"
+      [disabled]="ventaSvc.state().isSaving || rellenosSinResolver() > 0"
+      class="btn-primary ps-action-full"
+    >
+      @if (ventaSvc.state().isSaving) {
+        <span class="loading-spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;width:14px;height:14px"></span>
+        Confirmando...
+      } @else {
+        Confirmar venta
+      }
+    </button>
+
+    <button type="button" (click)="volverAlCarrito()" class="btn-secondary" style="font-size:0.85rem">
+      Volver al pedido
+    </button>
+
+    <button
+      type="button"
+      (click)="cancelar()"
+      [disabled]="ventaSvc.state().isSaving"
+      class="ps-cancel-btn"
+    >
+      Cancelar venta
+    </button>
+  </div>
+
+  </div><!-- /ps-layout -->
+</div>
+
+<!-- Barra de acciones fija (mobile, no en modal) -->
+@if (!isModal) {
+<div class="ps-action-bar">
+  @if (rellenosSinResolver() > 0) {
+    <p style="font-size:0.72rem;color:#DC2626;text-align:center;margin:0 0 0.5rem">
+      {{ rellenosSinResolver() }} producto(s) sin sustituto seleccionado
+    </p>
+  }
+  <button
+    type="button"
+    (click)="confirmar()"
+    [disabled]="ventaSvc.state().isSaving || rellenosSinResolver() > 0"
+    class="btn-primary ps-action-full"
+  >
+    @if (ventaSvc.state().isSaving) {
+      <span class="loading-spinner" style="border-color:rgba(255,255,255,0.3);border-top-color:#fff;width:14px;height:14px"></span>
+      Confirmando...
+    } @else {
+      Confirmar venta
+    }
+  </button>
+  <button
+    type="button"
+    (click)="cancelar()"
+    [disabled]="ventaSvc.state().isSaving"
+    class="ps-cancel-btn"
+  >
+    Cancelar venta
+  </button>
+</div>
+}
+
+<!-- ── Modal selector de producto de relleno ── -->
+@if (selectorIndice() !== null) {
+  <div class="ps-modal-backdrop" (click)="cerrarSelector()">
+    <div class="ps-modal-sheet" (click)="$event.stopPropagation()">
+
+      <div class="ps-modal-header">
+        <p class="ps-modal-title">Cambiar producto de relleno</p>
+        <button type="button" class="ps-modal-close" (click)="cerrarSelector()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="ps-modal-search">
+        <div style="position:relative">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%)">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input
+            type="text"
+            [(ngModel)]="selectorBusqueda"
+            (ngModelChange)="onSelectorBusqueda()"
+            placeholder="Buscar por nombre o código..."
+            class="ps-modal-search-input"
+          />
+        </div>
+      </div>
+
+      <div class="ps-modal-list" (scroll)="onSelectorScroll($event)">
+        @if (catalogoSvc.state().isLoading) {
+          <div class="ps-modal-status">
+            <div class="loading-spinner" style="margin-bottom:0.5rem"></div>
+            Cargando productos...
+          </div>
+        } @else if (catalogoSvc.state().productos.length === 0) {
+          <div class="ps-modal-status">
+            <div class="empty-icon-wrap" style="margin:0 auto 0.75rem">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+            </div>
+            No se encontraron productos
+          </div>
+        } @else {
+          @for (p of catalogoSvc.state().productos; track p.productoId) {
+            <div class="ps-selector-card" (click)="seleccionarReemplazo(p)">
+              @if (p.imagen) {
+                <img [src]="p.imagen" [alt]="p.nombre" class="ps-selector-img" />
+              } @else {
+                <div class="ps-selector-img-placeholder">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                    <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                    <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                  </svg>
+                </div>
+              }
+              <div class="ps-selector-info">
+                <p class="ps-selector-nombre">{{ p.nombre }}</p>
+                <p class="ps-selector-codigo">{{ p.codigo }}</p>
+                <div class="ps-selector-badges">
+                  @if (p.tieneConFactura) {
+                    <span class="badge badge-primary">Con factura</span>
+                  }
+                  @if (p.tieneSinFactura) {
+                    <span class="badge badge-zinc">Sin factura</span>
+                  }
+                </div>
+                <div class="ps-selector-bottom">
+                  <span class="ps-selector-precio">S/ {{ p.precioVentaMercado }}</span>
+                  <span class="ps-selector-stock" [class.ps-stock-ok]="+p.cantidadDisponible > 0" [class.ps-stock-err]="+p.cantidadDisponible <= 0">
+                    {{ p.cantidadDisponible }} {{ getUnidadLabel(p.unidadMedida) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+
+          @if (catalogoSvc.state().isLoadingMore) {
+            <div class="ps-modal-status">Cargando más...</div>
+          }
+        }
+      </div>
+
+    </div>
+  </div>
+}

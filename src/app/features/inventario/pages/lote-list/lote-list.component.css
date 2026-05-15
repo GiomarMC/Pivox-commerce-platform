@@ -1,0 +1,128 @@
+.lote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.875rem;
+}
+
+.lote-card {
+  display: block;
+  background: #fff;
+  border: 1px solid #E2E6F0;
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  position: relative;
+}
+
+.lote-card:hover {
+  border-color: #1F2A7C;
+  box-shadow: 0 4px 16px rgba(31,42,124,0.1);
+  transform: translateY(-1px);
+}
+
+.lote-inactivo { opacity: 0.55; }
+
+.lote-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.lote-id {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #1F2A7C;
+}
+
+.lote-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 0.75rem;
+}
+
+.lote-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  color: #6B7280;
+}
+
+.meta-icon { flex-shrink: 0; color: #9CA3AF; }
+
+.lote-deactivate {
+  width: 100%;
+  justify-content: center;
+  font-size: 0.78rem;
+  padding: 0.4rem 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Skeleton */
+@keyframes ll-pulse { 0%,100% { opacity:1; } 50% { opacity:0.45; } }
+.ll-skel { animation: ll-pulse 1.5s ease-in-out infinite; }
+.ll-skel-header { display:flex; justify-content:space-between; margin-bottom:0.75rem; }
+.ll-skel-line { height:10px; background:#F3F4F6; border-radius:6px; }
+.ll-skel-line.sm  { width:4rem; }
+.ll-skel-line.md  { width:5.5rem; }
+.ll-skel-line.lg  { width:6rem; }
+.ll-skel-line.xl  { width:8rem; }
+.ll-skel-line.tag { height:18px; border-radius:20px; }
+.ll-skel-meta { display:flex; flex-direction:column; gap:0.5rem; margin-bottom:0.75rem; }
+
+/* Load more */
+.load-more-wrap { display:flex; justify-content:center; padding:1.5rem 0; }
+
+/* Empty state */
+.empty-icon-wrap {
+  width: 64px;
+  height: 64px;
+  background: #F9FAFB;
+  border: 1px solid #E2E6F0;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.empty-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #374151;
+  margin: 0 0 0.35rem;
+}
+
+.empty-desc {
+  font-size: 0.82rem;
+  color: #9CA3AF;
+  margin: 0;
+}
+
+/* Modal overlay */
+.lf-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 60;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1.5rem 1rem;
+  overflow-y: auto;
+}
+
+.lf-modal-panel {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 960px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
