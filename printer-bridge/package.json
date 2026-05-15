@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Bridge HTTP local para impresora ESC/POS via TCP",
   "main": "server.js",
+  "packageManager": "pnpm@11.1.2",
   "scripts": {
     "start": "node server.js"
   },
