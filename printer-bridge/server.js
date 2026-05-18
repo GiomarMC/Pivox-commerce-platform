@@ -5,6 +5,25 @@ const http = require('http');
 const path = require('path');
 const cors = require('cors');
 const Canvas = require('canvas');
+
+// Polyfills requeridos por pdfjs-dist en Node.js (canvas@2.x los provee, canvas@3.x solo DOMMatrix)
+if (!global.DOMMatrix) global.DOMMatrix = Canvas.DOMMatrix;
+if (!global.Path2D) {
+  global.Path2D = class Path2D {
+    constructor(d) { this._d = d || ''; }
+    addPath() {}
+    closePath() {}
+    moveTo() {}
+    lineTo() {}
+    bezierCurveTo() {}
+    quadraticCurveTo() {}
+    arc() {}
+    arcTo() {}
+    ellipse() {}
+    rect() {}
+  };
+}
+
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
 const CMAP_URL = path.join(__dirname, 'node_modules/pdfjs-dist/cmaps/');
