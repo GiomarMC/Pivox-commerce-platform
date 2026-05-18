@@ -139,7 +139,7 @@ export const routes: Routes = [
           ),
       },
 
-      // Finanzas
+      // Finanzas (rediseñado: hub absorbe caja-resumen + caja-cierre como modal)
       {
         path: 'finanzas',
         loadComponent: () =>
@@ -148,31 +148,10 @@ export const routes: Routes = [
           ),
       },
       {
-        path: 'finanzas/caja/resumen',
+        path: 'finanzas/creditos',
         loadComponent: () =>
-          import('./features/finanzas/pages/caja-resumen/caja-resumen.component').then(
-            m => m.CajaResumenComponent,
-          ),
-      },
-      {
-        path: 'finanzas/caja/cierre',
-        loadComponent: () =>
-          import('./features/finanzas/pages/caja-cierre/caja-cierre.component').then(
-            m => m.CajaCierreComponent,
-          ),
-      },
-      {
-        path: 'finanzas/deudas',
-        loadComponent: () =>
-          import('./features/finanzas/pages/deudas/deudas.component').then(
-            m => m.DeudasComponent,
-          ),
-      },
-      {
-        path: 'finanzas/pago-resumen',
-        loadComponent: () =>
-          import('./features/finanzas/pages/pago-resumen/pago-resumen.component').then(
-            m => m.PagoResumenComponent,
+          import('./features/finanzas/pages/creditos/creditos.component').then(
+            m => m.CreditosComponent,
           ),
       },
       {
@@ -183,6 +162,12 @@ export const routes: Routes = [
           ),
         canActivate: [duenioGuard],
       },
+
+      // Redirects de rutas viejas (deprecated) hacia las nuevas
+      { path: 'finanzas/caja/resumen', redirectTo: 'finanzas',           pathMatch: 'full' },
+      { path: 'finanzas/caja/cierre',  redirectTo: 'finanzas',           pathMatch: 'full' },
+      { path: 'finanzas/deudas',       redirectTo: 'finanzas/creditos',  pathMatch: 'full' },
+      { path: 'finanzas/pago-resumen', redirectTo: 'finanzas/creditos',  pathMatch: 'full' },
 
       // Usuarios y asistencia
       {

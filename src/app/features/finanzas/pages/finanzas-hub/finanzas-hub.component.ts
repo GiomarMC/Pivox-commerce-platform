@@ -1,30 +1,22 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { FinanzasService } from '../../finanzas.service';
-
-interface HubItem {
-  label: string;
-  description: string;
-  iconKey: string;
-  bg: string;
-  color: string;
-  route: string;
-  duenioOnly?: boolean;
-}
-
-const HUB_ITEMS: HubItem[] = [
-  { label: 'Resumen de caja',  description: 'Ventas y servicios del día',    iconKey: 'cash',    bg: '#EEF0FB', color: '#1F2A7C', route: '/finanzas/caja/resumen' },
-  { label: 'Cierre de caja',   description: 'Cerrar la caja del día',        iconKey: 'lock',    bg: '#FEE2E2', color: '#DC2626', route: '/finanzas/caja/cierre' },
-  { label: 'Deudas',           description: 'Gestionar créditos pendientes', iconKey: 'debt',    bg: '#FEF3C7', color: '#D97706', route: '/finanzas/deudas' },
-  { label: 'Historial de pagos', description: 'Ver pagos registrados',       iconKey: 'history', bg: '#DCFCE7', color: '#15803D', route: '/finanzas/pago-resumen' },
-  { label: 'Gastos',           description: 'Gastos fijos y variables',      iconKey: 'chart',   bg: '#E0F2FE', color: '#0284C7', route: '/finanzas/gastos', duenioOnly: true },
-];
+import { MetodosPagoChartComponent, MetodoPagoSlice } from '../../components/metodos-pago-chart/metodos-pago-chart.component';
+import { TendenciaGastosChartComponent } from '../../components/tendencia-gastos-chart/tendencia-gastos-chart.component';
+import { CerrarCajaModalComponent } from '../../components/cerrar-caja-modal/cerrar-caja-modal.component';
 
 @Component({
   selector: 'app-finanzas-hub',
   standalone: true,
-  imports: [RouterLink],
+  imports: [
+    RouterLink,
+    DecimalPipe,
+    MetodosPagoChartComponent,
+    TendenciaGastosChartComponent,
+    CerrarCajaModalComponent,
+  ],
   templateUrl: './finanzas-hub.component.html',
   styleUrl: './finanzas-hub.component.css',
 })
@@ -33,52 +25,72 @@ export class FinanzasHubComponent implements OnInit {
   readonly svc = inject(FinanzasService);
   readonly isDueno = this.auth.isDueno;
 
-  get caja() { return this.svc.state().cajaResumen; }
+  readonly modalCierre = signal(false);
 
-  get deudasActivas() {
-    return this.svc.state().deudasDashboard.filter(d => d.estado === 'ACTIVA');
-  }
+  // KPIs del día
+  readonly totalDia = computed(() => parseFloat(this.svc.state().cajaResumen?.totalGeneral ?? '0'));
+  readonly totalContado = computed(() => parseFloat(this.svc.state().cajaResumen?.totalContado ?? '0'));
+  readonly totalCredito = computed(() => parseFloat(this.svc.state().cajaResumen?.totalCredito ?? '0'));
 
-  get saldoDeudas(): string {
-    const total = this.deudasActivas.reduce((acc, d) => acc + parseFloat(d.saldo || '0'), 0);
-    return total.toFixed(2);
-  }
+  readonly deudasActivas = computed(() =>
+    this.svc.state().deudasDashboard.filter(d => d.estado === 'ACTIVA'),
+  );
+  readonly totalDeudas = computed(() =>
+    this.deudasActivas().reduce((acc, d) => acc + parseFloat(d.saldo || '0'), 0),
+  );
+  readonly countDeudas = computed(() => this.deudasActivas().length);
 
-  get metodosPago(): { label: string; value: string }[] {
-    const c = this.caja;
+  // Ventas vs servicios (barras inline)
+  readonly totalVentas = computed(() => parseFloat(this.svc.state().cajaResumen?.resumenVentas?.totalGeneral ?? '0'));
+  readonly totalServicios = computed(() => parseFloat(this.svc.state().cajaResumen?.resumenServicios?.totalGeneral ?? '0'));
+  readonly ventasPct = computed(() => {
+    const total = this.totalVentas() + this.totalServicios();
+    return total > 0 ? (this.totalVentas() / total) * 100 : 0;
+  });
+  readonly serviciosPct = computed(() => {
+    const total = this.totalVentas() + this.totalServicios();
+    return total > 0 ? (this.totalServicios() / total) * 100 : 0;
+  });
+
+  // Slices para el donut de métodos de pago
+  readonly metodosPagoSlices = computed((): MetodoPagoSlice[] => {
+    const c = this.svc.state().cajaResumen;
     if (!c) return [];
-    return [
-      { label: 'Efectivo',      value: c.totalEfectivo },
-      { label: 'Yape',          value: c.totalYape },
-      { label: 'Plin',          value: c.totalPlin },
-      { label: 'Transferencia', value: c.totalTransferencia },
-      { label: 'Tarjeta',       value: c.totalTarjeta },
-    ].filter(m => parseFloat(m.value) > 0);
-  }
+    const slices: MetodoPagoSlice[] = [
+      { label: 'Efectivo',      value: parseFloat(c.totalEfectivo),      color: '#10B981' },
+      { label: 'Yape',          value: parseFloat(c.totalYape),          color: '#8B5CF6' },
+      { label: 'Tarjeta',       value: parseFloat(c.totalTarjeta),       color: '#06B6D4' },
+      { label: 'Plin',          value: parseFloat(c.totalPlin),          color: '#F59E0B' },
+      { label: 'Transferencia', value: parseFloat(c.totalTransferencia), color: '#6366F1' },
+    ];
+    return slices.filter(s => s.value > 0);
+  });
 
-  get ventasPorc(): number {
-    const c = this.caja;
-    if (!c) return 0;
-    const v = parseFloat(c.resumenVentas?.totalGeneral ?? '0');
-    const s = parseFloat(c.resumenServicios?.totalGeneral ?? '0');
-    const total = v + s;
-    return total > 0 ? Math.round((v / total) * 100) : 0;
-  }
+  readonly hayMetodosPago = computed(() => this.metodosPagoSlices().length > 0);
 
-  get serviciosPorc(): number {
-    return 100 - this.ventasPorc;
-  }
+  // Tendencia gastos
+  readonly tendenciaPuntos = computed(() => this.svc.state().tendenciaGastos);
+  readonly hayTendencia = computed(() =>
+    this.tendenciaPuntos().some(p => p.total > 0),
+  );
 
   get fechaHoy(): string {
     return new Date().toLocaleDateString('es-PE', { weekday: 'long', day: 'numeric', month: 'long' });
   }
 
   ngOnInit(): void {
-    this.svc.cargarCajaResumen();
-    this.svc.cargarDeudasDashboard();
+    void this.svc.cargarCajaResumen();
+    void this.svc.cargarDeudasDashboard();
+    if (this.isDueno()) {
+      void this.svc.cargarTendenciaGastos(6);
+    }
   }
 
-  visibleItems(): HubItem[] {
-    return HUB_ITEMS.filter(item => !item.duenioOnly || this.isDueno());
+  abrirCierre(): void {
+    this.modalCierre.set(true);
+  }
+
+  cerrarModalCierre(): void {
+    this.modalCierre.set(false);
   }
 }

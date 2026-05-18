@@ -8,6 +8,15 @@ import { GastoTipoModel } from './models/gasto-tipo.model';
 import { GastoFijoResumenModel } from './models/gasto-fijo-resumen.model';
 import { GastoVariableResumenModel } from './models/gasto-variable-resumen.model';
 
+export interface TendenciaGastosPunto {
+  mes: number;
+  anio: number;
+  fijo: number;
+  variable: number;
+  total: number;
+  label: string;
+}
+
 export interface FinanzasState {
   isLoading: boolean;
   isSaving: boolean;
@@ -21,6 +30,8 @@ export interface FinanzasState {
   gastosVariablesResumen: GastoVariableResumenModel | null;
   deudasDashboard: DeudaModel[];
   deudasDashboardLoading: boolean;
+  tendenciaGastos: TendenciaGastosPunto[];
+  tendenciaGastosLoading: boolean;
 }
 
 const INITIAL: FinanzasState = {
@@ -36,6 +47,8 @@ const INITIAL: FinanzasState = {
   gastosVariablesResumen: null,
   deudasDashboard: [],
   deudasDashboardLoading: false,
+  tendenciaGastos: [],
+  tendenciaGastosLoading: false,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -231,6 +244,49 @@ export class FinanzasService {
     } catch (err) {
       this._state.update(s => ({ ...s, isSaving: false, errorMessage: (err as Error).message }));
       return false;
+    }
+  }
+
+  /**
+   * Carga la tendencia de gastos de los últimos N meses (incluye mes actual).
+   * Hace N llamadas paralelas a `repo.getGastosFijosResumen` + `repo.getGastosVariablesResumen`.
+   * No toca el repo, no requiere endpoint nuevo.
+   */
+  async cargarTendenciaGastos(meses: number = 6): Promise<void> {
+    const tiendaId = this.auth.selectedTiendaId();
+    if (!tiendaId) return;
+    this._state.update(s => ({ ...s, tendenciaGastosLoading: true }));
+
+    const meseslabels = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const now = new Date();
+    const targets: { mes: number; anio: number }[] = [];
+    for (let i = meses - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      targets.push({ mes: d.getMonth() + 1, anio: d.getFullYear() });
+    }
+
+    try {
+      const results = await Promise.all(
+        targets.map(async t => {
+          const [fijo, variable] = await Promise.all([
+            this.repo.getGastosFijosResumen(tiendaId, t.mes, t.anio).catch(() => null),
+            this.repo.getGastosVariablesResumen(tiendaId, t.mes, t.anio).catch(() => null),
+          ]);
+          const fijoTotal = fijo ? parseFloat(fijo.totalGlobal ?? '0') : 0;
+          const variableTotal = variable ? parseFloat(variable.totalMes ?? '0') : 0;
+          return {
+            mes: t.mes,
+            anio: t.anio,
+            fijo: fijoTotal,
+            variable: variableTotal,
+            total: fijoTotal + variableTotal,
+            label: `${meseslabels[t.mes - 1]} ${String(t.anio).slice(-2)}`,
+          };
+        }),
+      );
+      this._state.update(s => ({ ...s, tendenciaGastos: results, tendenciaGastosLoading: false }));
+    } catch {
+      this._state.update(s => ({ ...s, tendenciaGastosLoading: false }));
     }
   }
 
