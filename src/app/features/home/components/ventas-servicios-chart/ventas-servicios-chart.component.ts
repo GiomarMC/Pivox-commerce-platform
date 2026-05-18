@@ -50,40 +50,55 @@ export class VentasServiciosChartComponent implements OnDestroy {
       plotOptions: {
         bar: {
           horizontal: true,
-          borderRadius: 6,
+          borderRadius: 0,
           distributed: true,
           dataLabels: { position: 'end' },
+          barHeight: '60%',
         },
       },
       series: [{ data: [ventas, servicios] }],
       xaxis: {
         categories: ['Ventas', 'Servicios'],
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#6B7280'] },
+          style: { fontFamily: 'Geist Mono Variable, monospace', fontSize: '10px', colors: ['#94A3B8'] },
           formatter: (val: string) => `S/ ${Number(val).toLocaleString('es-PE', { minimumFractionDigits: 0 })}`,
         },
         axisBorder: { show: false },
         axisTicks: { show: false },
       },
       yaxis: {
-        labels: { style: { fontFamily: 'inherit', fontSize: '12px', colors: ['#374151'], fontWeight: '600' } },
+        labels: {
+          style: {
+            fontFamily: 'Geist Variable, sans-serif',
+            fontSize: '11px',
+            colors: ['#334155'],
+            fontWeight: '600',
+          },
+        },
       },
-      colors: ['#4F46E5', '#0284C7'],
+      colors: ['#6366F1', '#8B5CF6'],
       dataLabels: {
         enabled: true,
         formatter: (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
-        style: { fontFamily: 'inherit', fontSize: '11px', fontWeight: '700', colors: ['#374151'] },
+        style: {
+          fontFamily: 'Geist Mono Variable, monospace',
+          fontSize: '11px',
+          fontWeight: '500',
+          colors: ['#334155'],
+        },
         offsetX: -6,
       },
       legend: { show: false },
       grid: {
-        borderColor: '#F0F2F5',
+        borderColor: '#EEF1F6',
+        strokeDashArray: 2,
         xaxis: { lines: { show: true } },
         yaxis: { lines: { show: false } },
         padding: { left: 0, right: 24 },
       },
       tooltip: {
         y: { formatter: (val: number) => `S/ ${val.toFixed(2)}` },
+        style: { fontFamily: 'Geist Variable, sans-serif' },
       },
     };
   }

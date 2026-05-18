@@ -25,10 +25,10 @@ function truncate(name: string, max = 26): string {
     @if (hayAlertas()) {
       <div class="ia-summary">
         @if (sinStock().length > 0) {
-          <span class="ia-badge ia-badge-red">{{ sinStock().length }} sin stock</span>
+          <span class="badge badge-error">{{ sinStock().length }} sin stock</span>
         }
         @if (criticos().length > 0) {
-          <span class="ia-badge ia-badge-orange">{{ criticos().length }} críticos</span>
+          <span class="badge badge-warning">{{ criticos().length }} críticos</span>
         }
       </div>
     } @else {
@@ -37,29 +37,23 @@ function truncate(name: string, max = 26): string {
 
     <div #chartEl></div>
 
-    <a routerLink="/inventario/productos" class="ia-link">Ver inventario completo →</a>
+    <a routerLink="/inventario/productos" class="ia-link link-edit">Ver inventario completo →</a>
   `,
   styles: [`
+    :host { display: block; }
     .ia-summary {
-      display: flex; gap: 0.5rem; margin-bottom: 0.625rem; flex-wrap: wrap;
+      display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap;
     }
-    .ia-badge {
-      font-size: 0.68rem; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; padding: 0.2rem 0.6rem; border-radius: 99px;
-    }
-    .ia-badge-red    { background: #FEE2E2; color: #991B1B; }
-    .ia-badge-orange { background: #FEF3C7; color: #92400E; }
-
     .ia-subtitle {
-      font-size: 0.68rem; font-weight: 700; color: #9CA3AF;
+      font-family: var(--font-sans);
+      font-size: 0.6875rem; font-weight: 700; color: var(--color-ink-3);
       text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 0.5rem;
     }
-
     .ia-link {
-      display: block; text-align: right; margin-top: 0.25rem;
-      font-size: 0.75rem; font-weight: 700; color: #4F46E5; text-decoration: none;
+      display: inline-block; text-align: right; margin-top: 0.875rem;
+      font-family: var(--font-sans);
+      font-size: 0.75rem; font-weight: 600;
     }
-    .ia-link:hover { text-decoration: underline; }
   `],
 })
 export class InventarioAlertasComponent implements OnDestroy {
@@ -69,12 +63,10 @@ export class InventarioAlertasComponent implements OnDestroy {
 
   readonly hayAlertas = computed(() => this.sinStock().length > 0 || this.criticos().length > 0);
 
-  // Lista combinada: sin stock (rojo) → crítico (naranja) → bajo stock (azul)
-  // Ordenada de menor a mayor cantidad
   private readonly allItems = computed(() => {
-    const ss = this.sinStock().map(p  => ({ ...p, color: '#DC2626' }));
-    const cr = this.criticos().map(p  => ({ ...p, color: '#D97706' }));
-    const bs = this.bajoStock().map(p => ({ ...p, color: '#0284C7' }));
+    const ss = this.sinStock().map(p  => ({ ...p, color: '#EF4444' }));
+    const cr = this.criticos().map(p  => ({ ...p, color: '#F59E0B' }));
+    const bs = this.bajoStock().map(p => ({ ...p, color: '#6366F1' }));
     return [...ss, ...cr, ...bs];
   });
 
@@ -101,7 +93,7 @@ export class InventarioAlertasComponent implements OnDestroy {
   }
 
   private buildOptions(items: { nombre: string; cantidadDisponible: string; unidadMedida: string; color: string }[]): ApexCharts.ApexOptions {
-    const height = Math.max(160, items.length * 34 + 40);
+    const height = Math.max(160, items.length * 36 + 40);
 
     return {
       chart: {
@@ -114,25 +106,23 @@ export class InventarioAlertasComponent implements OnDestroy {
       plotOptions: {
         bar: {
           horizontal: true,
-          borderRadius: 5,
+          borderRadius: 0,
           distributed: true,
           dataLabels: { position: 'end' },
-          barHeight: '60%',
+          barHeight: '50%',
         },
       },
       series: [{
         data: items.map(p => ({
           x: truncate(p.nombre),
-          // Sin stock (0) se muestra con valor mínimo para que sea visible
           y: +p.cantidadDisponible === 0 ? 0.2 : +p.cantidadDisponible,
-          // Valor real para tooltip
           goals: [{ name: 'real', value: +p.cantidadDisponible }],
         })),
       }],
       colors: items.map(p => p.color),
       xaxis: {
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#9CA3AF'] },
+          style: { fontFamily: 'Geist Mono Variable, monospace', fontSize: '10px', colors: ['#94A3B8'] },
           formatter: (val: string) => {
             const n = Number(val);
             return n < 1 ? '0' : String(Math.round(n));
@@ -143,7 +133,7 @@ export class InventarioAlertasComponent implements OnDestroy {
       },
       yaxis: {
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#374151'] },
+          style: { fontFamily: 'Geist Variable, sans-serif', fontSize: '11px', colors: ['#334155'] },
           maxWidth: 190,
         },
       },
@@ -156,36 +146,37 @@ export class InventarioAlertasComponent implements OnDestroy {
           return qty === 0 ? `0 ${item.unidadMedida}` : `${qty} ${item.unidadMedida}`;
         },
         style: {
-          fontFamily: 'inherit',
+          fontFamily: 'Geist Mono Variable, monospace',
           fontSize: '11px',
-          fontWeight: '700',
-          colors: ['#374151'],
+          fontWeight: '500',
+          colors: ['#334155'],
         },
         offsetX: -6,
       },
-      // Línea de referencia en cantidad = 5 (umbral crítico)
       annotations: {
         xaxis: [{
           x: 5,
-          borderColor: '#D97706',
-          borderWidth: 1.5,
-          strokeDashArray: 4,
+          borderColor: '#F59E0B',
+          borderWidth: 1,
+          strokeDashArray: 3,
           label: {
-            text: 'límite crítico',
+            text: 'CRÍTICO',
             position: 'top',
             orientation: 'horizontal',
             style: {
-              fontFamily: 'inherit',
-              fontSize: '10px',
-              color: '#D97706',
-              background: '#FEF3C7',
+              fontFamily: 'Geist Variable, sans-serif',
+              fontSize: '9px',
+              fontWeight: '700',
+              color: '#F59E0B',
+              background: 'transparent',
             },
           },
         }],
       },
       legend: { show: false },
       grid: {
-        borderColor: '#F0F2F5',
+        borderColor: '#EEF1F6',
+        strokeDashArray: 2,
         xaxis: { lines: { show: true } },
         yaxis: { lines: { show: false } },
         padding: { left: 0, right: 20 },
@@ -195,7 +186,7 @@ export class InventarioAlertasComponent implements OnDestroy {
         custom: ({ dataPointIndex }: any) => {
           const item = items[dataPointIndex as number] as typeof items[number];
           const qty = +item.cantidadDisponible;
-          return `<div style="padding:6px 10px;font-family:inherit;font-size:12px;font-weight:600">${item.nombre}<br><span style="color:#6B7280;font-weight:400">${qty} ${item.unidadMedida}</span></div>`;
+          return `<div style="padding:8px 12px;font-family:'Geist Variable',sans-serif;font-size:12px;font-weight:600;border:1px solid #334155;background:#FFFFFF">${item.nombre}<br><span style="color:#64748B;font-weight:400;font-family:'Geist Mono Variable',monospace;font-size:11px">${qty} ${item.unidadMedida}</span></div>`;
         },
       },
     };

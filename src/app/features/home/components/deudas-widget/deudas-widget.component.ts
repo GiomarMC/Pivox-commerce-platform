@@ -1,41 +1,44 @@
 import { Component, input } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
 
 @Component({
   selector: 'app-deudas-widget',
   standalone: true,
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, DecimalPipe],
   template: `
     @if (isLoading()) {
-      <div class="dw-skeleton"></div>
+      <div class="dw-skel"></div>
     } @else if (count() === 0) {
       <div class="dw-empty">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
-          <path d="M12 22C6.48 22 2 17.52 2 12S6.48 2 12 2s10 4.48 10 10-4.48 10-10 10z"/>
-          <path d="M8 12h8M12 8v8"/>
-        </svg>
-        <p class="dw-empty-txt">Sin deudas activas</p>
+        <span class="text-mono-s dw-empty-glyph">✓</span>
+        <p class="dw-empty-text">Sin deudas activas.</p>
       </div>
     } @else {
       <div class="dw-body">
         <div class="dw-main">
-          <span class="dw-amount">{{ total() | currency:'PEN':'S/ ' }}</span>
-          <span class="dw-label">en créditos pendientes</span>
+          <span class="text-eyebrow eyebrow-mark">Saldo pendiente</span>
+          <span class="dw-amount">
+            <span class="dw-amount-prefix">S/</span>{{ total() | number: '1.2-2' }}
+          </span>
         </div>
-        <div class="dw-divider"></div>
+
+        <div class="dw-rule"></div>
+
         <div class="dw-side">
           <span class="dw-count">{{ count() }}</span>
-          <span class="dw-count-lbl">{{ count() === 1 ? 'deuda activa' : 'deudas activas' }}</span>
-          <a routerLink="/finanzas/deudas" class="dw-link">Ver todas →</a>
+          <span class="text-eyebrow">{{ count() === 1 ? 'deuda activa' : 'deudas activas' }}</span>
+          <a routerLink="/finanzas/deudas" class="link-edit dw-link">Ver todas</a>
         </div>
       </div>
     }
   `,
   styles: [`
-    .dw-skeleton {
-      height: 80px; border-radius: 8px;
-      background: linear-gradient(90deg, #F3F4F6 25%, #E9EAEC 50%, #F3F4F6 75%);
+    :host { display: block; }
+
+    .dw-skel {
+      height: 88px;
+      background: linear-gradient(90deg, var(--color-rule) 25%, var(--color-surface-2) 50%, var(--color-rule) 75%);
       background-size: 200% 100%;
       animation: dw-shimmer 1.5s infinite;
     }
@@ -43,42 +46,78 @@ import { CurrencyPipe } from '@angular/common';
 
     .dw-empty {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 0.4rem; padding: 1rem 0;
+      gap: 0.5rem; padding: 1.5rem 0;
     }
-    .dw-empty-txt { margin: 0; font-size: 0.82rem; color: #9CA3AF; }
+    .dw-empty-glyph { color: var(--color-success); font-size: 1.5rem; }
+    .dw-empty-text {
+      font-family: var(--font-sans);
+      font-style: normal;
+      font-size: 0.875rem;
+      color: var(--color-ink-2);
+      margin: 0;
+    }
 
     .dw-body {
-      display: flex; align-items: center; gap: 1.25rem;
+      display: flex; align-items: center; gap: 2rem;
+      padding: 0.5rem 0;
     }
     .dw-main {
-      display: flex; flex-direction: column; gap: 0.2rem; flex: 1;
+      flex: 1;
+      display: flex; flex-direction: column; gap: 0.625rem;
     }
     .dw-amount {
-      font-size: 1.75rem; font-weight: 900; color: #DC2626;
-      letter-spacing: -0.04em; line-height: 1;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(2.5rem, 5vw, 3.75rem);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: var(--color-accent);
+      
+      font-feature-settings: 'tnum';
     }
-    .dw-label {
-      font-size: 0.68rem; font-weight: 600; color: #9CA3AF;
-      text-transform: uppercase; letter-spacing: 0.05em;
+    .dw-amount-prefix {
+      font-family: var(--font-mono);
+      font-weight: 500;
+      font-size: 0.6em;
+      color: var(--color-ink-2);
+      letter-spacing: 0;
+      margin-right: 0.25em;
+      vertical-align: 0.15em;
     }
-    .dw-divider {
-      width: 1px; background: #F0F2F5; align-self: stretch; margin: 0.25rem 0;
+
+    .dw-rule {
+      width: 1px;
+      align-self: stretch;
+      background: var(--color-rule-bold);
+      margin: 0.5rem 0;
     }
+
     .dw-side {
-      display: flex; flex-direction: column; align-items: center; gap: 0.2rem; min-width: 80px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 0.5rem;
+      min-width: 6rem;
     }
     .dw-count {
-      font-size: 2rem; font-weight: 900; color: #111827; letter-spacing: -0.04em; line-height: 1;
-    }
-    .dw-count-lbl {
-      font-size: 0.65rem; font-weight: 600; color: #9CA3AF;
-      text-transform: uppercase; letter-spacing: 0.05em; text-align: center;
+      font-family: var(--font-display);
+      font-style: normal;
+      font-weight: 600;
+      font-size: 2.5rem;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      color: var(--color-ink);
+      
     }
     .dw-link {
-      font-size: 0.75rem; font-weight: 700; color: #4F46E5;
-      text-decoration: none; margin-top: 0.3rem;
+      font-family: var(--font-sans);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
     }
-    .dw-link:hover { text-decoration: underline; }
+
+    @media (max-width: 540px) {
+      .dw-body { gap: 1rem; }
+      .dw-amount { font-size: 2.25rem; }
+      .dw-count { font-size: 2rem; }
+    }
   `],
 })
 export class DeudasWidgetComponent {

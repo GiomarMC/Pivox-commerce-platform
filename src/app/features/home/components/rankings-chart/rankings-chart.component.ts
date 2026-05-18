@@ -62,14 +62,14 @@ export class RankingsChartComponent implements OnDestroy {
       ...top.map(p => p.cantidadVendida),
       ...bottom.map(p => p.cantidadVendida),
     ];
-    // Indigo para top, amber para bottom
+    // Indigo (top performers) + amber (bottom — needs attention)
     const colors: string[] = [
-      ...top.map(   () => '#4F46E5'),
+      ...top.map(   () => '#6366F1'),
       ...bottom.map(() => '#F59E0B'),
     ];
 
     const totalBars = top.length + bottom.length;
-    const height    = Math.max(200, totalBars * 36 + 60);
+    const height    = Math.max(200, totalBars * 38 + 40);
 
     return {
       chart: {
@@ -82,23 +82,24 @@ export class RankingsChartComponent implements OnDestroy {
       plotOptions: {
         bar: {
           horizontal: true,
-          borderRadius: 5,
+          borderRadius: 0,
           distributed: true,
           dataLabels: { position: 'end' },
+          barHeight: '55%',
         },
       },
       series: [{ data: values }],
       xaxis: {
         categories,
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#6B7280'] },
+          style: { fontFamily: 'Geist Mono Variable, monospace', fontSize: '10px', colors: ['#94A3B8'] },
         },
         axisBorder: { show: false },
         axisTicks: { show: false },
       },
       yaxis: {
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#374151'] },
+          style: { fontFamily: 'Geist Variable, sans-serif', fontSize: '12px', colors: ['#334155'] },
           maxWidth: 180,
         },
       },
@@ -107,22 +108,24 @@ export class RankingsChartComponent implements OnDestroy {
         enabled: true,
         formatter: (val: number) => `${val} uds.`,
         style: {
-          fontFamily: 'inherit',
+          fontFamily: 'Geist Mono Variable, monospace',
           fontSize: '11px',
-          fontWeight: '700',
-          colors: ['#374151'],
+          fontWeight: '500',
+          colors: ['#334155'],
         },
         offsetX: -4,
       },
       legend: { show: false },
       grid: {
-        borderColor: '#F0F2F5',
+        borderColor: '#EEF1F6',
+        strokeDashArray: 2,
         xaxis: { lines: { show: true } },
         yaxis: { lines: { show: false } },
         padding: { left: 0, right: 24 },
       },
       tooltip: {
         y: { formatter: (val: number) => `${val} unidades vendidas` },
+        style: { fontFamily: 'Geist Variable, sans-serif' },
       },
     };
   }

@@ -57,46 +57,53 @@ export class InventarioChartComponent implements OnDestroy {
       },
       series: [normal, critico, sinStock, inactivos],
       labels: ['Stock normal', 'Stock crítico', 'Sin stock', 'Inactivos'],
-      colors: ['#16A34A', '#D97706', '#DC2626', '#9CA3AF'],
+      colors: ['#10B981', '#F59E0B', '#EF4444', '#94A3B8'],
       legend: {
         position: 'bottom',
-        fontSize: '11px',
-        fontFamily: 'inherit',
-        markers: { size: 6 },
-        itemMargin: { horizontal: 6 },
+        fontSize: '10px',
+        fontFamily: 'Geist Variable, sans-serif',
+        fontWeight: 500,
+        labels: { colors: '#64748B' },
+        markers: { size: 5, shape: 'square' },
+        itemMargin: { horizontal: 8, vertical: 4 },
       },
       dataLabels: {
         enabled: true,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         formatter: (val: any) => `${Number(val).toFixed(0)}%`,
-        style: { fontSize: '10px', fontFamily: 'inherit', fontWeight: '600' },
+        style: { fontSize: '10px', fontFamily: 'Geist Mono Variable, monospace', fontWeight: '500', colors: ['#FFFFFF'] },
         dropShadow: { enabled: false },
       },
       plotOptions: {
         pie: {
           donut: {
-            size: '65%',
+            size: '70%',
             labels: {
               show: true,
               total: {
                 show: true,
-                label: 'Total SKUs',
+                label: 'TOTAL SKUs',
                 fontSize: '10px',
-                fontFamily: 'inherit',
-                fontWeight: '600',
-                color: '#9CA3AF',
+                fontFamily: 'Geist Variable, sans-serif',
+                fontWeight: '700',
+                color: '#94A3B8',
                 formatter: () => String(total),
+              },
+              value: {
+                fontFamily: 'Geist Variable, serif',
+                fontSize: '24px',
+                fontWeight: '600',
+                color: '#334155',
               },
             },
           },
         },
       },
       tooltip: {
-        y: {
-          formatter: (val: number) => `${val} productos`,
-        },
+        y: { formatter: (val: number) => `${val} productos` },
+        style: { fontFamily: 'Geist Variable, sans-serif' },
       },
-      stroke: { width: 2, colors: ['#FFFFFF'] },
+      stroke: { width: 1, colors: ['#F8FAFC'] },
     };
   }
 

@@ -59,56 +59,60 @@ export class TendenciaChartComponent implements OnDestroy {
       xaxis: {
         categories: tendencia.map(t => t.fecha),
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: Array(7).fill('#6B7280') },
+          style: { fontFamily: 'Geist Mono Variable, monospace', fontSize: '10px', colors: Array(7).fill('#94A3B8') },
         },
         axisBorder: { show: false },
         axisTicks: { show: false },
       },
       yaxis: {
         labels: {
-          style: { fontFamily: 'inherit', fontSize: '11px', colors: ['#9CA3AF'] },
+          style: { fontFamily: 'Geist Mono Variable, monospace', fontSize: '10px', colors: ['#94A3B8'] },
           formatter: (val: number) => `S/ ${val.toLocaleString('es-PE', { minimumFractionDigits: 0 })}`,
         },
       },
-      colors: ['#4F46E5', '#059669'],
+      colors: ['#6366F1', '#06B6D4'],
       stroke: {
-        curve: 'smooth',
-        width: 2,
+        curve: 'straight',
+        width: 1.5,
       },
       fill: {
         type: 'gradient',
         gradient: {
           shadeIntensity: 1,
-          opacityFrom: 0.35,
-          opacityTo: 0.02,
+          opacityFrom: 0.18,
+          opacityTo: 0.01,
           stops: [0, 100],
         },
       },
       legend: {
         position: 'top',
         horizontalAlign: 'right',
-        fontSize: '11px',
-        fontFamily: 'inherit',
-        markers: { size: 6 },
+        fontSize: '10px',
+        fontFamily: 'Geist Variable, sans-serif',
+        fontWeight: 600,
+        labels: { colors: '#334155' },
+        markers: { size: 5, shape: 'square' },
+        itemMargin: { horizontal: 12 },
       },
       tooltip: {
         shared: true,
         intersect: false,
-        y: {
-          formatter: (val: number) => `S/ ${val.toFixed(2)}`,
-        },
+        y: { formatter: (val: number) => `S/ ${val.toFixed(2)}` },
+        style: { fontFamily: 'Geist Variable, sans-serif' },
       },
       grid: {
-        borderColor: '#F0F2F5',
-        strokeDashArray: 4,
+        borderColor: '#EEF1F6',
+        strokeDashArray: 2,
         xaxis: { lines: { show: false } },
         yaxis: { lines: { show: true } },
         padding: { left: 8, right: 8 },
       },
       dataLabels: { enabled: false },
       markers: {
-        size: 4,
-        hover: { size: 6 },
+        size: 0,
+        strokeColors: '#FFFFFF',
+        strokeWidth: 1,
+        hover: { size: 5 },
       },
     };
   }

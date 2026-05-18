@@ -1,0 +1,216 @@
+<div class="page-content hm-page">
+
+  <!-- ─── Hero editorial: greeting + day breakdown ─── -->
+  <header class="hm-hero anim-fade-up">
+
+    <div class="hm-hero-meta">
+      <span class="text-eyebrow eyebrow-mark">{{ todayLabel }}</span>
+      <span class="text-mono-s hm-hero-tick">{{ fechaCorta }}</span>
+    </div>
+
+    <h1 class="hm-greeting">
+      {{ greetLabel }}, <em>{{ userMe()?.firstName ?? 'usuario' }}</em>
+    </h1>
+
+    @if (fin.state().errorMessage) {
+      <div class="error-banner hm-error">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+          <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        <span>{{ fin.state().errorMessage }}</span>
+      </div>
+    }
+
+    <!-- KPIs editoriales -->
+    <div class="hm-kpis">
+      @if (fin.state().isLoading) {
+        @for (i of [1,2,3,4]; track i) {
+          <div class="hm-kpi hm-kpi-skel"></div>
+        }
+      } @else if (fin.state().cajaResumen) {
+        <div class="hm-kpi hm-kpi-hero anim-fade-up anim-delay-1">
+          <span class="text-eyebrow eyebrow-mark hm-kpi-eyebrow">Total del día</span>
+          <span class="hm-kpi-hero-val">
+            <span class="hm-kpi-prefix">S/</span>{{ totalDia() | number: '1.2-2' }}
+          </span>
+          <span class="hm-kpi-meta">En curso</span>
+        </div>
+
+        <div class="hm-kpi anim-fade-up anim-delay-2">
+          <span class="text-eyebrow hm-kpi-eyebrow">Ventas</span>
+          <span class="hm-kpi-val">
+            <span class="hm-kpi-prefix">S/</span>{{ totalVentas() | number: '1.2-2' }}
+          </span>
+        </div>
+
+        <div class="hm-kpi anim-fade-up anim-delay-3">
+          <span class="text-eyebrow hm-kpi-eyebrow">Servicios</span>
+          <span class="hm-kpi-val">
+            <span class="hm-kpi-prefix">S/</span>{{ totalServicios() | number: '1.2-2' }}
+          </span>
+        </div>
+
+        <div class="hm-kpi anim-fade-up anim-delay-4">
+          <span class="text-eyebrow hm-kpi-eyebrow">Efectivo</span>
+          <span class="hm-kpi-val">
+            <span class="hm-kpi-prefix">S/</span>{{ totalEfectivo() | number: '1.2-2' }}
+          </span>
+        </div>
+      } @else {
+        <div class="hm-kpi hm-kpi-empty">
+          <span class="text-eyebrow">Sin datos</span>
+          <p class="hm-kpi-empty-text">
+            La caja no se ha iniciado para el día de hoy.
+          </p>
+          <a routerLink="/finanzas/caja/resumen" class="link-edit">Ir a finanzas →</a>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- ─── Atajos ─── -->
+  <section class="hm-shortcuts anim-fade-up anim-delay-2">
+    <a routerLink="/ventas" class="hm-shortcut hm-shortcut-primary">
+      <span class="text-eyebrow hm-sc-tick">01 / Atajo</span>
+      <span class="hm-sc-label">
+        Nueva venta
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="13 6 19 12 13 18"/>
+        </svg>
+      </span>
+    </a>
+
+    <a routerLink="/servicios" class="hm-shortcut">
+      <span class="text-eyebrow hm-sc-tick">02</span>
+      <span class="hm-sc-label-light">Nuevo servicio</span>
+    </a>
+
+    <a routerLink="/inventario/productos" class="hm-shortcut">
+      <span class="text-eyebrow hm-sc-tick">03</span>
+      <span class="hm-sc-label-light">Productos</span>
+    </a>
+
+    <a routerLink="/inventario/lotes" class="hm-shortcut">
+      <span class="text-eyebrow hm-sc-tick">04</span>
+      <span class="hm-sc-label-light">Lotes</span>
+    </a>
+
+    <a routerLink="/finanzas/caja/resumen" class="hm-shortcut">
+      <span class="text-eyebrow hm-sc-tick">05</span>
+      <span class="hm-sc-label-light">Ver caja</span>
+    </a>
+
+    <a routerLink="/operaciones/historial" class="hm-shortcut">
+      <span class="text-eyebrow hm-sc-tick">06</span>
+      <span class="hm-sc-label-light">Historial</span>
+    </a>
+  </section>
+
+  <!-- ─── Charts grid ─── -->
+  <app-editorial-section
+    eyebrow="Estadísticas"
+    tick="02 / Hoy"
+    title="Movimiento del día"
+    rule="bold">
+
+    <div class="hm-charts">
+
+      <!-- Fila 1: Cobros + Inventario alertas -->
+      <div class="hm-chart">
+        <p class="text-eyebrow hm-chart-title">Métodos de pago</p>
+        @if (fin.state().isLoading) {
+          <div class="hm-chart-skel"></div>
+        } @else if (paymentSlices().length > 0) {
+          <app-cobros-chart [slices]="paymentSlices()" />
+        } @else {
+          <div class="hm-chart-empty">Caja no iniciada hoy</div>
+        }
+      </div>
+
+      <div class="hm-chart">
+        <p class="text-eyebrow hm-chart-title">Alertas de inventario</p>
+        @if (cat.state().isLoading) {
+          <div class="hm-chart-skel"></div>
+        } @else {
+          <app-inventario-alertas
+            [sinStock]="prodSinStock()"
+            [criticos]="prodCriticos()"
+            [bajoStock]="prodBajoStock()" />
+        }
+      </div>
+
+      <!-- Fila 2: Ventas vs Servicios + Contado vs Crédito -->
+      <div class="hm-chart">
+        <p class="text-eyebrow hm-chart-title">Ventas / Servicios</p>
+        @if (fin.state().isLoading) {
+          <div class="hm-chart-skel"></div>
+        } @else if (ventasVsServicios()) {
+          <app-ventas-servicios-chart
+            [ventas]="ventasVsServicios()!.ventas"
+            [servicios]="ventasVsServicios()!.servicios" />
+        } @else {
+          <div class="hm-chart-empty">Caja no iniciada hoy</div>
+        }
+      </div>
+
+      <div class="hm-chart">
+        <p class="text-eyebrow hm-chart-title">Contado / Crédito</p>
+        @if (fin.state().isLoading) {
+          <div class="hm-chart-skel"></div>
+        } @else if (contadoCredito()) {
+          <app-contado-credito-chart
+            [contado]="contadoCredito()!.contado"
+            [credito]="contadoCredito()!.credito" />
+        } @else {
+          <div class="hm-chart-empty">Caja no iniciada hoy</div>
+        }
+      </div>
+
+      <!-- Fila 3: Rankings full-width con period toggle -->
+      <div class="hm-chart hm-chart-full">
+        <div class="hm-chart-head">
+          <p class="text-eyebrow hm-chart-title" style="margin: 0;">Ranking de productos</p>
+          <div class="hm-period-toggle">
+            <button class="hm-period-btn" [class.is-active]="periodo() === 'dia'"
+                    (click)="periodo.set('dia')">Hoy</button>
+            <button class="hm-period-btn" [class.is-active]="periodo() === 'semana'"
+                    (click)="periodo.set('semana')">Semana</button>
+            <button class="hm-period-btn" [class.is-active]="periodo() === 'mes'"
+                    (click)="periodo.set('mes')">Mes</button>
+          </div>
+        </div>
+        @if (stats.state().isLoading) {
+          <div class="hm-chart-skel" style="height: 160px;"></div>
+        } @else if (rankingsData()) {
+          <app-rankings-chart [data]="rankingsData()" />
+        } @else {
+          <div class="hm-chart-empty">Sin datos de ventas</div>
+        }
+      </div>
+
+      <!-- Fila 4: Tendencia full-width -->
+      <div class="hm-chart hm-chart-full">
+        <p class="text-eyebrow hm-chart-title">Tendencia · últimos 7 días</p>
+        @if (stats.state().isLoading) {
+          <div class="hm-chart-skel" style="height: 280px;"></div>
+        } @else if (tendenciaData().length > 0) {
+          <app-tendencia-chart [tendencia]="tendenciaData()" />
+        } @else {
+          <div class="hm-chart-empty">Sin datos de tendencia</div>
+        }
+      </div>
+
+      <!-- Fila 5: Deudas full-width -->
+      <div class="hm-chart hm-chart-full">
+        <p class="text-eyebrow hm-chart-title">Deudas activas</p>
+        <app-deudas-widget
+          [total]="totalDeudas().total"
+          [count]="totalDeudas().count"
+          [isLoading]="fin.state().deudasDashboardLoading" />
+      </div>
+
+    </div>
+  </app-editorial-section>
+
+</div>
