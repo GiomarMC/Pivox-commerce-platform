@@ -1,13 +1,19 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { TiendaService } from '../../tienda.service';
 import { StoreModel } from '../../../../core/models/store.model';
+import { EditorialPageHeaderComponent } from '../../../../shared/components/editorial-page-header/editorial-page-header.component';
+import { EditorialSectionComponent } from '../../../../shared/components/editorial-section/editorial-section.component';
 
 @Component({
   selector: 'app-tienda-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [
+    ReactiveFormsModule,
+    EditorialPageHeaderComponent,
+    EditorialSectionComponent,
+  ],
   templateUrl: './tienda-form.component.html',
   styleUrl: './tienda-form.component.css',
 })
@@ -30,8 +36,9 @@ export class TiendaFormComponent implements OnInit {
 
   readonly state = this.svc.state;
 
+  readonly modoLabel = computed(() => this.esEdicion ? 'Editando sede' : 'Nueva sede');
+
   ngOnInit(): void {
-    // Recuperar tienda desde navigation state (pasada como [state]="{ tienda }")
     const nav = this.router.getCurrentNavigation();
     const tienda = nav?.extras?.state?.['tienda'] as StoreModel | undefined;
     if (tienda) {
@@ -42,7 +49,6 @@ export class TiendaFormComponent implements OnInit {
         ubigeo: tienda.ubigeo,
       });
     } else {
-      // Sugerir series para nueva tienda
       const tiendas = this.svc.state().tiendas;
       this.form.patchValue({
         serieFactura: this.siguienteSerie(tiendas.map(t => t.serieFactura), 'F'),

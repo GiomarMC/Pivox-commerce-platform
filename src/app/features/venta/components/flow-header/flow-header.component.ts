@@ -76,11 +76,11 @@ const BASE_STEPS: FlowStep[] = [
       cursor: pointer;
     }
     .flow-step-btn-back:hover .flow-bubble {
-      background: #BFDBFE;
-      color: #1D4ED8;
+      background: #C7D2FE;
+      color: #6366F1;
     }
     .flow-step-btn-back:hover .flow-label {
-      color: #1D4ED8;
+      color: #6366F1;
     }
 
     .flow-bubble {
@@ -92,8 +92,8 @@ const BASE_STEPS: FlowStep[] = [
       justify-content: center;
       font-size: 0.7rem;
       font-weight: 700;
-      background: #E2E6F0;
-      color: #9CA3AF;
+      background: #EEF1F6;
+      color: #94A3B8;
       flex-shrink: 0;
       transition: background 0.15s, color 0.15s;
     }
@@ -101,20 +101,20 @@ const BASE_STEPS: FlowStep[] = [
     .flow-label {
       font-size: 0.75rem;
       font-weight: 500;
-      color: #9CA3AF;
+      color: #94A3B8;
       transition: color 0.15s;
     }
 
-    .flow-step-btn.flow-current .flow-bubble { background: #1F2A7C; color: #fff; }
-    .flow-step-btn.flow-current .flow-label  { color: #1F2A7C; font-weight: 700; }
+    .flow-step-btn.flow-current .flow-bubble { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #fff; }
+    .flow-step-btn.flow-current .flow-label  { color: #334155; font-weight: 700; }
 
-    .flow-step-btn.flow-done .flow-bubble { background: #DCFCE7; color: #15803D; }
-    .flow-step-btn.flow-done .flow-label  { color: #6B7280; }
+    .flow-step-btn.flow-done .flow-bubble { background: #ECFDF5; color: #10B981; }
+    .flow-step-btn.flow-done .flow-label  { color: #64748B; }
 
     .flow-connector {
       width: 24px;
       height: 1px;
-      background: #E2E6F0;
+      background: #EEF1F6;
       margin: 0 0.35rem;
       flex-shrink: 0;
     }

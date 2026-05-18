@@ -1,6 +1,5 @@
 import { Component, OnInit, OnDestroy, inject, signal, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { CatalogoService } from '../../catalogo.service';
 import { InventarioService } from '../../inventario.service';
@@ -11,7 +10,7 @@ import { getUnidadMedidaLabel } from '../../constants/unidad-medida';
 @Component({
   selector: 'app-productos',
   standalone: true,
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule],
   templateUrl: './productos.component.html',
   styleUrl: './productos.component.css',
 })
@@ -30,6 +29,11 @@ export class ProductosComponent implements OnInit, OnDestroy {
   editImagenFile: File | null = null;
 
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+
+  // ── Imágenes fallidas (solo UI) ──
+  private readonly imgFailedIds = new Set<number>();
+  hasImgFailed(productoId: number): boolean { return this.imgFailedIds.has(productoId); }
+  onImgError(productoId: number): void { this.imgFailedIds.add(productoId); }
 
   ngOnInit(): void {
     this.catalogoSvc.cargarCatalogo();

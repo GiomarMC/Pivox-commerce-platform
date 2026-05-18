@@ -1,70 +1,174 @@
-<div class="page-content" style="max-width:540px">
-  <div style="margin-bottom:1.25rem">
-    <button class="btn-back" (click)="volver()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Volver
-    </button>
-    <h1 class="page-title">{{ esEdicion ? 'Editar tienda' : 'Nueva tienda' }}</h1>
-  </div>
+<div class="page-content">
 
-  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="form-card">
-    <div class="field-group">
-      <label class="field-label">Nombre de la sede <span style="color:#DC2626">*</span></label>
-      <input formControlName="nombreSede" placeholder="ej: Sede Principal" class="field-input" />
-    </div>
+  <button class="btn-back anim-fade-up" (click)="volver()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+    Volver a sucursales
+  </button>
 
-    <div class="field-group">
-      <label class="field-label">Dirección <span style="color:#DC2626">*</span></label>
-      <input formControlName="direccion" placeholder="ej: Av. Lima 123" class="field-input" />
-    </div>
+  <app-editorial-page-header
+    [eyebrow]="modoLabel()"
+    tick="01 / Formulario"
+    [title]="esEdicion ? tiendaExistente!.nombreSede : 'Nueva sucursal'"
+    [subtitle]="esEdicion
+      ? 'Modifica los datos principales de la sede. Las series de comprobante no son editables una vez creadas.'
+      : 'Registra una nueva sede para comenzar a operar. Las series se sugieren automáticamente.'">
+  </app-editorial-page-header>
 
-    <div class="field-group">
-      <label class="field-label">Ubigeo <span style="color:#9CA3AF;font-weight:400;font-size:0.8rem">(opcional)</span></label>
-      <input formControlName="ubigeo" placeholder="ej: 150101" class="field-input" />
-    </div>
+  <div class="tf-grid">
+    <!-- Formulario principal -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="tf-form anim-fade-up anim-delay-1">
 
-    @if (!esEdicion) {
-      <div class="series-divider">
-        <span>Series de comprobante</span>
-      </div>
+      <app-editorial-section
+        eyebrow="Identidad"
+        tick="02"
+        title="Datos de la sede"
+        rule="subtle">
 
-      <div class="fields-row">
-        <div class="field-group">
-          <label class="field-label">Factura</label>
-          <input formControlName="serieFactura" placeholder="F001" class="field-input" />
+        <div class="tf-stack">
+          <div class="field-group">
+            <label class="field-label">Nombre de la sede <span class="tf-req">·</span></label>
+            <input
+              formControlName="nombreSede"
+              placeholder="Sede Principal"
+              class="field-input" />
+            @if (form.get('nombreSede')?.invalid && form.get('nombreSede')?.touched) {
+              <p class="field-error">El nombre de la sede es requerido.</p>
+            }
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Dirección <span class="tf-req">·</span></label>
+            <input
+              formControlName="direccion"
+              placeholder="Av. Lima 123, Lima"
+              class="field-input" />
+            @if (form.get('direccion')?.invalid && form.get('direccion')?.touched) {
+              <p class="field-error">La dirección es requerida.</p>
+            }
+          </div>
+
+          <div class="field-group">
+            <label class="field-label">Ubigeo <span class="tf-opt">opcional</span></label>
+            <input
+              formControlName="ubigeo"
+              placeholder="150101"
+              maxlength="6"
+              class="field-input tf-input-mono" />
+            <p class="field-hint">Código INEI de 6 dígitos.</p>
+          </div>
         </div>
-        <div class="field-group">
-          <label class="field-label">Boleta</label>
-          <input formControlName="serieBoleta" placeholder="B001" class="field-input" />
-        </div>
-        <div class="field-group">
-          <label class="field-label">Ticket</label>
-          <input formControlName="serieTicket" placeholder="T001" class="field-input" />
-        </div>
-      </div>
-    }
+      </app-editorial-section>
 
-    @if (state().errorMessage) {
-      <div class="error-banner">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
-          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
-        </svg>
-        {{ state().errorMessage }}
-      </div>
-    }
+      @if (!esEdicion) {
+        <app-editorial-section
+          eyebrow="Comprobantes"
+          tick="03"
+          title="Series de emisión"
+          rule="subtle">
 
-    <div class="form-actions">
-      <button type="button" class="btn-secondary" (click)="volver()">Cancelar</button>
-      <button type="submit" class="btn-primary" [disabled]="form.invalid || state().isSaving">
-        @if (state().isSaving) {
-          <span class="loading-spinner" style="border-color:#fff3;border-top-color:#fff;width:14px;height:14px"></span>
-          Guardando...
+          <p class="tf-section-desc">
+            Configura las series con las que se emitirán facturas, boletas y tickets. <strong>No serán editables</strong> después de crear la sede.
+          </p>
+
+          <div class="tf-series-row">
+            <div class="field-group">
+              <label class="field-label">Factura</label>
+              <input formControlName="serieFactura" placeholder="F001" class="field-input tf-input-mono" maxlength="4" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Boleta</label>
+              <input formControlName="serieBoleta" placeholder="B001" class="field-input tf-input-mono" maxlength="4" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Ticket</label>
+              <input formControlName="serieTicket" placeholder="T001" class="field-input tf-input-mono" maxlength="4" />
+            </div>
+          </div>
+        </app-editorial-section>
+      }
+
+      @if (state().errorMessage) {
+        <div class="error-banner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+            <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <span>{{ state().errorMessage }}</span>
+        </div>
+      }
+
+      @if (state().successMessage) {
+        <div class="success-banner">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>{{ state().successMessage }}</span>
+        </div>
+      }
+
+      <div class="tf-actions">
+        <button type="button" class="btn-ghost" (click)="volver()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary"
+          [disabled]="form.invalid || state().isSaving">
+          @if (state().isSaving) {
+            <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 12px; height: 12px;"></span>
+            Guardando…
+          } @else {
+            {{ esEdicion ? 'Actualizar sede' : 'Crear sucursal' }}
+          }
+        </button>
+      </div>
+    </form>
+
+    <!-- Side panel: tips contextuales -->
+    <aside class="tf-aside anim-fade-up anim-delay-2">
+
+      <div class="tf-side-block">
+        <span class="text-eyebrow eyebrow-mark">Notas</span>
+        <h3 class="tf-side-title">
+          @if (esEdicion) {
+            Editar con cuidado.
+          } @else {
+            Cómo funciona.
+          }
+        </h3>
+        @if (esEdicion) {
+          <p class="tf-side-text">
+            Los cambios en <em>nombre</em>, <em>dirección</em> y <em>ubigeo</em> son reversibles. Las series de comprobante quedan fijas según las normas SUNAT.
+          </p>
         } @else {
-          {{ esEdicion ? 'Actualizar' : 'Crear tienda' }}
+          <p class="tf-side-text">
+            La nueva sede aparecerá en el selector de tiendas. Podrás seleccionarla como tienda activa para operar (vender, gestionar inventario, finanzas).
+          </p>
         }
-      </button>
-    </div>
-  </form>
+      </div>
+
+      @if (!esEdicion) {
+        <div class="tf-side-block tf-side-block-rule">
+          <span class="text-eyebrow eyebrow-mark">Series</span>
+          <h3 class="tf-side-title">Formato esperado.</h3>
+          <ul class="tf-side-list">
+            <li><span class="text-mono">F001</span> · Factura electrónica</li>
+            <li><span class="text-mono">B001</span> · Boleta electrónica</li>
+            <li><span class="text-mono">T001</span> · Ticket interno (no SUNAT)</li>
+          </ul>
+          <p class="tf-side-text-s">
+            Formato: una letra mayúscula + tres dígitos. Las series sugeridas no chocan con tus sedes existentes.
+          </p>
+        </div>
+      }
+
+      <div class="tf-side-block tf-side-block-rule">
+        <span class="text-eyebrow eyebrow-mark">Roles</span>
+        <h3 class="tf-side-title">Solo dueños.</h3>
+        <p class="tf-side-text">
+          Crear y editar sedes requiere rol <span class="text-mono">DUENO</span>. Los administradores y trabajadores pueden verlas pero no modificarlas.
+        </p>
+      </div>
+
+    </aside>
+  </div>
 </div>

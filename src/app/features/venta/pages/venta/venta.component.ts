@@ -72,6 +72,11 @@ export class VentaComponent implements OnInit, OnDestroy {
   readonly modalProducto = signal<ProductoCatalogoModel | null>(null);
   private debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // ── Imágenes fallidas (solo UI) ──
+  private readonly imgFailedIds = new Set<number>();
+  hasImgFailed(productoId: number): boolean { return this.imgFailedIds.has(productoId); }
+  onImgError(productoId: number): void { this.imgFailedIds.add(productoId); }
+
   // ── Panel / Carrito ──
   readonly mostrarSheet = signal(false);
   readonly panelStep = signal<1 | 2>(1);

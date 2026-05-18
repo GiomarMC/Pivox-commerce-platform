@@ -19,8 +19,8 @@
   align-items: center;
   gap: 1rem;
   background: #fff;
-  border: 1px solid #E2E6F0;
-  border-radius: 14px;
+  border: 1px solid #EEF1F6;
+  border-radius: 16px;
   padding: 1.25rem;
   text-decoration: none;
   color: inherit;
@@ -29,7 +29,7 @@
 }
 
 .hub-card:hover {
-  border-color: #1F2A7C;
+  border-color: #334155;
   box-shadow: 0 4px 20px rgba(31,42,124,0.1);
   transform: translateY(-1px);
 }
@@ -37,8 +37,8 @@
 .hub-card:active { transform: scale(0.99); }
 
 .hub-card-primary {
-  background: #1F2A7C;
-  border-color: #1F2A7C;
+  background: #334155;
+  border-color: #334155;
 }
 
 .hub-card-primary:hover {
@@ -51,7 +51,7 @@
 .hub-icon-wrap {
   width: 52px;
   height: 52px;
-  border-radius: 12px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +63,7 @@
 .hub-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #111827;
+  color: #334155;
   margin: 0 0 0.2rem;
 }
 
@@ -74,8 +74,8 @@
   margin: 0 0 0.2rem;
 }
 
-.hub-desc { font-size: 0.8rem; color: #6B7280; margin: 0; }
+.hub-desc { font-size: 0.8rem; color: #64748B; margin: 0; }
 .hub-desc-light { font-size: 0.8rem; color: rgba(255,255,255,0.65); margin: 0; }
 
-.hub-arrow { width: 18px; height: 18px; color: #9CA3AF; flex-shrink: 0; }
+.hub-arrow { width: 18px; height: 18px; color: #94A3B8; flex-shrink: 0; }
 .hub-arrow-light { width: 18px; height: 18px; flex-shrink: 0; }

@@ -11,10 +11,10 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
   standalone: true,
   imports: [FormsModule],
   styles: [`
-    .hist-card { background:#fff; border:1px solid #E2E6F0; border-radius:14px; padding:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.75rem; }
+    .hist-card { background:#fff; border:1px solid #EEF1F6; border-radius: 16px; padding:1rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.75rem; }
     .hist-meta { display:flex; gap:1.5rem; flex-wrap:wrap; margin-bottom:0.75rem; }
-    .hist-meta-item { font-size:0.75rem; color:#9CA3AF; }
-    .hist-meta-item span { color:#374151; font-weight:600; }
+    .hist-meta-item { font-size:0.75rem; color:#94A3B8; }
+    .hist-meta-item span { color:#334155; font-weight:600; }
   `],
   template: `
     <div class="page-content max-w-3xl pb-24">
@@ -25,11 +25,11 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
       <!-- Filtros -->
       <div class="card" style="margin-bottom:1rem;display:flex;flex-direction:column;gap:0.75rem">
         <div style="position:relative">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%)">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
           <input type="text" [(ngModel)]="busqueda" placeholder="Buscar por N° comprobante..."
-            style="width:100%;padding:0.55rem 0.875rem 0.55rem 2.25rem;border:1px solid #E2E6F0;border-radius:10px;font-size:0.875rem;outline:none;font-family:inherit;box-sizing:border-box" />
+            style="width:100%;padding:0.55rem 0.875rem 0.55rem 2.25rem;border:1px solid #EEF1F6;border-radius: 16px;font-size:0.875rem;outline:none;font-family:inherit;box-sizing:border-box" />
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem">
           <select [(ngModel)]="filtroTipo" class="field-select">
@@ -68,7 +68,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
       } @else if (svc.historial().servicios.length === 0) {
         <div class="empty-state">
           <div class="empty-icon-wrap">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
               <polyline points="14 2 14 8 20 8"/>
             </svg>
@@ -81,10 +81,10 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
           <div class="hist-card">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.625rem">
               <div>
-                <p style="font-size:0.68rem;font-family:monospace;color:#9CA3AF;margin:0 0 0.2rem">{{ s.numeroComprobante }}</p>
-                <p style="font-size:0.9rem;font-weight:700;color:#111827;margin:0">{{ getTipoVentaLabel(s.tipo) }}</p>
+                <p style="font-size:0.68rem;font-family:monospace;color:#94A3B8;margin:0 0 0.2rem">{{ s.numeroComprobante }}</p>
+                <p style="font-size:0.9rem;font-weight:700;color:#334155;margin:0">{{ getTipoVentaLabel(s.tipo) }}</p>
                 @if (s.descripcion) {
-                  <p style="font-size:0.75rem;color:#9CA3AF;margin:0.15rem 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">{{ s.descripcion }}</p>
+                  <p style="font-size:0.75rem;color:#94A3B8;margin:0.15rem 0 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px">{{ s.descripcion }}</p>
                 }
               </div>
               @if (s.estadoSunat && s.estadoSunat !== 'NO_APLICA') {
@@ -98,7 +98,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
               }
               <span class="hist-meta-item">Período: <span>{{ s.fechaInicio }} — {{ s.fechaFin }}</span></span>
               <span class="hist-meta-item">Fecha: <span>{{ s.fecha }}</span></span>
-              <span style="font-size:0.875rem;font-weight:800;color:#1F2A7C;letter-spacing:-0.01em">S/ {{ s.total.toFixed(2) }}</span>
+              <span style="font-size:0.875rem;font-weight:800;color:#334155;letter-spacing:-0.01em">S/ {{ s.total.toFixed(2) }}</span>
             </div>
 
             <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
@@ -131,7 +131,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
         }
 
         @if (svc.historial().isLoading) {
-          <div style="text-align:center;padding:1.5rem 0;font-size:0.85rem;color:#9CA3AF">Cargando más...</div>
+          <div style="text-align:center;padding:1.5rem 0;font-size:0.85rem;color:#94A3B8">Cargando más...</div>
         }
       }
     </div>

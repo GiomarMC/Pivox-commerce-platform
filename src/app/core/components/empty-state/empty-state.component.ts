@@ -4,17 +4,19 @@ import { Component, input } from '@angular/core';
   selector: 'app-empty-state',
   standalone: true,
   template: `
-    <div class="flex flex-col items-center justify-center py-12 text-center">
-      <p class="text-4xl mb-3">{{ icon() }}</p>
-      <p class="text-sm font-semibold text-[var(--color-text-primary)]">{{ title() }}</p>
+    <div class="empty-state anim-fade-up">
+      <div class="empty-icon-wrap">
+        <span class="text-mono-s" style="letter-spacing: 0.04em;">{{ icon() }}</span>
+      </div>
+      <p class="empty-title">{{ title() }}</p>
       @if (message()) {
-        <p class="text-xs text-[var(--color-text-secondary)] mt-1 max-w-xs">{{ message() }}</p>
+        <p class="empty-desc">{{ message() }}</p>
       }
     </div>
   `,
 })
 export class EmptyStateComponent {
-  readonly icon = input('📭');
+  readonly icon = input('—');
   readonly title = input.required<string>();
   readonly message = input('');
 }

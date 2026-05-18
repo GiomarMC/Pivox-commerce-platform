@@ -8,19 +8,19 @@ import { TicketConverter, TicketData } from '../ticket.converter';
   standalone: true,
   styles: [`
     .pp-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; display:flex; align-items:center; justify-content:center; padding:1rem; }
-    .pp-modal { background:#fff; border-radius:16px; width:100%; max-width:40rem; box-shadow:0 8px 32px rgba(0,0,0,0.15); overflow:hidden; }
-    .pp-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #E2E6F0; }
-    .pp-title { font-size:0.875rem; font-weight:600; color:#111827; margin:0; }
-    .pp-close { width:28px; height:28px; border-radius:8px; background:#F4F6FB; border:none; display:flex; align-items:center; justify-content:center; color:#6B7280; cursor:pointer; }
-    .pp-preview { overflow-y:auto; max-height:32rem; background:#F9FAFB; padding:0.75rem; display:flex; justify-content:center; }
-    .pp-iframe { width:100%; border-radius:8px; border:1px solid #E2E6F0; height:500px; }
+    .pp-modal { background:#fff; border-radius: 16px; width:100%; max-width:40rem; box-shadow:0 8px 32px rgba(0,0,0,0.15); overflow:hidden; }
+    .pp-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #EEF1F6; }
+    .pp-title { font-size:0.875rem; font-weight:600; color:#334155; margin:0; }
+    .pp-close { width:28px; height:28px; border-radius: 14px; background:#F8FAFC; border:none; display:flex; align-items:center; justify-content:center; color:#64748B; cursor:pointer; }
+    .pp-preview { overflow-y:auto; max-height:32rem; background:#F8FAFC; padding:0.75rem; display:flex; justify-content:center; }
+    .pp-iframe { width:100%; border-radius: 14px; border:1px solid #EEF1F6; height:500px; }
     .pp-ticket { font-family:'Courier New',Courier,monospace; font-size:11px; width:260px; background:#fff; padding:12px 10px; border:1px dashed #ccc; line-height:1.5; white-space:pre; }
-    .pp-error { margin:0.75rem 1rem 0; background:#FEF2F2; border:1px solid #FECACA; border-radius:10px; padding:0.75rem; }
-    .pp-error-title { font-size:0.75rem; font-weight:700; color:#991B1B; margin:0 0 0.2rem; }
-    .pp-error-msg { font-size:0.75rem; color:#DC2626; margin:0; }
+    .pp-error { margin:0.75rem 1rem 0; background:#FEF2F2; border:1px solid #EF4444; border-radius: 16px; padding:0.75rem; }
+    .pp-error-title { font-size:0.75rem; font-weight:700; color:#EF4444; margin:0 0 0.2rem; }
+    .pp-error-msg { font-size:0.75rem; color:#EF4444; margin:0; }
     .pp-error-hint { font-size:0.72rem; color:#EF4444; margin:0.25rem 0 0; }
-    .pp-success { margin:0.75rem 1rem 0; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:0.75rem; text-align:center; }
-    .pp-success-msg { font-size:0.875rem; font-weight:700; color:#166534; margin:0; }
+    .pp-success { margin:0.75rem 1rem 0; background:#ECFDF5; border:1px solid #10B981; border-radius: 16px; padding:0.75rem; text-align:center; }
+    .pp-success-msg { font-size:0.875rem; font-weight:700; color:#10B981; margin:0; }
     .pp-actions { padding:1rem; display:flex; flex-direction:column; gap:0.5rem; }
     .pp-spin { width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:pp-rotate 0.6s linear infinite; flex-shrink:0; }
     @keyframes pp-rotate { to { transform:rotate(360deg); } }

@@ -18,10 +18,10 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
   standalone: true,
   imports: [ServicioFlowHeaderComponent, FormsModule, PrintPreviewComponent],
   styles: [`
-    .sc-card { background:#fff; border:1px solid #E2E6F0; border-radius:14px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.875rem; }
-    .sc-meta-row { display:flex; justify-content:space-between; align-items:baseline; padding:0.35rem 0; border-bottom:1px solid #F4F6FB; }
+    .sc-card { background:#fff; border:1px solid #EEF1F6; border-radius: 16px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.875rem; }
+    .sc-meta-row { display:flex; justify-content:space-between; align-items:baseline; padding:0.35rem 0; border-bottom:1px solid #F8FAFC; }
     .sc-meta-row:last-child { border-bottom:none; }
-    .sc-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E6F0; padding:1rem; display:flex; flex-direction:column; gap:0.5rem; z-index:20; }
+    .sc-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #EEF1F6; padding:1rem; display:flex; flex-direction:column; gap:0.5rem; z-index:20; }
     .sc-layout { display:flex; flex-direction:column; gap:0.875rem; }
     .sc-right-panel { display:flex; flex-direction:column; gap:0.5rem; }
     .sc-desktop-footer { display:none; }
@@ -29,7 +29,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
     @media (min-width: 768px) {
       .sc-wrap { max-width:900px; padding-bottom:2rem; }
       .sc-layout { display:grid; grid-template-columns:1fr 280px; gap:1.5rem; align-items:start; }
-      .sc-right-panel { position:sticky; top:1rem; background:#fff; border:1px solid #E2E6F0; border-radius:14px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+      .sc-right-panel { position:sticky; top:1rem; background:#fff; border:1px solid #EEF1F6; border-radius: 16px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
       .sc-footer { display:none; }
       .sc-desktop-footer { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.5rem; }
     }
@@ -39,15 +39,15 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
 
     <div class="page-content sc-wrap pb-28">
       <!-- Banner éxito -->
-      <div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:14px;padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.875rem">
-        <div style="width:40px;height:40px;border-radius:50%;background:#16A34A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <div style="background:#ECFDF5;border:1px solid #86EFAC;border-radius: 16px;padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.875rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
         <div>
-          <p style="font-size:0.9rem;font-weight:700;color:#15803D;margin:0 0 0.1rem">Servicio registrado</p>
-          <p style="font-size:0.75rem;color:#16A34A;margin:0">La operación fue procesada correctamente</p>
+          <p style="font-size:0.9rem;font-weight:700;color:#10B981;margin:0 0 0.1rem">Servicio registrado</p>
+          <p style="font-size:0.75rem;color:#10B981;margin:0">La operación fue procesada correctamente</p>
         </div>
       </div>
 
@@ -60,10 +60,10 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
         <div class="sc-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.875rem">
             <div>
-              <p style="font-size:0.68rem;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.2rem">Comprobante</p>
-              <p style="font-size:1rem;font-weight:800;color:#111827;margin:0 0 0.1rem">{{ getTipoVentaLabel(s.tipo) }}</p>
+              <p style="font-size:0.68rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.2rem">Comprobante</p>
+              <p style="font-size:1rem;font-weight:800;color:#334155;margin:0 0 0.1rem">{{ getTipoVentaLabel(s.tipo) }}</p>
               @if (s.tipoComprobante) {
-                <p style="font-size:0.78rem;color:#6B7280;margin:0">{{ getTipoComprobanteLabel(s.tipoComprobante) }}</p>
+                <p style="font-size:0.78rem;color:#64748B;margin:0">{{ getTipoComprobanteLabel(s.tipoComprobante) }}</p>
               }
             </div>
             @if (isSunat() && s.estadoSunat) {
@@ -80,47 +80,47 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
             </div>
           }
 
-          <div style="border-top:1px solid #F4F6FB;padding-top:0.75rem;margin-bottom:0.75rem">
+          <div style="border-top:1px solid #F8FAFC;padding-top:0.75rem;margin-bottom:0.75rem">
             <div class="sc-meta-row">
-              <span style="font-size:0.75rem;color:#9CA3AF">N° comprobante</span>
-              <span style="font-size:0.75rem;font-weight:700;color:#111827;font-family:monospace">{{ s.numeroComprobante }}</span>
+              <span style="font-size:0.75rem;color:#94A3B8">N° comprobante</span>
+              <span style="font-size:0.75rem;font-weight:700;color:#334155;font-family:monospace">{{ s.numeroComprobante }}</span>
             </div>
             @if (s.cliente) {
               <div class="sc-meta-row">
-                <span style="font-size:0.75rem;color:#9CA3AF">Cliente</span>
-                <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ s.cliente.nombre }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Cliente</span>
+                <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ s.cliente.nombre }}</span>
               </div>
             }
             @if (s.metodoPago) {
               <div class="sc-meta-row">
-                <span style="font-size:0.75rem;color:#9CA3AF">Pago</span>
-                <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ getMetodoPagoLabel(s.metodoPago) }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Pago</span>
+                <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ getMetodoPagoLabel(s.metodoPago) }}</span>
               </div>
             }
             <div class="sc-meta-row">
-              <span style="font-size:0.75rem;color:#9CA3AF">Período</span>
-              <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ s.fechaInicio }} — {{ s.fechaFin }}</span>
+              <span style="font-size:0.75rem;color:#94A3B8">Período</span>
+              <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ s.fechaInicio }} — {{ s.fechaFin }}</span>
             </div>
             <div class="sc-meta-row">
-              <span style="font-size:0.75rem;color:#9CA3AF">Fecha</span>
-              <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ s.fecha }}</span>
+              <span style="font-size:0.75rem;color:#94A3B8">Fecha</span>
+              <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ s.fecha }}</span>
             </div>
             @if (s.descripcion) {
               <div class="sc-meta-row">
-                <span style="font-size:0.75rem;color:#9CA3AF">Descripción</span>
-                <span style="font-size:0.75rem;font-weight:600;color:#374151;max-width:200px;text-align:right">{{ s.descripcion }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Descripción</span>
+                <span style="font-size:0.75rem;font-weight:600;color:#334155;max-width:200px;text-align:right">{{ s.descripcion }}</span>
               </div>
             }
           </div>
 
-          <div style="border-top:1px solid #E2E6F0;padding-top:0.75rem;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.9rem;font-weight:700;color:#111827">Total</span>
-            <span style="font-size:1.1rem;font-weight:800;color:#1F2A7C;letter-spacing:-0.01em">S/ {{ s.total.toFixed(2) }}</span>
+          <div style="border-top:1px solid #EEF1F6;padding-top:0.75rem;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.9rem;font-weight:700;color:#334155">Total</span>
+            <span style="font-size:1.1rem;font-weight:800;color:#334155;letter-spacing:-0.01em">S/ {{ s.total.toFixed(2) }}</span>
           </div>
           @if (s.deuda > 0) {
             <div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.35rem">
-              <span style="font-size:0.75rem;color:#D97706">Deuda pendiente</span>
-              <span style="font-size:0.82rem;font-weight:700;color:#D97706">S/ {{ s.deuda.toFixed(2) }}</span>
+              <span style="font-size:0.75rem;color:#F59E0B">Deuda pendiente</span>
+              <span style="font-size:0.82rem;font-weight:700;color:#F59E0B">S/ {{ s.deuda.toFixed(2) }}</span>
             </div>
           }
         </div>
@@ -155,7 +155,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
             </button>
           } @else {
             <div class="sc-card">
-              <p style="font-size:0.875rem;font-weight:700;color:#111827;margin:0 0 0.75rem">Nota de crédito</p>
+              <p style="font-size:0.875rem;font-weight:700;color:#334155;margin:0 0 0.75rem">Nota de crédito</p>
               <div class="field-group" style="margin-bottom:0.75rem">
                 <label class="field-label">Tipo</label>
                 <select [(ngModel)]="tipoNotaCredito" class="field-select">

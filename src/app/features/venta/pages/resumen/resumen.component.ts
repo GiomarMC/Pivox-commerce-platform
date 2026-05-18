@@ -19,18 +19,18 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, FlowHeaderComponent, ClienteSearchComponent, DecimalPipe],
   styles: [`
-    .rv-section { background:#fff; border:1px solid #E2E6F0; border-radius:14px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
-    .rv-section-header { display:flex; align-items:center; gap:0.625rem; padding:0.875rem 1rem; border-bottom:1px solid #E2E6F0; }
-    .rv-section-icon { width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rv-section { background:#fff; border:1px solid #EEF1F6; border-radius: 16px; overflow:hidden; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+    .rv-section-header { display:flex; align-items:center; gap:0.625rem; padding:0.875rem 1rem; border-bottom:1px solid #EEF1F6; }
+    .rv-section-icon { width:32px; height:32px; border-radius: 14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .rv-section-body { padding:1rem; }
     .rv-collapse-btn { width:100%; display:flex; align-items:center; justify-content:space-between; padding:0.875rem 1rem; background:none; border:none; cursor:pointer; font-family:inherit; }
-    .rv-item-row { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0; border-bottom:1px solid #F4F6FB; }
+    .rv-item-row { display:flex; align-items:center; justify-content:space-between; padding:0.6rem 0; border-bottom:1px solid #F8FAFC; }
     .rv-item-row:last-child { border-bottom:none; }
-    .rv-num { width:22px; height:22px; border-radius:50%; background:#1F2A7C; color:#fff; font-size:0.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-    .rv-toggle { display:flex; border:1.5px solid #E2E6F0; border-radius:8px; overflow:hidden; margin-bottom:0.875rem; }
-    .rv-toggle-btn { flex:1; padding:0.5rem 0.75rem; font-size:0.8rem; font-weight:600; border:none; cursor:pointer; transition:background 0.12s, color 0.12s; font-family:inherit; background:#fff; color:#6B7280; }
-    .rv-toggle-btn-active { background:#1F2A7C; color:#fff; }
-    .rv-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E6F0; padding:1rem; z-index:20; }
+    .rv-num { width:22px; height:22px; border-radius:50%; background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #fff; font-size:0.68rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rv-toggle { display:flex; border:1.5px solid #EEF1F6; border-radius: 14px; overflow:hidden; margin-bottom:0.875rem; }
+    .rv-toggle-btn { flex:1; padding:0.5rem 0.75rem; font-size:0.8rem; font-weight:600; border:none; cursor:pointer; transition:background 0.12s, color 0.12s; font-family:inherit; background:#fff; color:#64748B; }
+    .rv-toggle-btn-active { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #fff; }
+    .rv-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #EEF1F6; padding:1rem; z-index:20; }
   `],
   template: `
     <app-flow-header [currentStep]="4" [showSunatStep]="isSunat()" />
@@ -41,18 +41,18 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
       <div class="rv-section">
         <button type="button" class="rv-collapse-btn" (click)="resumenExpandido.set(!resumenExpandido())">
           <div style="display:flex;align-items:center;gap:0.625rem">
-            <div class="rv-section-icon" style="background:#EFF6FF;color:#1F2A7C">
+            <div class="rv-section-icon" style="background:#EEF2FF;color:#334155">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
               </svg>
             </div>
-            <span style="font-size:0.875rem;font-weight:700;color:#111827">Productos</span>
-            <span style="font-size:0.72rem;color:#9CA3AF">({{ carritoSvc.items().length }})</span>
+            <span style="font-size:0.875rem;font-weight:700;color:#334155">Productos</span>
+            <span style="font-size:0.72rem;color:#94A3B8">({{ carritoSvc.items().length }})</span>
           </div>
           <div style="display:flex;align-items:center;gap:0.625rem">
-            <span style="font-size:0.95rem;font-weight:800;color:#1F2A7C">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
-            <svg [style]="'transition:transform 0.2s;transform:' + (resumenExpandido() ? 'rotate(180deg)' : 'rotate(0deg)')" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2.5">
+            <span style="font-size:0.95rem;font-weight:800;color:#334155">S/ {{ carritoSvc.total() | number:'1.2-2' }}</span>
+            <svg [style]="'transition:transform 0.2s;transform:' + (resumenExpandido() ? 'rotate(180deg)' : 'rotate(0deg)')" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2.5">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </div>
@@ -63,11 +63,11 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
               <div class="rv-item-row">
                 <div style="display:flex;align-items:center;gap:0.5rem;min-width:0">
                   <div class="rv-num">{{ i + 1 }}</div>
-                  <span style="font-size:0.82rem;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">{{ item.nombre }}</span>
+                  <span style="font-size:0.82rem;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px">{{ item.nombre }}</span>
                 </div>
                 <div style="text-align:right;flex-shrink:0">
-                  <p style="font-size:0.7rem;color:#9CA3AF;margin:0">{{ item.cantidad }} × S/ {{ item.precioUnitario | number:'1.2-2' }}</p>
-                  <p style="font-size:0.82rem;font-weight:700;color:#1F2A7C;margin:0">S/ {{ (item.cantidad * item.precioUnitario) | number:'1.2-2' }}</p>
+                  <p style="font-size:0.7rem;color:#94A3B8;margin:0">{{ item.cantidad }} × S/ {{ item.precioUnitario | number:'1.2-2' }}</p>
+                  <p style="font-size:0.82rem;font-weight:700;color:#334155;margin:0">S/ {{ (item.cantidad * item.precioUnitario) | number:'1.2-2' }}</p>
                 </div>
               </div>
             }
@@ -80,15 +80,15 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
         <!-- Tipo de venta (readonly, fue seleccionado en paso 1) -->
         <div class="rv-section">
           <div class="rv-section-header">
-            <div class="rv-section-icon" style="background:#DCFCE7;color:#15803D">
+            <div class="rv-section-icon" style="background:#ECFDF5;color:#10B981">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/>
                 <circle cx="12" cy="12" r="1"/>
               </svg>
             </div>
-            <span style="font-size:0.875rem;font-weight:700;color:#111827">Tipo de venta</span>
-            <span style="font-size:0.72rem;color:#9CA3AF;margin-left:auto">
-              <a routerLink="/ventas" style="color:#1F2A7C;font-size:0.72rem;font-weight:600;text-decoration:none">Cambiar</a>
+            <span style="font-size:0.875rem;font-weight:700;color:#334155">Tipo de venta</span>
+            <span style="font-size:0.72rem;color:#94A3B8;margin-left:auto">
+              <a routerLink="/ventas" style="color:#334155;font-size:0.72rem;font-weight:600;text-decoration:none">Cambiar</a>
             </span>
           </div>
           <div class="rv-section-body">
@@ -100,13 +100,13 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
         @if (!isCredito()) {
           <div class="rv-section">
             <div class="rv-section-header">
-              <div class="rv-section-icon" style="background:#FEF3C7;color:#D97706">
+              <div class="rv-section-icon" style="background:#FFFBEB;color:#F59E0B">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="2" y="5" width="20" height="14" rx="2"/>
                   <line x1="2" y1="10" x2="22" y2="10"/>
                 </svg>
               </div>
-              <span style="font-size:0.875rem;font-weight:700;color:#111827">Método de pago</span>
+              <span style="font-size:0.875rem;font-weight:700;color:#334155">Método de pago</span>
             </div>
             <div class="rv-section-body">
               <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
@@ -124,13 +124,13 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
         @if (isSunat()) {
           <div class="rv-section">
             <div class="rv-section-header">
-              <div class="rv-section-icon" style="background:#FEE2E2;color:#DC2626">
+              <div class="rv-section-icon" style="background:#FEF2F2;color:#EF4444">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                   <polyline points="14 2 14 8 20 8"/>
                 </svg>
               </div>
-              <span style="font-size:0.875rem;font-weight:700;color:#111827">Tipo de comprobante</span>
+              <span style="font-size:0.875rem;font-weight:700;color:#334155">Tipo de comprobante</span>
             </div>
             <div class="rv-section-body">
               <div style="display:flex;flex-wrap:wrap;gap:0.5rem">
@@ -141,7 +141,7 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
                 }
               </div>
               @if (form.get('tipoComprobante')?.touched && !tipoComprobante()) {
-                <p style="font-size:0.75rem;color:#DC2626;margin:0.5rem 0 0">Selecciona un tipo de comprobante</p>
+                <p style="font-size:0.75rem;color:#EF4444;margin:0.5rem 0 0">Selecciona un tipo de comprobante</p>
               }
             </div>
           </div>
@@ -150,13 +150,13 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
         <!-- Sección cliente -->
         <div class="rv-section" style="overflow:visible">
           <div class="rv-section-header">
-            <div class="rv-section-icon" style="background:#F3E8FF;color:#7C3AED">
+            <div class="rv-section-icon" style="background:#F3E8FF;color:#6366F1">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
               </svg>
             </div>
-            <span style="font-size:0.875rem;font-weight:700;color:#111827">Cliente</span>
-            <span style="font-size:0.72rem;color:#9CA3AF;margin-left:0.25rem">
+            <span style="font-size:0.875rem;font-weight:700;color:#334155">Cliente</span>
+            <span style="font-size:0.72rem;color:#94A3B8;margin-left:0.25rem">
               {{ clienteObligatorio() ? '(obligatorio)' : '(opcional)' }}
             </span>
           </div>
@@ -196,7 +196,7 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
                   <label class="field-label">N° documento</label>
                   <input formControlName="numeroDocumento" type="text" class="field-input" />
                   @if (form.get('clienteNuevo.numeroDocumento')?.errors?.['rucInvalido']) {
-                    <p style="font-size:0.75rem;color:#DC2626;margin:0.3rem 0 0">RUC debe tener 11 dígitos</p>
+                    <p style="font-size:0.75rem;color:#EF4444;margin:0.3rem 0 0">RUC debe tener 11 dígitos</p>
                   }
                 </div>
                 <div class="field-group">
@@ -204,15 +204,15 @@ import { ventaFormValidator, rucValidator, noRucEnBoletaValidator } from '../../
                   <input formControlName="nombre" type="text" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Teléfono{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#9CA3AF">{{ isCredito() ? '' : '(opcional)' }}</span></label>
+                  <label class="field-label">Teléfono{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#94A3B8">{{ isCredito() ? '' : '(opcional)' }}</span></label>
                   <input formControlName="telefono" type="tel" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Email{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#9CA3AF">{{ isCredito() ? '' : '(opcional)' }}</span></label>
+                  <label class="field-label">Email{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#94A3B8">{{ isCredito() ? '' : '(opcional)' }}</span></label>
                   <input formControlName="email" type="email" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Dirección{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#9CA3AF">{{ isCredito() ? '' : '(opcional)' }}</span></label>
+                  <label class="field-label">Dirección{{ isCredito() ? ' *' : '' }} <span style="font-weight:400;color:#94A3B8">{{ isCredito() ? '' : '(opcional)' }}</span></label>
                   <input formControlName="direccion" type="text" class="field-input" />
                 </div>
               </div>

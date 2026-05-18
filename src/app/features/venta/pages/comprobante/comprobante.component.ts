@@ -17,12 +17,12 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
   standalone: true,
   imports: [FlowHeaderComponent, FormsModule, PrintPreviewComponent],
   styles: [`
-    .comp-card { background:#fff; border:1px solid #E2E6F0; border-radius:14px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.875rem; }
+    .comp-card { background:#fff; border:1px solid #EEF1F6; border-radius: 16px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); margin-bottom:0.875rem; }
     .comp-meta-row { display:flex; justify-content:space-between; align-items:baseline; padding:0.35rem 0; }
-    .comp-meta-row:not(:last-child) { border-bottom:1px solid #F4F6FB; }
+    .comp-meta-row:not(:last-child) { border-bottom:1px solid #F8FAFC; }
     .comp-detail-row { display:flex; justify-content:space-between; align-items:center; padding:0.45rem 0; }
-    .comp-detail-row:not(:last-child) { border-bottom:1px solid #F4F6FB; }
-    .comp-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E6F0; padding:1rem; display:flex; flex-direction:column; gap:0.5rem; z-index:20; }
+    .comp-detail-row:not(:last-child) { border-bottom:1px solid #F8FAFC; }
+    .comp-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #EEF1F6; padding:1rem; display:flex; flex-direction:column; gap:0.5rem; z-index:20; }
     .comp-footer-hidden { display:none !important; }
     .sunat-badge { font-size:0.7rem; font-weight:700; padding:0.2rem 0.6rem; border-radius:20px; }
     .comp-layout { display:flex; flex-direction:column; gap:0.875rem; }
@@ -33,7 +33,7 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
     @media (min-width: 768px) {
       .comp-wrap { max-width:960px; padding-bottom:2rem; }
       .comp-layout { display:grid; grid-template-columns:1fr 280px; gap:1.5rem; align-items:start; }
-      .comp-right-panel { position:sticky; top:1rem; background:#fff; border:1px solid #E2E6F0; border-radius:14px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
+      .comp-right-panel { position:sticky; top:1rem; background:#fff; border:1px solid #EEF1F6; border-radius: 16px; padding:1.25rem; box-shadow:0 1px 4px rgba(0,0,0,0.04); }
       .comp-footer { display:none; }
       .comp-desktop-footer { display:flex; flex-direction:column; gap:0.5rem; margin-top:0.5rem; }
     }
@@ -45,15 +45,15 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
 
     <div class="page-content comp-wrap pb-28">
       <!-- Banner éxito -->
-      <div style="background:#DCFCE7;border:1px solid #86EFAC;border-radius:14px;padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.875rem">
-        <div style="width:40px;height:40px;border-radius:50%;background:#16A34A;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+      <div style="background:#ECFDF5;border:1px solid #86EFAC;border-radius: 16px;padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:0.875rem">
+        <div style="width:40px;height:40px;border-radius:50%;background:#10B981;display:flex;align-items:center;justify-content:center;flex-shrink:0">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         </div>
         <div>
-          <p style="font-size:0.9rem;font-weight:700;color:#15803D;margin:0 0 0.1rem">Venta registrada</p>
-          <p style="font-size:0.75rem;color:#16A34A;margin:0">La operación fue procesada correctamente</p>
+          <p style="font-size:0.9rem;font-weight:700;color:#10B981;margin:0 0 0.1rem">Venta registrada</p>
+          <p style="font-size:0.75rem;color:#10B981;margin:0">La operación fue procesada correctamente</p>
         </div>
       </div>
 
@@ -66,10 +66,10 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
         <div class="comp-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.875rem">
             <div>
-              <p style="font-size:0.68rem;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.2rem">Comprobante</p>
-              <p style="font-size:1rem;font-weight:800;color:#111827;margin:0 0 0.1rem">{{ getTipoVentaLabel(v.tipoVenta) }}</p>
+              <p style="font-size:0.68rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.2rem">Comprobante</p>
+              <p style="font-size:1rem;font-weight:800;color:#334155;margin:0 0 0.1rem">{{ getTipoVentaLabel(v.tipoVenta) }}</p>
               @if (v.tipoComprobante) {
-                <p style="font-size:0.78rem;color:#6B7280;margin:0">{{ getTipoComprobanteLabel(v.tipoComprobante) }}</p>
+                <p style="font-size:0.78rem;color:#64748B;margin:0">{{ getTipoComprobanteLabel(v.tipoComprobante) }}</p>
               }
             </div>
             @if (isSunat() && v.estadoSunat) {
@@ -88,63 +88,63 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
             </div>
           }
 
-          <div style="border-top:1px solid #F4F6FB;padding-top:0.75rem;margin-bottom:0.75rem">
+          <div style="border-top:1px solid #F8FAFC;padding-top:0.75rem;margin-bottom:0.75rem">
             <div class="comp-meta-row">
-              <span style="font-size:0.75rem;color:#9CA3AF">N° operación</span>
-              <span style="font-size:0.75rem;font-weight:700;color:#111827;font-family:monospace">{{ v.numero }}</span>
+              <span style="font-size:0.75rem;color:#94A3B8">N° operación</span>
+              <span style="font-size:0.75rem;font-weight:700;color:#334155;font-family:monospace">{{ v.numero }}</span>
             </div>
             @if (v.clienteNombre) {
               <div class="comp-meta-row">
-                <span style="font-size:0.75rem;color:#9CA3AF">Cliente</span>
-                <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ v.clienteNombre }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Cliente</span>
+                <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ v.clienteNombre }}</span>
               </div>
             }
             @if (v.metodoPago) {
               <div class="comp-meta-row">
-                <span style="font-size:0.75rem;color:#9CA3AF">Pago</span>
-                <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ getMetodoPagoLabel(v.metodoPago) }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Pago</span>
+                <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ getMetodoPagoLabel(v.metodoPago) }}</span>
               </div>
             }
             <div class="comp-meta-row">
-              <span style="font-size:0.75rem;color:#9CA3AF">Fecha</span>
-              <span style="font-size:0.75rem;font-weight:600;color:#374151">{{ formatFecha(v.fechaCreacion) }}</span>
+              <span style="font-size:0.75rem;color:#94A3B8">Fecha</span>
+              <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ formatFecha(v.fechaCreacion) }}</span>
             </div>
           </div>
 
           <!-- Detalle ítems -->
-          <div style="border-top:1px solid #F4F6FB;padding-top:0.75rem;margin-bottom:0.75rem">
+          <div style="border-top:1px solid #F8FAFC;padding-top:0.75rem;margin-bottom:0.75rem">
             @if (isSunat() && v.detallesSunat.length > 0) {
               @for (l of v.detallesSunat; track l.id) {
                 <div class="comp-detail-row">
-                  <span style="font-size:0.82rem;color:#374151">{{ l.productoNombre }} × {{ l.cantidad }}</span>
-                  <span style="font-size:0.82rem;font-weight:700;color:#111827">S/ {{ l.subtotal }}</span>
+                  <span style="font-size:0.82rem;color:#334155">{{ l.productoNombre }} × {{ l.cantidad }}</span>
+                  <span style="font-size:0.82rem;font-weight:700;color:#334155">S/ {{ l.subtotal }}</span>
                 </div>
               }
             } @else {
               @for (l of v.detalles; track l.id) {
                 <div class="comp-detail-row">
-                  <span style="font-size:0.82rem;color:#374151">{{ l.productoNombre }} × {{ l.cantidad }}</span>
-                  <span style="font-size:0.82rem;font-weight:700;color:#111827">S/ {{ l.subtotal }}</span>
+                  <span style="font-size:0.82rem;color:#334155">{{ l.productoNombre }} × {{ l.cantidad }}</span>
+                  <span style="font-size:0.82rem;font-weight:700;color:#334155">S/ {{ l.subtotal }}</span>
                 </div>
               }
             }
           </div>
 
           <!-- Totales -->
-          <div style="border-top:1px solid #E2E6F0;padding-top:0.75rem">
+          <div style="border-top:1px solid #EEF1F6;padding-top:0.75rem">
             @if (v.igvTotal) {
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem">
-                <span style="font-size:0.75rem;color:#9CA3AF">Subtotal</span>
-                <span style="font-size:0.75rem;color:#6B7280">S/ {{ v.subtotal }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">Subtotal</span>
+                <span style="font-size:0.75rem;color:#64748B">S/ {{ v.subtotal }}</span>
               </div>
               <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.3rem">
-                <span style="font-size:0.75rem;color:#9CA3AF">IGV (18%)</span>
-                <span style="font-size:0.75rem;color:#6B7280">S/ {{ v.igvTotal }}</span>
+                <span style="font-size:0.75rem;color:#94A3B8">IGV (18%)</span>
+                <span style="font-size:0.75rem;color:#64748B">S/ {{ v.igvTotal }}</span>
               </div>
             }
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-size:0.9rem;font-weight:700;color:#111827">Total</span>
-              <span style="font-size:1.1rem;font-weight:800;color:#1F2A7C">S/ {{ v.total }}</span>
+              <span style="font-size:0.9rem;font-weight:700;color:#334155">Total</span>
+              <span style="font-size:1.1rem;font-weight:800;color:#334155">S/ {{ v.total }}</span>
             </div>
           </div>
         </div>
@@ -189,7 +189,7 @@ import { getMetodoPagoLabel } from '../../constants/metodo-pago';
             </button>
           } @else {
             <div class="comp-card">
-              <p style="font-size:0.875rem;font-weight:700;color:#111827;margin:0 0 0.75rem">Nota de crédito</p>
+              <p style="font-size:0.875rem;font-weight:700;color:#334155;margin:0 0 0.75rem">Nota de crédito</p>
               <div class="field-group" style="margin-bottom:0.75rem">
                 <label class="field-label">Motivo</label>
                 <textarea

@@ -20,18 +20,18 @@ import { ImpresoraService, TipoConexionImpresora } from '../impresora.service';
       </div>
 
       @if (svc.estaConfigurada()) {
-        <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:0.875rem;display:flex;align-items:center;gap:0.75rem">
-          <div style="width:32px;height:32px;background:#16A34A;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div style="background:#ECFDF5;border:1px solid #10B981;border-radius: 16px;padding:0.875rem;display:flex;align-items:center;gap:0.75rem">
+          <div style="width:32px;height:32px;background:#10B981;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5">
               <polyline points="20 6 9 17 4 12"/>
             </svg>
           </div>
           <div>
-            <p style="font-size:0.8rem;font-weight:600;color:#166534;margin:0">Impresora configurada</p>
+            <p style="font-size:0.8rem;font-weight:600;color:#10B981;margin:0">Impresora configurada</p>
             @if (svc.config().tipoConexion === 'wifi') {
-              <p style="font-size:0.72rem;color:#16A34A;margin:0">WiFi · {{ svc.config().ip }}:{{ svc.config().puerto }}</p>
+              <p style="font-size:0.72rem;color:#10B981;margin:0">WiFi · {{ svc.config().ip }}:{{ svc.config().puerto }}</p>
             } @else {
-              <p style="font-size:0.72rem;color:#16A34A;margin:0">USB / Sistema (CUPS)</p>
+              <p style="font-size:0.72rem;color:#10B981;margin:0">USB / Sistema (CUPS)</p>
             }
           </div>
         </div>
@@ -65,7 +65,7 @@ import { ImpresoraService, TipoConexionImpresora } from '../impresora.service';
               <label class="field-label">Dirección IP</label>
               <input type="text" formControlName="ip" placeholder="192.168.1.100" class="field-input" />
               @if (formWifi.get('ip')?.invalid && formWifi.get('ip')?.touched) {
-                <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">Ingresa la IP</p>
+                <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">Ingresa la IP</p>
               }
             </div>
             <div class="field-group">

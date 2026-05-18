@@ -6,7 +6,7 @@ export type BadgeType = 'success' | 'error' | 'warning' | 'info';
   selector: 'app-status-badge',
   standalone: true,
   template: `
-    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium" [class]="badgeClass()">
+    <span class="badge" [class]="badgeClass()">
       {{ label() }}
     </span>
   `,
@@ -17,10 +17,10 @@ export class StatusBadgeComponent {
 
   readonly badgeClass = computed(() => {
     const map: Record<BadgeType, string> = {
-      success: 'bg-green-100 text-green-800',
-      error: 'bg-red-100 text-red-800',
-      warning: 'bg-yellow-100 text-yellow-800',
-      info: 'bg-blue-100 text-blue-800',
+      success: 'badge-success',
+      error:   'badge-error',
+      warning: 'badge-warning',
+      info:    'badge-info',
     };
     return map[this.type()];
   });

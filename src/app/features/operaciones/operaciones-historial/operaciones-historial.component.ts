@@ -36,101 +36,101 @@ const NC_VENTA_TIPOS = [
   standalone: true,
   imports: [RouterLink, FormsModule, PrintPreviewComponent],
   styles: [`
-    .oh-page { background:#F2F4FA; padding-bottom:2rem; }
-    .oh-header { position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #E2E6F0; padding:0.75rem 1rem; }
+    .oh-page { background:#FAFBFC; padding-bottom:2rem; }
+    .oh-header { position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #EEF1F6; padding:0.75rem 1rem; }
     .oh-header-row { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
-    .oh-back-btn { display:flex; align-items:center; gap:0.25rem; font-size:0.875rem; color:#9CA3AF; background:none; border:none; cursor:pointer; padding:0; font-family:inherit; }
-    .oh-title { font-size:1rem; font-weight:700; color:#111827; flex:1; margin:0; }
+    .oh-back-btn { display:flex; align-items:center; gap:0.25rem; font-size:0.875rem; color:#94A3B8; background:none; border:none; cursor:pointer; padding:0; font-family:inherit; }
+    .oh-title { font-size:1rem; font-weight:700; color:#334155; flex:1; margin:0; }
     .oh-search-wrap { position:relative; margin-bottom:0.75rem; }
     .oh-search-icon { position:absolute; left:0.75rem; top:50%; transform:translateY(-50%); pointer-events:none; }
-    .oh-search-input { width:100%; padding:0.5rem 0.75rem 0.5rem 2.25rem; font-size:0.875rem; border:1px solid #E2E6F0; border-radius:12px; background:#F9FAFB; outline:none; font-family:inherit; box-sizing:border-box; }
-    .oh-search-input:focus { border-color:#1F2A7C; background:#fff; }
+    .oh-search-input { width:100%; padding:0.5rem 0.75rem 0.5rem 2.25rem; font-size:0.875rem; border:1px solid #EEF1F6; border-radius: 16px; background:#F8FAFC; outline:none; font-family:inherit; box-sizing:border-box; }
+    .oh-search-input:focus { border-color:#334155; background:#fff; }
     .oh-chips-row { display:flex; gap:0.5rem; overflow-x:auto; padding-bottom:0.25rem; margin-bottom:0.5rem; scrollbar-width:none; }
     .oh-chips-row::-webkit-scrollbar { display:none; }
     .oh-date-range { display:flex; gap:0.5rem; margin-bottom:0.5rem; align-items:center; }
-    .oh-date-input { flex:1; padding:0.375rem 0.5rem; font-size:0.75rem; border:1px solid #E2E6F0; border-radius:8px; outline:none; font-family:inherit; }
+    .oh-date-input { flex:1; padding:0.375rem 0.5rem; font-size:0.75rem; border:1px solid #EEF1F6; border-radius: 14px; outline:none; font-family:inherit; }
     .oh-type-chips { display:flex; gap:0.5rem; }
     .oh-content { padding:1rem; }
     .oh-list { display:flex; flex-direction:column; gap:0.75rem; }
-    .oh-op-card { background:#fff; border-radius:14px; border:1px solid #E2E6F0; padding:1rem; text-align:left; width:100%; cursor:pointer; transition:box-shadow 0.18s; display:block; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
+    .oh-op-card { background:#fff; border-radius: 16px; border:1px solid #EEF1F6; padding:1rem; text-align:left; width:100%; cursor:pointer; transition:box-shadow 0.18s; display:block; overflow:hidden; box-shadow:0 1px 3px rgba(0,0,0,0.04); }
     .oh-op-card:hover { box-shadow:0 6px 18px rgba(31,42,124,0.1); }
-    .oh-op-card:active { background:#F9FAFB; }
+    .oh-op-card:active { background:#F8FAFC; }
     .oh-op-row { display:flex; gap:0.75rem; align-items:flex-start; }
-    .oh-icon-wrap { width:44px; height:44px; border-radius:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .oh-icon-wrap { width:44px; height:44px; border-radius: 16px; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
     .oh-op-info { flex:1; min-width:0; }
     .oh-op-top { display:flex; align-items:flex-start; justify-content:space-between; gap:0.5rem; margin-bottom:0.2rem; }
-    .oh-op-num { font-size:0.875rem; font-weight:600; color:#111827; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
-    .oh-op-total { font-size:1rem; font-weight:800; color:#1F2A7C; flex-shrink:0; margin:0; letter-spacing:-0.02em; }
-    .oh-op-sub { font-size:0.75rem; color:#9CA3AF; margin:0 0 0.2rem; }
-    .oh-op-client { font-size:0.75rem; color:#374151; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
-    .oh-op-date { font-size:0.72rem; color:#9CA3AF; margin:0.2rem 0 0; }
-    .oh-nc-badge { font-size:0.72rem; font-weight:700; padding:0.1rem 0.35rem; border-radius:4px; background:#DBEAFE; color:#1D4ED8; flex-shrink:0; }
+    .oh-op-num { font-size:0.875rem; font-weight:600; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
+    .oh-op-total { font-size:1rem; font-weight:800; color:#334155; flex-shrink:0; margin:0; letter-spacing:-0.02em; }
+    .oh-op-sub { font-size:0.75rem; color:#94A3B8; margin:0 0 0.2rem; }
+    .oh-op-client { font-size:0.75rem; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
+    .oh-op-date { font-size:0.72rem; color:#94A3B8; margin:0.2rem 0 0; }
+    .oh-nc-badge { font-size:0.72rem; font-weight:700; padding:0.1rem 0.35rem; border-radius: 14px; background:#E0E7FF; color:#6366F1; flex-shrink:0; }
     .oh-cancelled { margin-top:0.5rem; font-size:0.72rem; color:#EF4444; font-weight:600; }
-    .oh-loading-more { text-align:center; padding:1rem; font-size:0.75rem; color:#9CA3AF; }
+    .oh-loading-more { text-align:center; padding:1rem; font-size:0.75rem; color:#94A3B8; }
     /* Skeleton */
-    .oh-skel-card { background:#fff; border-radius:14px; border:1px solid #E2E6F0; padding:1rem; animation:oh-pulse 1.5s ease-in-out infinite; }
+    .oh-skel-card { background:#fff; border-radius: 16px; border:1px solid #EEF1F6; padding:1rem; animation:oh-pulse 1.5s ease-in-out infinite; }
     .oh-skel-row { display:flex; gap:0.75rem; }
-    .oh-skel-icon { width:44px; height:44px; border-radius:12px; background:#F3F4F6; flex-shrink:0; }
+    .oh-skel-icon { width:44px; height:44px; border-radius: 16px; background:#EEF1F6; flex-shrink:0; }
     .oh-skel-lines { flex:1; display:flex; flex-direction:column; gap:0.5rem; }
-    .oh-skel-line { background:#F3F4F6; border-radius:6px; height:10px; }
+    .oh-skel-line { background:#EEF1F6; border-radius: 14px; height:10px; }
     @keyframes oh-pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
     /* Text color helpers */
-    .oh-t-success { color:#15803D; }
-    .oh-t-error { color:#DC2626; }
-    .oh-t-info { color:#0284C7; }
-    .oh-t-warning { color:#D97706; }
-    .oh-t-neutral { color:#9CA3AF; }
+    .oh-t-success { color:#10B981; }
+    .oh-t-error { color:#EF4444; }
+    .oh-t-info { color:#6366F1; }
+    .oh-t-warning { color:#F59E0B; }
+    .oh-t-neutral { color:#94A3B8; }
     /* Bottom sheet modal */
     .oh-sheet-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:40; display:flex; align-items:flex-end; justify-content:center; }
     .oh-sheet { background:#fff; width:100%; max-width:32rem; border-radius:1rem 1rem 0 0; max-height:90vh; overflow-y:auto; }
-    .oh-sheet-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #E2E6F0; position:sticky; top:0; background:#fff; }
-    .oh-sheet-title { font-size:0.875rem; font-weight:600; color:#111827; margin:0; }
-    .oh-sheet-sub { font-size:0.72rem; color:#9CA3AF; margin:0; }
-    .oh-close-btn { width:28px; height:28px; border-radius:8px; background:#F4F6FB; border:none; display:flex; align-items:center; justify-content:center; color:#6B7280; cursor:pointer; flex-shrink:0; }
+    .oh-sheet-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #EEF1F6; position:sticky; top:0; background:#fff; }
+    .oh-sheet-title { font-size:0.875rem; font-weight:600; color:#334155; margin:0; }
+    .oh-sheet-sub { font-size:0.72rem; color:#94A3B8; margin:0; }
+    .oh-close-btn { width:28px; height:28px; border-radius: 14px; background:#F8FAFC; border:none; display:flex; align-items:center; justify-content:center; color:#64748B; cursor:pointer; flex-shrink:0; }
     .oh-sheet-body { padding:1rem; display:flex; flex-direction:column; gap:1rem; }
     /* Info sections */
-    .oh-section { background:#F9FAFB; border-radius:12px; padding:0.75rem; }
-    .oh-section-title { font-size:0.72rem; font-weight:700; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.5rem; }
+    .oh-section { background:#F8FAFC; border-radius: 16px; padding:0.75rem; }
+    .oh-section-title { font-size:0.72rem; font-weight:700; color:#94A3B8; text-transform:uppercase; letter-spacing:0.05em; margin:0 0 0.5rem; }
     .oh-info-row { display:flex; justify-content:space-between; font-size:0.75rem; padding:0.2rem 0; }
-    .oh-info-label { color:#9CA3AF; }
+    .oh-info-label { color:#94A3B8; }
     .oh-info-total { display:flex; justify-content:space-between; font-size:0.875rem; font-weight:700; padding:0.2rem 0; }
     /* Product items */
-    .oh-product { display:flex; gap:0.75rem; background:#F9FAFB; border-radius:12px; padding:0.75rem; border:1px solid #E2E6F0; }
-    .oh-product.averiado { border-color:#FDE68A; background:#FFFBEB; }
-    .oh-product-icon { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .oh-product { display:flex; gap:0.75rem; background:#F8FAFC; border-radius: 16px; padding:0.75rem; border:1px solid #EEF1F6; }
+    .oh-product.averiado { border-color:#F59E0B; background:#FFFBEB; }
+    .oh-product-icon { width:36px; height:36px; border-radius: 14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
     .oh-product-info { flex:1; min-width:0; }
-    .oh-product-name { font-size:0.75rem; font-weight:600; color:#111827; margin:0; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .oh-product-code { font-size:0.72rem; color:#9CA3AF; font-family:monospace; margin:0.15rem 0 0; }
-    .oh-product-price { font-size:0.875rem; font-weight:700; color:#1F2A7C; flex-shrink:0; margin:0; }
-    .oh-product-qty { font-size:0.75rem; color:#9CA3AF; }
-    .oh-badge-averiado { font-size:0.72rem; font-weight:600; background:#FEF3C7; color:#D97706; padding:0.1rem 0.375rem; border-radius:99px; }
+    .oh-product-name { font-size:0.75rem; font-weight:600; color:#334155; margin:0; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .oh-product-code { font-size:0.72rem; color:#94A3B8; font-family:monospace; margin:0.15rem 0 0; }
+    .oh-product-price { font-size:0.875rem; font-weight:700; color:#334155; flex-shrink:0; margin:0; }
+    .oh-product-qty { font-size:0.75rem; color:#94A3B8; }
+    .oh-badge-averiado { font-size:0.72rem; font-weight:600; background:#FFFBEB; color:#F59E0B; padding:0.1rem 0.375rem; border-radius:99px; }
     /* NC banner */
-    .oh-nc-banner { background:#EFF6FF; border:1px solid #BFDBFE; border-radius:12px; padding:0.75rem; }
-    .oh-nc-title { font-size:0.75rem; font-weight:700; color:#1E40AF; margin:0 0 0.25rem; }
-    .oh-nc-num { font-size:0.75rem; color:#1D4ED8; font-weight:600; margin:0; }
-    .oh-nc-detail { font-size:0.72rem; color:#3B82F6; margin:0.15rem 0 0; }
+    .oh-nc-banner { background:#EEF2FF; border:1px solid #C7D2FE; border-radius: 16px; padding:0.75rem; }
+    .oh-nc-title { font-size:0.75rem; font-weight:700; color:#4338CA; margin:0 0 0.25rem; }
+    .oh-nc-num { font-size:0.75rem; color:#6366F1; font-weight:600; margin:0; }
+    .oh-nc-detail { font-size:0.72rem; color:#6366F1; margin:0.15rem 0 0; }
     /* Reject banner */
-    .oh-reject-banner { background:#FEF2F2; border:1px solid #FECACA; border-radius:12px; padding:0.75rem; font-size:0.75rem; color:#DC2626; }
+    .oh-reject-banner { background:#FEF2F2; border:1px solid #EF4444; border-radius: 16px; padding:0.75rem; font-size:0.75rem; color:#EF4444; }
     /* Action buttons */
-    .oh-action-ghost { width:100%; padding:0.625rem; font-size:0.875rem; color:#374151; border:1px solid #E2E6F0; border-radius:12px; background:transparent; cursor:pointer; font-family:inherit; transition:background 0.15s; }
-    .oh-action-ghost:hover { background:#F9FAFB; }
+    .oh-action-ghost { width:100%; padding:0.625rem; font-size:0.875rem; color:#334155; border:1px solid #EEF1F6; border-radius: 16px; background:transparent; cursor:pointer; font-family:inherit; transition:background 0.15s; }
+    .oh-action-ghost:hover { background:#F8FAFC; }
     .oh-action-ghost:disabled { opacity:0.5; cursor:not-allowed; }
-    .oh-action-danger { width:100%; padding:0.625rem; font-size:0.875rem; color:#DC2626; border:1px solid #FECACA; border-radius:12px; background:transparent; cursor:pointer; font-family:inherit; transition:background 0.15s; }
+    .oh-action-danger { width:100%; padding:0.625rem; font-size:0.875rem; color:#EF4444; border:1px solid #EF4444; border-radius: 16px; background:transparent; cursor:pointer; font-family:inherit; transition:background 0.15s; }
     .oh-action-danger:hover { background:#FEF2F2; }
     .oh-action-danger:disabled { opacity:0.5; cursor:not-allowed; }
     /* Confirm modal */
     .oh-confirm-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:50; display:flex; align-items:center; justify-content:center; padding:1rem; }
-    .oh-confirm-modal { background:#fff; border-radius:16px; width:100%; max-width:22rem; box-shadow:0 8px 32px rgba(0,0,0,0.12); padding:1.25rem; }
+    .oh-confirm-modal { background:#fff; border-radius: 16px; width:100%; max-width:22rem; box-shadow:0 8px 32px rgba(0,0,0,0.12); padding:1.25rem; }
     /* NC modals */
     .oh-nc-sheet-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:50; display:flex; align-items:flex-end; justify-content:center; }
     .oh-nc-sheet { background:#fff; width:100%; max-width:32rem; border-radius:1rem 1rem 0 0; max-height:92vh; overflow-y:auto; }
-    .oh-nc-tipo-btn { display:flex; align-items:flex-start; gap:0.75rem; padding:0.75rem; border-radius:12px; border:2px solid #E2E6F0; background:#fff; width:100%; text-align:left; cursor:pointer; font-family:inherit; transition:border-color 0.15s,background 0.15s; }
-    .oh-nc-tipo-btn.active { border-color:#1F2A7C; background:#EEF0FB; }
-    .oh-nc-radio { margin-top:2px; width:16px; height:16px; border-radius:50%; border:2px solid #D1D5DB; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
-    .oh-nc-radio.active { border-color:#1F2A7C; }
-    .oh-nc-radio-dot { width:8px; height:8px; border-radius:50%; background:#1F2A7C; }
-    .oh-nc-item { border:1px solid #E2E6F0; border-radius:12px; padding:0.75rem; }
-    .oh-nc-item.selected { border-color:#1F2A7C; background:rgba(238,240,251,0.3); }
+    .oh-nc-tipo-btn { display:flex; align-items:flex-start; gap:0.75rem; padding:0.75rem; border-radius: 16px; border:2px solid #EEF1F6; background:#fff; width:100%; text-align:left; cursor:pointer; font-family:inherit; transition:border-color 0.15s,background 0.15s; }
+    .oh-nc-tipo-btn.active { border-color:#334155; background:#EEF2FF; }
+    .oh-nc-radio { margin-top:2px; width:16px; height:16px; border-radius:50%; border:2px solid #CBD5E1; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .oh-nc-radio.active { border-color:#334155; }
+    .oh-nc-radio-dot { width:8px; height:8px; border-radius:50%; background:#334155; }
+    .oh-nc-item { border:1px solid #EEF1F6; border-radius: 16px; padding:0.75rem; }
+    .oh-nc-item.selected { border-color:#334155; background:rgba(238,240,251,0.3); }
     .oh-nc-item-indent { margin-top:0.5rem; padding-left:1.5rem; }
     .oh-nc-serv-body { padding:1.25rem; display:flex; flex-direction:column; gap:0.75rem; }
   `],
@@ -150,7 +150,7 @@ const NC_VENTA_TIPOS = [
         <!-- Search -->
         <div class="oh-search-wrap">
           <span class="oh-search-icon">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
             </svg>
           </span>
@@ -179,7 +179,7 @@ const NC_VENTA_TIPOS = [
         @if (activeDateChip() === 'PERSONALIZADO') {
           <div class="oh-date-range">
             <input type="date" [(ngModel)]="fechaDesde" (ngModelChange)="aplicarFiltros()" class="oh-date-input" />
-            <span style="font-size:0.75rem;color:#9CA3AF;flex-shrink:0">—</span>
+            <span style="font-size:0.75rem;color:#94A3B8;flex-shrink:0">—</span>
             <input type="date" [(ngModel)]="fechaHasta" (ngModelChange)="aplicarFiltros()" class="oh-date-input" />
           </div>
         }
@@ -214,7 +214,7 @@ const NC_VENTA_TIPOS = [
         } @else if (svc.state().operaciones.length === 0) {
           <div class="empty-state">
             <div class="empty-icon-wrap">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
                 <polyline points="14 2 14 8 20 8"/>
               </svg>
@@ -226,11 +226,11 @@ const NC_VENTA_TIPOS = [
           <div class="oh-list">
             @for (op of svc.state().operaciones; track op.id) {
               <button type="button" (click)="abrirDetalle(op)" class="oh-op-card"
-                [style.border-left]="op.isCancelada ? '3px solid #9CA3AF' : op.tipo === 'VENTA' ? '3px solid #1D4ED8' : '3px solid #16A34A'">
+                [style.border-left]="op.isCancelada ? '3px solid #94A3B8' : op.tipo === 'VENTA' ? '3px solid #6366F1' : '3px solid #10B981'">
                 <div class="oh-op-row">
                   <div class="oh-icon-wrap"
-                    [style.background]="op.tipo === 'VENTA' ? '#EFF6FF' : '#F0FDF4'"
-                    [style.color]="op.tipo === 'VENTA' ? '#1D4ED8' : '#16A34A'">
+                    [style.background]="op.tipo === 'VENTA' ? '#EEF2FF' : '#ECFDF5'"
+                    [style.color]="op.tipo === 'VENTA' ? '#6366F1' : '#10B981'">
                     @if (op.tipo === 'VENTA') {
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
@@ -316,10 +316,10 @@ const NC_VENTA_TIPOS = [
                 </div>
               }
               <div class="oh-info-total">
-                <span>Total</span><span style="color:#1F2A7C">S/ {{ op.total.toFixed(2) }}</span>
+                <span>Total</span><span style="color:#334155">S/ {{ op.total.toFixed(2) }}</span>
               </div>
               @if (op.deuda > 0) {
-                <div class="oh-info-row" style="color:#D97706;font-weight:600">
+                <div class="oh-info-row" style="color:#F59E0B;font-weight:600">
                   <span>Deuda pendiente</span><span>S/ {{ op.deuda.toFixed(2) }}</span>
                 </div>
               }
@@ -338,9 +338,9 @@ const NC_VENTA_TIPOS = [
                   @for (d of op.detalles; track d.id) {
                     <div class="oh-product" [class.averiado]="d.esAveriado">
                       <div class="oh-product-icon"
-                        [style.background]="d.esAveriado ? '#FEF3C7' : '#F4F6FB'"
-                        [style.color]="d.esAveriado ? '#D97706' : '#9CA3AF'"
-                        [style.border]="d.esAveriado ? 'none' : '1px solid #E2E6F0'">
+                        [style.background]="d.esAveriado ? '#FFFBEB' : '#F8FAFC'"
+                        [style.color]="d.esAveriado ? '#F59E0B' : '#94A3B8'"
+                        [style.border]="d.esAveriado ? 'none' : '1px solid #EEF1F6'">
                         @if (d.esAveriado) {
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
@@ -378,7 +378,7 @@ const NC_VENTA_TIPOS = [
             @if (op.clienteNombre) {
               <div class="oh-section">
                 <p class="oh-section-title">Cliente</p>
-                <p style="font-size:0.875rem;color:#111827;margin:0">{{ op.clienteNombre }}</p>
+                <p style="font-size:0.875rem;color:#334155;margin:0">{{ op.clienteNombre }}</p>
               </div>
             }
 
@@ -414,7 +414,7 @@ const NC_VENTA_TIPOS = [
                       <button type="button" (click)="descargarNcPdf(nc.urlPdfA4!)" class="btn-secondary" style="flex:1;font-size:0.78rem">Ver PDF</button>
                     }
                     @if (nc.urlPdfTicket) {
-                      <button type="button" (click)="imprimirNcExistente(nc.urlPdfTicket!)" class="btn-primary" style="flex:1;font-size:0.78rem;background:#D97706;border-color:#D97706">Imprimir NC</button>
+                      <button type="button" (click)="imprimirNcExistente(nc.urlPdfTicket!)" class="btn-primary" style="flex:1;font-size:0.78rem;background:#F59E0B;border-color:#F59E0B">Imprimir NC</button>
                     }
                   </div>
                 }
@@ -433,7 +433,7 @@ const NC_VENTA_TIPOS = [
                       <button type="button" (click)="descargarNcPdf(nc.pdfA4!)" class="btn-secondary" style="flex:1;font-size:0.78rem">Ver PDF</button>
                     }
                     @if (nc.pdfTicket) {
-                      <button type="button" (click)="imprimirNcExistente(nc.pdfTicket!)" class="btn-primary" style="flex:1;font-size:0.78rem;background:#D97706;border-color:#D97706">Imprimir NC</button>
+                      <button type="button" (click)="imprimirNcExistente(nc.pdfTicket!)" class="btn-primary" style="flex:1;font-size:0.78rem;background:#F59E0B;border-color:#F59E0B">Imprimir NC</button>
                     }
                   </div>
                 }
@@ -448,7 +448,7 @@ const NC_VENTA_TIPOS = [
               </div>
               <div class="oh-info-row">
                 <span class="oh-info-label">Estado</span>
-                <span [style.color]="op.isActive ? '#15803D' : '#EF4444'">
+                <span [style.color]="op.isActive ? '#10B981' : '#EF4444'">
                   {{ op.isActive ? 'Activo' : (op.tipo === 'VENTA' ? 'Cancelado' : 'Inactivo') }}
                 </span>
               </div>
@@ -460,7 +460,7 @@ const NC_VENTA_TIPOS = [
             <!-- Acciones -->
             <div style="display:flex;flex-direction:column;gap:0.5rem;padding-bottom:0.5rem">
               <button type="button" (click)="imprimirDesdeDetalle(op)"
-                class="btn-primary w-full" style="background:#D97706;border-color:#D97706">
+                class="btn-primary w-full" style="background:#F59E0B;border-color:#F59E0B">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="6 9 6 2 18 2 18 9"/>
                   <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
@@ -505,8 +505,8 @@ const NC_VENTA_TIPOS = [
     @if (confirmModal(); as cm) {
       <div class="oh-confirm-backdrop">
         <div class="oh-confirm-modal">
-          <p style="font-size:0.875rem;font-weight:700;color:#111827;margin:0 0 0.25rem">{{ cm.titulo }}</p>
-          <p style="font-size:0.75rem;color:#9CA3AF;margin:0 0 1rem">{{ cm.descripcion }}</p>
+          <p style="font-size:0.875rem;font-weight:700;color:#334155;margin:0 0 0.25rem">{{ cm.titulo }}</p>
+          <p style="font-size:0.75rem;color:#94A3B8;margin:0 0 1rem">{{ cm.descripcion }}</p>
           @if (cm.conMotivo) {
             <textarea [(ngModel)]="motivoInput" rows="2" [placeholder]="cm.motivoPlaceholder ?? 'Motivo...'"
               class="field-textarea" style="margin-bottom:0.75rem">
@@ -548,10 +548,10 @@ const NC_VENTA_TIPOS = [
                       @if (ncVentaTipo === t.codigo) { <span class="oh-nc-radio-dot"></span> }
                     </span>
                     <div>
-                      <p style="font-size:0.875rem;font-weight:600;margin:0" [style.color]="ncVentaTipo === t.codigo ? '#1F2A7C' : '#111827'">
+                      <p style="font-size:0.875rem;font-weight:600;margin:0" [style.color]="ncVentaTipo === t.codigo ? '#334155' : '#334155'">
                         {{ t.codigo }} — {{ t.label }}
                       </p>
-                      <p style="font-size:0.72rem;color:#9CA3AF;margin:0.15rem 0 0">{{ t.desc }}</p>
+                      <p style="font-size:0.72rem;color:#94A3B8;margin:0.15rem 0 0">{{ t.desc }}</p>
                     </div>
                   </button>
                 }
@@ -565,16 +565,16 @@ const NC_VENTA_TIPOS = [
                   {{ ncVentaTipo === '07' ? 'Productos a devolver' : 'Productos con ajuste de precio' }}
                 </p>
                 @if (ncVentaItems().length === 0) {
-                  <p style="font-size:0.75rem;color:#9CA3AF;font-style:italic">No hay ítems disponibles</p>
+                  <p style="font-size:0.75rem;color:#94A3B8;font-style:normal">No hay ítems disponibles</p>
                 } @else {
                   <div style="display:flex;flex-direction:column;gap:0.5rem">
                     @for (item of ncVentaItems(); track item.loteProductoId; let i = $index) {
                       <div [class]="item.seleccionado ? 'oh-nc-item selected' : 'oh-nc-item'">
                         <label style="display:flex;align-items:flex-start;gap:0.5rem;cursor:pointer">
-                          <input type="checkbox" [checked]="item.seleccionado" (change)="toggleNcItem(i)" style="margin-top:2px;accent-color:#1F2A7C" />
+                          <input type="checkbox" [checked]="item.seleccionado" (change)="toggleNcItem(i)" style="margin-top:2px;accent-color:#334155" />
                           <div style="flex:1;min-width:0">
-                            <p style="font-size:0.75rem;font-weight:600;color:#111827;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0">{{ item.nombre }}</p>
-                            <p style="font-size:0.72rem;color:#9CA3AF;margin:0.15rem 0 0">
+                            <p style="font-size:0.75rem;font-weight:600;color:#334155;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin:0">{{ item.nombre }}</p>
+                            <p style="font-size:0.72rem;color:#94A3B8;margin:0.15rem 0 0">
                               {{ ncVentaTipo === '07' ? 'Cantidad: ' + item.cantidadOrig : 'Precio actual: S/ ' + item.precioOrig }}
                             </p>
                           </div>
@@ -607,7 +607,7 @@ const NC_VENTA_TIPOS = [
               <textarea [(ngModel)]="motivoInput" rows="2" placeholder="Motivo de la nota de crédito..." class="field-textarea"></textarea>
             </div>
 
-            @if (ncVentaError) { <p style="font-size:0.75rem;color:#DC2626">{{ ncVentaError }}</p> }
+            @if (ncVentaError) { <p style="font-size:0.75rem;color:#EF4444">{{ ncVentaError }}</p> }
             @if (svc.state().errorMessage) { <div class="error-banner">{{ svc.state().errorMessage }}</div> }
 
             <div style="display:flex;gap:0.5rem;padding-bottom:0.5rem">
@@ -625,7 +625,7 @@ const NC_VENTA_TIPOS = [
     @if (notaCreditoServicioOp()) {
       <div class="oh-confirm-backdrop">
         <div class="oh-confirm-modal" style="max-width:24rem">
-          <p style="font-size:0.875rem;font-weight:700;color:#111827;margin:0 0 0.75rem">Nota de crédito — Servicio</p>
+          <p style="font-size:0.875rem;font-weight:700;color:#334155;margin:0 0 0.75rem">Nota de crédito — Servicio</p>
           <div class="oh-nc-serv-body" style="padding:0">
             <div class="field-group">
               <label class="field-label">Tipo</label>

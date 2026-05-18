@@ -35,7 +35,7 @@
       <ul class="asist-list">
         @for (i of [1,2,3]; track i) {
           <li class="asist-card as-skel">
-            <div class="asist-avatar" style="background:#F3F4F6"></div>
+            <div class="asist-avatar" style="background:#EEF1F6"></div>
             <div style="flex:1">
               <div class="as-skel-line short"></div>
               <div class="as-skel-line medium"></div>
@@ -46,7 +46,7 @@
     } @else if (svc.state().usuariosHoy.length === 0) {
       <div class="empty-state">
         <div class="empty-icon-wrap">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
             <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
           </svg>
         </div>
@@ -160,7 +160,7 @@
       <p class="dialog-body">¿Registrar salida para <strong>{{ dialogSalida.usuario.usuarioNombre }}</strong>?</p>
 
       <label class="checkbox-label-asist">
-        <input type="checkbox" [(ngModel)]="almuerzo" style="accent-color:#1F2A7C" />
+        <input type="checkbox" [(ngModel)]="almuerzo" style="accent-color:#334155" />
         <span>Incluye tiempo de almuerzo</span>
       </label>
 

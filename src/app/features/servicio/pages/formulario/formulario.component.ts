@@ -10,7 +10,7 @@ import { ServicioFlowHeaderComponent } from '../../components/servicio-flow-head
   standalone: true,
   imports: [ReactiveFormsModule, ServicioFlowHeaderComponent],
   styles: [`
-    .sf-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E6F0; padding:1rem; z-index:20; }
+    .sf-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #EEF1F6; padding:1rem; z-index:20; }
     .sf-desktop-btn { display:none; }
 
     @media (min-width: 768px) {
@@ -30,7 +30,7 @@ import { ServicioFlowHeaderComponent } from '../../components/servicio-flow-head
         <div class="card">
           <p class="section-title" style="margin-bottom:0.875rem">Nuevo servicio</p>
           <div class="field-group">
-            <label class="field-label">Descripción <span style="font-weight:400;color:#9CA3AF">(opcional)</span></label>
+            <label class="field-label">Descripción <span style="font-weight:400;color:#94A3B8">(opcional)</span></label>
             <textarea
               formControlName="descripcion"
               rows="3"
@@ -45,35 +45,35 @@ import { ServicioFlowHeaderComponent } from '../../components/servicio-flow-head
           <p class="section-title" style="margin-bottom:0.875rem">Período del servicio</p>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
             <div class="field-group">
-              <label class="field-label">Fecha inicio <span style="color:#DC2626">*</span></label>
+              <label class="field-label">Fecha inicio <span style="color:#EF4444">*</span></label>
               <input type="date" formControlName="fechaInicio" class="field-input" />
               @if (form.get('fechaInicio')?.invalid && form.get('fechaInicio')?.touched) {
-                <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">Requerido</p>
+                <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">Requerido</p>
               }
             </div>
             <div class="field-group">
-              <label class="field-label">Fecha fin <span style="color:#DC2626">*</span></label>
+              <label class="field-label">Fecha fin <span style="color:#EF4444">*</span></label>
               <input type="date" formControlName="fechaFin" class="field-input" />
               @if (form.get('fechaFin')?.invalid && form.get('fechaFin')?.touched) {
-                <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">Requerido</p>
+                <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">Requerido</p>
               }
             </div>
           </div>
           @if (form.errors?.['fechaFinAnterior'] && form.touched) {
-            <p style="font-size:0.75rem;color:#DC2626;margin:0.5rem 0 0">La fecha fin debe ser posterior a la fecha inicio</p>
+            <p style="font-size:0.75rem;color:#EF4444;margin:0.5rem 0 0">La fecha fin debe ser posterior a la fecha inicio</p>
           }
         </div>
 
         <!-- Total -->
         <div class="card">
           <div class="field-group">
-            <label class="field-label">Total (S/) <span style="color:#DC2626">*</span></label>
+            <label class="field-label">Total (S/) <span style="color:#EF4444">*</span></label>
             <input type="number" formControlName="total" step="0.01" min="0.01" placeholder="0.00" class="field-input" />
             @if (form.get('total')?.errors?.['required'] && form.get('total')?.touched) {
-              <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">Requerido</p>
+              <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">Requerido</p>
             }
             @if (form.get('total')?.errors?.['min'] && form.get('total')?.touched) {
-              <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">El total debe ser mayor a 0</p>
+              <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">El total debe ser mayor a 0</p>
             }
           </div>
         </div>

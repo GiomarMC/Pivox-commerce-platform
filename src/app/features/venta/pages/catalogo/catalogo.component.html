@@ -20,7 +20,7 @@
 
   <!-- Search -->
   <div class="search-wrap">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" class="search-icon">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
     </svg>
     <input
@@ -49,7 +49,7 @@
         <div class="producto-grid">
           @for (i of [1,2,3,4,5,6]; track i) {
             <div class="cat-card cat-skel">
-              <div class="cat-img-placeholder" style="background:#F3F4F6"></div>
+              <div class="cat-img-placeholder" style="background:#EEF1F6"></div>
               <div class="cat-info">
                 <div class="cat-skel-line w3"></div>
                 <div class="cat-skel-line w2"></div>
@@ -61,7 +61,7 @@
       } @else if (svc.state().productos.length === 0) {
         <div class="empty-state">
           <div class="empty-icon-wrap">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
               <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
               <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
             </svg>
@@ -84,7 +84,7 @@
                   <img [src]="p.imagen" [alt]="p.nombre" class="cat-img" />
                 } @else {
                   <div class="cat-img-placeholder">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
                       <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                       <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
                     </svg>
@@ -151,7 +151,7 @@
     @if (carritoSvc.count() > 0) {
       <div class="cat-cart-panel">
         <div class="cat-cart-panel-header">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F2A7C" stroke-width="2">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="2">
             <circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/>
             <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/>
           </svg>
@@ -165,7 +165,7 @@
                 <img [src]="item.imagen" [alt]="item.nombre" class="cat-cart-item-img" />
               } @else {
                 <div class="cat-cart-item-ph">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
                     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                   </svg>
                 </div>

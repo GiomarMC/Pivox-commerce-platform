@@ -6,38 +6,185 @@ import { AuthService } from '../../../core/auth/auth.service';
   selector: 'app-store-selector',
   standalone: true,
   styles: [`
-    .ss-wrap { min-height:100dvh; display:flex; align-items:center; justify-content:center; background:#F2F4FA; padding:1rem; }
-    .ss-card { background:#fff; border:1px solid #E2E6F0; border-radius:16px; padding:2rem; width:100%; max-width:360px; box-shadow:0 4px 24px rgba(0,0,0,0.06); }
-    .ss-store-btn { width:100%; padding:0.875rem 1rem; background:#fff; border:1.5px solid #E2E6F0; border-radius:12px; cursor:pointer; font-size:0.9rem; font-weight:600; color:#111827; text-align:left; display:flex; align-items:center; gap:0.75rem; transition:border-color 0.15s,background 0.15s; font-family:inherit; }
-    .ss-store-btn:hover { border-color:#1F2A7C; background:#F8F9FF; }
-    .ss-icon { width:36px; height:36px; background:#EEF0FF; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    :host { display: block; }
+    .ss-bg {
+      position: relative;
+      min-height: 100dvh;
+      background: var(--color-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+      overflow: hidden;
+    }
+    .ss-bg::before {
+      content: '';
+      position: absolute;
+      top: -8rem;
+      right: -8rem;
+      width: 28rem;
+      height: 28rem;
+      border: 1px solid var(--color-rule);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .ss-bg::after {
+      content: '';
+      position: absolute;
+      bottom: -10rem;
+      left: -10rem;
+      width: 32rem;
+      height: 32rem;
+      border: 1px solid var(--color-rule);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .ss-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 32rem;
+      animation: ed-fade-up 720ms cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+    .ss-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .ss-tick {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--color-ink-3);
+      letter-spacing: 0.05em;
+    }
+    .ss-label {
+      font-family: var(--font-sans);
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-ink);
+    }
+    .ss-title {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      line-height: 1.02;
+      letter-spacing: -0.025em;
+      color: var(--color-ink);
+      margin: 0 0 0.875rem;
+      text-align: center;
+      
+    }
+    .ss-title em {
+      font-style: normal;
+      color: var(--color-accent);
+    }
+    .ss-subtitle {
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      color: var(--color-ink-2);
+      text-align: center;
+      margin: 0 auto 2.5rem;
+      max-width: 32ch;
+    }
+    .ss-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-top: 1px solid var(--color-rule-bold);
+    }
+    .ss-row {
+      display: grid;
+      grid-template-columns: 3.5ch 1fr auto;
+      align-items: center;
+      gap: 1.25rem;
+      padding: 1.5rem 0.5rem;
+      border-bottom: 1px solid var(--color-rule);
+      cursor: pointer;
+      background: transparent;
+      border-left: none;
+      border-right: none;
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      color: inherit;
+      transition: padding 200ms cubic-bezier(0.4, 0, 0.2, 1),
+                  background 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ss-row:hover {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      background: var(--color-surface-2);
+    }
+    .ss-index {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--color-ink-3);
+      letter-spacing: 0.04em;
+    }
+    .ss-name {
+      font-family: var(--font-display);
+      font-weight: 500;
+      font-style: normal;
+      font-size: 1.375rem;
+      line-height: 1.15;
+      color: var(--color-ink);
+      margin: 0;
+      
+    }
+    .ss-arrow {
+      font-family: var(--font-mono);
+      font-size: 0.875rem;
+      color: var(--color-ink-2);
+      transition: color 180ms, transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .ss-row:hover .ss-arrow {
+      color: var(--color-ink);
+      transform: translateX(4px);
+    }
+    .ss-empty {
+      font-family: var(--font-sans);
+      font-size: 0.875rem;
+      color: var(--color-ink-3);
+      text-align: center;
+      padding: 3rem 1rem;
+      font-style: normal;
+    }
   `],
   template: `
-    <div class="ss-wrap">
-      <div class="ss-card">
-        <div style="text-align:center;margin-bottom:1.5rem">
-          <div style="width:48px;height:48px;background:#1F2A7C;border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 0.875rem">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
-              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-              <polyline points="9 22 9 12 15 12 15 22"/>
-            </svg>
-          </div>
-          <h1 style="font-size:1.15rem;font-weight:800;color:#111827;margin:0 0 0.25rem">Selecciona una sede</h1>
-          <p style="font-size:0.8rem;color:#9CA3AF;margin:0">Elige la sede en la que trabajarás hoy</p>
+    <div class="ss-bg">
+      <div class="ss-wrap">
+
+        <div class="ss-eyebrow">
+          <span class="ss-tick">01</span>
+          <span class="ss-label">Pivox · Sucursales</span>
         </div>
 
-        <div style="display:flex;flex-direction:column;gap:0.5rem">
-          @for (tienda of tiendas; track tienda.tiendaId) {
-            <button type="button" (click)="seleccionar(tienda.tiendaId)" class="ss-store-btn">
-              <div class="ss-icon">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1F2A7C" stroke-width="2">
-                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                </svg>
-              </div>
-              {{ tienda.tiendaNombre }}
-            </button>
-          }
-        </div>
+        <h1 class="ss-title">Elige tu <em>sede</em>.</h1>
+        <p class="ss-subtitle">La sucursal que selecciones será donde operes hoy. Podrás cambiarla en cualquier momento.</p>
+
+        @if (tiendas.length === 0) {
+          <div class="ss-empty">
+            Tu cuenta aún no tiene sucursales asignadas. Contacta al dueño de la empresa.
+          </div>
+        } @else {
+          <ul class="ss-list">
+            @for (tienda of tiendas; track tienda.tiendaId; let i = $index) {
+              <li>
+                <button type="button"
+                  (click)="seleccionar(tienda.tiendaId)"
+                  class="ss-row"
+                  [style.animation]="'ed-fade-up 600ms ' + (160 + i * 60) + 'ms cubic-bezier(0.16, 1, 0.3, 1) both'">
+                  <span class="ss-index">{{ (i + 1).toString().padStart(2, '0') }}</span>
+                  <h2 class="ss-name">{{ tienda.tiendaNombre }}</h2>
+                  <span class="ss-arrow">→</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
       </div>
     </div>
   `,

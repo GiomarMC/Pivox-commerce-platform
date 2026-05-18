@@ -10,21 +10,21 @@ import { ClienteModel } from '../../models/cliente.model';
   imports: [FormsModule],
   styles: [`
     .cs-wrap { position:relative; }
-    .cs-selected { display:flex; align-items:center; gap:0.75rem; padding:0.75rem; background:#F9FAFB; border-radius:10px; border:1px solid #E2E6F0; }
+    .cs-selected { display:flex; align-items:center; gap:0.75rem; padding:0.75rem; background:#F8FAFC; border-radius: 16px; border:1px solid #EEF1F6; }
     .cs-selected-info { flex:1; min-width:0; }
-    .cs-selected-name { font-size:0.875rem; font-weight:600; color:#111827; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
-    .cs-selected-doc { font-size:0.75rem; color:#9CA3AF; margin:0; }
-    .cs-change-btn { font-size:0.75rem; color:#DC2626; background:none; border:none; cursor:pointer; flex-shrink:0; font-family:inherit; padding:0; }
+    .cs-selected-name { font-size:0.875rem; font-weight:600; color:#334155; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin:0; }
+    .cs-selected-doc { font-size:0.75rem; color:#94A3B8; margin:0; }
+    .cs-change-btn { font-size:0.75rem; color:#EF4444; background:none; border:none; cursor:pointer; flex-shrink:0; font-family:inherit; padding:0; }
     .cs-change-btn:hover { text-decoration:underline; }
     .cs-hint { font-size:0.72rem; margin:0 0 0.375rem; }
-    .cs-hint-warn { color:#D97706; }
-    .cs-hint-muted { color:#9CA3AF; }
-    .cs-dropdown { position:absolute; z-index:100; width:100%; top:calc(100% + 0.25rem); bottom:auto; background:#fff; border:1px solid #E2E6F0; border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-height:12rem; overflow-y:auto; }
+    .cs-hint-warn { color:#F59E0B; }
+    .cs-hint-muted { color:#94A3B8; }
+    .cs-dropdown { position:absolute; z-index:100; width:100%; top:calc(100% + 0.25rem); bottom:auto; background:#fff; border:1px solid #EEF1F6; border-radius: 16px; box-shadow:0 4px 16px rgba(0,0,0,0.08); max-height:12rem; overflow-y:auto; }
     .cs-dropdown-btn { width:100%; text-align:left; padding:0.625rem 0.75rem; font-size:0.875rem; background:none; border:none; cursor:pointer; font-family:inherit; transition:background 0.1s; display:flex; align-items:center; gap:0.5rem; }
-    .cs-dropdown-btn:hover { background:#F9FAFB; }
-    .cs-dropdown-name { font-weight:600; color:#111827; }
-    .cs-dropdown-doc { color:#9CA3AF; font-size:0.75rem; }
-    .cs-no-results { font-size:0.75rem; color:#9CA3AF; margin:0.375rem 0 0; }
+    .cs-dropdown-btn:hover { background:#F8FAFC; }
+    .cs-dropdown-name { font-weight:600; color:#334155; }
+    .cs-dropdown-doc { color:#94A3B8; font-size:0.75rem; }
+    .cs-no-results { font-size:0.75rem; color:#94A3B8; margin:0.375rem 0 0; }
   `],
   template: `
     <div class="cs-wrap">

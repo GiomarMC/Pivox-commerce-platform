@@ -18,10 +18,10 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
   standalone: true,
   imports: [ReactiveFormsModule, RouterLink, ServicioFlowHeaderComponent, ClienteSearchComponent],
   styles: [`
-    .srs-toggle { display:flex; border:1.5px solid #E2E6F0; border-radius:8px; overflow:hidden; margin-bottom:0.875rem; }
-    .srs-toggle-btn { flex:1; padding:0.5rem 0.75rem; font-size:0.8rem; font-weight:600; border:none; cursor:pointer; transition:background 0.12s; font-family:inherit; background:#fff; color:#6B7280; }
-    .srs-toggle-btn-active { background:#1F2A7C; color:#fff; }
-    .srs-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #E2E6F0; padding:1rem; z-index:20; }
+    .srs-toggle { display:flex; border:1.5px solid #EEF1F6; border-radius: 14px; overflow:hidden; margin-bottom:0.875rem; }
+    .srs-toggle-btn { flex:1; padding:0.5rem 0.75rem; font-size:0.8rem; font-weight:600; border:none; cursor:pointer; transition:background 0.12s; font-family:inherit; background:#fff; color:#64748B; }
+    .srs-toggle-btn-active { background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%); color: #fff; }
+    .srs-footer { position:fixed; bottom:0; left:0; right:0; background:#fff; border-top:1px solid #EEF1F6; padding:1rem; z-index:20; }
     .srs-layout { display:flex; flex-direction:column; gap:0.875rem; }
     .srs-left { display:flex; flex-direction:column; gap:0.875rem; }
     .srs-desktop-btn { display:none; }
@@ -51,15 +51,15 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
       </a>
 
       <!-- Resumen del servicio -->
-      <div class="card" style="border-left:3px solid #1F2A7C">
-        <p style="font-size:0.68rem;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.4rem">Período</p>
-        <p style="font-size:0.875rem;font-weight:700;color:#111827;margin:0 0 0.2rem">{{ formSvc.state().fechaInicio }} — {{ formSvc.state().fechaFin }}</p>
+      <div class="card" style="border-left:3px solid #334155">
+        <p style="font-size:0.68rem;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;margin:0 0 0.4rem">Período</p>
+        <p style="font-size:0.875rem;font-weight:700;color:#334155;margin:0 0 0.2rem">{{ formSvc.state().fechaInicio }} — {{ formSvc.state().fechaFin }}</p>
         @if (formSvc.state().descripcion) {
-          <p style="font-size:0.75rem;color:#9CA3AF;margin:0 0 0.625rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ formSvc.state().descripcion }}</p>
+          <p style="font-size:0.75rem;color:#94A3B8;margin:0 0 0.625rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ formSvc.state().descripcion }}</p>
         }
-        <div style="border-top:1px solid #E2E6F0;padding-top:0.625rem;display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:0.82rem;font-weight:600;color:#374151">Total</span>
-          <span style="font-size:1.1rem;font-weight:800;color:#1F2A7C;letter-spacing:-0.01em">S/ {{ formSvc.state().total }}</span>
+        <div style="border-top:1px solid #EEF1F6;padding-top:0.625rem;display:flex;justify-content:space-between;align-items:center">
+          <span style="font-size:0.82rem;font-weight:600;color:#334155">Total</span>
+          <span style="font-size:1.1rem;font-weight:800;color:#334155;letter-spacing:-0.01em">S/ {{ formSvc.state().total }}</span>
         </div>
       </div>
       </div><!-- /srs-left -->
@@ -106,7 +106,7 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
               }
             </div>
             @if (form.get('tipoComprobante')?.invalid && form.get('tipoComprobante')?.touched) {
-              <p style="font-size:0.75rem;color:#DC2626;margin:0.5rem 0 0">Requerido para SUNAT</p>
+              <p style="font-size:0.75rem;color:#EF4444;margin:0.5rem 0 0">Requerido para SUNAT</p>
             }
           </div>
         }
@@ -115,13 +115,13 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
         @if (isCredito() || isSunat()) {
           <div class="card">
             <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.875rem">
-              <div style="width:28px;height:28px;border-radius:8px;background:#F3E8FF;color:#7C3AED;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <div style="width:28px;height:28px;border-radius: 14px;background:#F3E8FF;color:#7C3AED;display:flex;align-items:center;justify-content:center;flex-shrink:0">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                 </svg>
               </div>
-              <span style="font-size:0.875rem;font-weight:700;color:#111827">Cliente</span>
-              <span style="font-size:0.72rem;color:#9CA3AF">{{ clienteObligatorio() ? '(obligatorio)' : '(opcional)' }}</span>
+              <span style="font-size:0.875rem;font-weight:700;color:#334155">Cliente</span>
+              <span style="font-size:0.72rem;color:#94A3B8">{{ clienteObligatorio() ? '(obligatorio)' : '(opcional)' }}</span>
             </div>
 
             <div class="srs-toggle">
@@ -155,7 +155,7 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
                   <label class="field-label">N° documento</label>
                   <input formControlName="numeroDocumento" type="text" class="field-input" />
                   @if (form.get('clienteNuevo.numeroDocumento')?.errors?.['invalidRuc']) {
-                    <p style="font-size:0.72rem;color:#DC2626;margin:0.25rem 0 0">RUC debe tener 11 dígitos</p>
+                    <p style="font-size:0.72rem;color:#EF4444;margin:0.25rem 0 0">RUC debe tener 11 dígitos</p>
                   }
                 </div>
                 <div class="field-group">
@@ -163,15 +163,15 @@ import { rucValidator, noRucEnBoletaValidator } from '../../../venta/validators/
                   <input formControlName="nombre" type="text" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Teléfono <span style="font-weight:400;color:#9CA3AF">(opcional)</span></label>
+                  <label class="field-label">Teléfono <span style="font-weight:400;color:#94A3B8">(opcional)</span></label>
                   <input formControlName="telefono" type="tel" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Email <span style="font-weight:400;color:#9CA3AF">(opcional)</span></label>
+                  <label class="field-label">Email <span style="font-weight:400;color:#94A3B8">(opcional)</span></label>
                   <input formControlName="email" type="email" class="field-input" />
                 </div>
                 <div class="field-group">
-                  <label class="field-label">Dirección <span style="font-weight:400;color:#9CA3AF">(opcional)</span></label>
+                  <label class="field-label">Dirección <span style="font-weight:400;color:#94A3B8">(opcional)</span></label>
                   <input formControlName="direccion" type="text" class="field-input" />
                 </div>
               </div>

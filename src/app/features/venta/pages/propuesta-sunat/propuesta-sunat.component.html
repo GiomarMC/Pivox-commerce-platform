@@ -53,7 +53,7 @@
                 <img [src]="linea.imagenActual" [alt]="linea.loteProductoNombre" class="ps-producto-img" />
               } @else {
                 <div class="ps-producto-img-placeholder">
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
                     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                     <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
                   </svg>
@@ -103,7 +103,7 @@
                   <line x1="12" y1="9" x2="12" y2="13"/>
                 </svg>
                 <div>
-                  <p style="font-size:0.75rem;font-weight:700;margin:0 0 0.2rem;color:#DC2626">No se encontró sustituto automático</p>
+                  <p style="font-size:0.75rem;font-weight:700;margin:0 0 0.2rem;color:#EF4444">No se encontró sustituto automático</p>
                   <p style="font-size:0.72rem;margin:0;line-height:1.4">
                     Este producto no tiene un reemplazo con factura disponible. Debes seleccionar uno manualmente usando el botón "Cambiar", o volver al carrito y seleccionar un lote con factura.
                   </p>
@@ -120,7 +120,7 @@
                     <img [src]="linea.imagenOriginal" [alt]="linea.nombreOriginal" class="ps-producto-img" />
                   } @else {
                     <div class="ps-producto-img-placeholder ps-placeholder-zinc">
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
                         <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                         <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
                       </svg>
@@ -243,7 +243,7 @@
 @if (!isModal) {
 <div class="ps-action-bar">
   @if (rellenosSinResolver() > 0) {
-    <p style="font-size:0.72rem;color:#DC2626;text-align:center;margin:0 0 0.5rem">
+    <p style="font-size:0.72rem;color:#EF4444;text-align:center;margin:0 0 0.5rem">
       {{ rellenosSinResolver() }} producto(s) sin sustituto seleccionado
     </p>
   }
@@ -287,7 +287,7 @@
 
       <div class="ps-modal-search">
         <div style="position:relative">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%)">
             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
           </svg>
           <input
@@ -309,7 +309,7 @@
         } @else if (catalogoSvc.state().productos.length === 0) {
           <div class="ps-modal-status">
             <div class="empty-icon-wrap" style="margin:0 auto 0.75rem">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="1.5">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
             </div>
@@ -322,7 +322,7 @@
                 <img [src]="p.imagen" [alt]="p.nombre" class="ps-selector-img" />
               } @else {
                 <div class="ps-selector-img-placeholder">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" stroke-width="1.5">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5">
                     <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
                     <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
                   </svg>
