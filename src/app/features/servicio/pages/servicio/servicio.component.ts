@@ -1035,18 +1035,14 @@ export class ServicioComponent implements OnInit, OnDestroy {
   readonly getMetodoPagoLabel    = getMetodoPagoLabel;
   readonly getTipoComprobanteLabel = getTipoComprobanteLabel;
 
-  private readonly _tipoVenta       = signal('NORMAL');
-  private readonly _metodoPago      = signal('EFECTIVO');
-  private readonly _tipoComprobante = signal('');
+  readonly tipoVenta       = computed(() => this.resumenSvc.state().tipoVenta);
+  readonly metodoPago      = computed(() => this.resumenSvc.state().metodoPago);
+  readonly tipoComprobante = computed(() => this.resumenSvc.state().tipoComprobante ?? '');
 
-  readonly tipoVenta       = this._tipoVenta.asReadonly();
-  readonly metodoPago      = this._metodoPago.asReadonly();
-  readonly tipoComprobante = this._tipoComprobante.asReadonly();
-
-  readonly isSunat  = computed(() => this._tipoVenta() === 'SUNAT');
-  readonly isCredito = computed(() => this._tipoVenta() === 'CREDITO');
+  readonly isSunat  = computed(() => this.tipoVenta() === 'SUNAT');
+  readonly isCredito = computed(() => this.tipoVenta() === 'CREDITO');
   readonly clienteObligatorio = computed(() =>
-    this.isCredito() || (this.isSunat() && this._tipoComprobante() === '01'),
+    this.isCredito() || (this.isSunat() && this.tipoComprobante() === '01'),
   );
 
   readonly mostrarSheet = signal(false);
@@ -1073,10 +1069,10 @@ export class ServicioComponent implements OnInit, OnDestroy {
   readonly previewFechaFin    = signal<string>('');
   readonly previewTotal       = signal<number | null>(null);
 
-  readonly previewTipoVentaLabel = computed(() => getTipoVentaLabel(this._tipoVenta()));
-  readonly previewMetodoPagoLabel = computed(() => getMetodoPagoLabel(this._metodoPago()));
+  readonly previewTipoVentaLabel = computed(() => getTipoVentaLabel(this.tipoVenta()));
+  readonly previewMetodoPagoLabel = computed(() => getMetodoPagoLabel(this.metodoPago()));
   readonly previewTipoComprobanteLabel = computed(() => {
-    const t = this._tipoComprobante();
+    const t = this.tipoComprobante();
     return t ? getTipoComprobanteLabel(t) : '';
   });
   readonly previewClienteNombre = computed(() => this.resumenSvc.state().clienteNombre);
@@ -1151,9 +1147,6 @@ export class ServicioComponent implements OnInit, OnDestroy {
     });
 
     const savedConfig = this.resumenSvc.state();
-    this._tipoVenta.set(savedConfig.tipoVenta);
-    this._metodoPago.set(savedConfig.metodoPago);
-    this._tipoComprobante.set(savedConfig.tipoComprobante ?? '');
     this.formConfig.patchValue({
       tipoVenta:        savedConfig.tipoVenta,
       metodoPago:       savedConfig.metodoPago,
@@ -1185,22 +1178,6 @@ export class ServicioComponent implements OnInit, OnDestroy {
         this.previewFechaInicio.set(val['fechaInicio'] ?? '');
         this.previewFechaFin.set(val['fechaFin'] ?? '');
         this.previewTotal.set(typeof val['total'] === 'number' ? val['total'] : null);
-      }),
-    );
-
-    this.subs.push(
-      this.formConfig.get('tipoVenta')!.valueChanges.subscribe(v => {
-        this._tipoVenta.set(v ?? 'NORMAL');
-      }),
-    );
-    this.subs.push(
-      this.formConfig.get('metodoPago')!.valueChanges.subscribe(v => {
-        this._metodoPago.set(v ?? 'EFECTIVO');
-      }),
-    );
-    this.subs.push(
-      tipoCompCtrl.valueChanges.subscribe(v => {
-        this._tipoComprobante.set(v ?? '');
       }),
     );
 

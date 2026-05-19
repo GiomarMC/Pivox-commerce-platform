@@ -152,7 +152,6 @@
   position: fixed;
   inset: 0;
   background: rgba(14, 13, 11, 0.55);
-  backdrop-filter: blur(2px);
   z-index: 70;
   display: flex;
   align-items: flex-start;
@@ -167,5 +166,5 @@
   width: 100%;
   max-width: 60rem;
   margin-bottom: 2rem;
-  animation: ed-fade-up 480ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: ed-fade-in 320ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }

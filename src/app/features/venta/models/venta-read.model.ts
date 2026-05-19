@@ -84,7 +84,7 @@ export interface VentaReadModel {
 function ventaLineaFromJson(json: Record<string, unknown>): VentaLineaModel {
   return {
     id: json['id'] as number,
-    productoId: json['producto_id'] as number,
+    productoId: (json['producto_id'] ?? json['producto']) as number,
     loteProductoId: (json['lote_producto_id'] as number | null) ?? null,
     productoNombre: json['producto_nombre'] as string,
     productoCodigo: json['producto_codigo'] as string,

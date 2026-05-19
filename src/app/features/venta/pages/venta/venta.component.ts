@@ -89,19 +89,15 @@ export class VentaComponent implements OnInit, OnDestroy {
   });
 
   // ── Resumen / Pago ──
-  private readonly _metodoPago = signal('EFECTIVO');
-  private readonly _tipoComprobante = signal('');
-  private readonly _tipoVenta = signal('NORMAL');
+  readonly tipoVentaActual = computed(() => this.resumenSvc.state().tipoVenta);
+  readonly metodoPago = computed(() => this.resumenSvc.state().metodoPago);
+  readonly tipoComprobante = computed(() => this.resumenSvc.state().tipoComprobante ?? '');
 
-  readonly metodoPago = this._metodoPago.asReadonly();
-  readonly tipoComprobante = this._tipoComprobante.asReadonly();
-  readonly tipoVentaActual = this._tipoVenta.asReadonly();
-
-  readonly isSunat = computed(() => this._tipoVenta() === 'SUNAT');
-  readonly isCredito = computed(() => this._tipoVenta() === 'CREDITO');
-  readonly esSunat = computed(() => this._tipoVenta() === 'SUNAT');
+  readonly isSunat = computed(() => this.tipoVentaActual() === 'SUNAT');
+  readonly isCredito = computed(() => this.tipoVentaActual() === 'CREDITO');
+  readonly esSunat = computed(() => this.tipoVentaActual() === 'SUNAT');
   readonly clienteObligatorio = computed(
-    () => this.isCredito() || (this.isSunat() && this._tipoComprobante() === '01'),
+    () => this.isCredito() || (this.isSunat() && this.tipoComprobante() === '01'),
   );
 
   readonly stockPorTipo = computed(() => {
@@ -202,10 +198,6 @@ export class VentaComponent implements OnInit, OnDestroy {
     }
 
     const saved = this.resumenSvc.state();
-    this._tipoVenta.set(saved.tipoVenta);
-    this._metodoPago.set(saved.metodoPago);
-    this._tipoComprobante.set(saved.tipoComprobante ?? '');
-
     this.form.patchValue({
       metodoPago: saved.metodoPago,
       tipoComprobante: saved.tipoComprobante ?? '',
@@ -217,16 +209,6 @@ export class VentaComponent implements OnInit, OnDestroy {
     const numDocCtrl = this.form.get('clienteNuevo.numeroDocumento')!;
     const tipoCompCtrl = this.form.get('tipoComprobante')!;
 
-    this.subs.push(
-      this.form.get('metodoPago')!.valueChanges.subscribe(v => {
-        this._metodoPago.set(v ?? 'EFECTIVO');
-      }),
-    );
-    this.subs.push(
-      tipoCompCtrl.valueChanges.subscribe(v => {
-        this._tipoComprobante.set(v ?? '');
-      }),
-    );
     this.subs.push(
       tipoDocCtrl.valueChanges.subscribe(tipo => {
         if (tipo === '6') {
@@ -324,7 +306,6 @@ export class VentaComponent implements OnInit, OnDestroy {
   // ── Tipo de venta ──
 
   seleccionarTipoVenta(tipo: string): void {
-    this._tipoVenta.set(tipo);
     this.resumenSvc.actualizar({ tipoVenta: tipo });
 
     const tipoCompCtrl = this.form.get('tipoComprobante')!;
@@ -488,6 +469,25 @@ export class VentaComponent implements OnInit, OnDestroy {
 
   cerrarModal(): void {
     this.modalActivo.set(null);
+  }
+
+  onNuevaVenta(): void {
+    this.modalActivo.set(null);
+    this.panelStep.set(1);
+    this.form.reset({
+      metodoPago: 'EFECTIVO',
+      tipoComprobante: '',
+      clienteId: null,
+      usarClienteNuevo: false,
+      clienteNuevo: {
+        tipoDocumento: '1',
+        numeroDocumento: '',
+        nombre: '',
+        telefono: '',
+        email: '',
+        direccion: '',
+      },
+    });
   }
 
   onVentaCancelada(): void {

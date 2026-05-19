@@ -8,12 +8,12 @@ import { TicketConverter, TicketData } from '../ticket.converter';
   standalone: true,
   styles: [`
     .pp-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:50; display:flex; align-items:center; justify-content:center; padding:1rem; }
-    .pp-modal { background:#fff; border-radius: 16px; width:100%; max-width:40rem; box-shadow:0 8px 32px rgba(0,0,0,0.15); overflow:hidden; }
+    .pp-modal { background:#fff; border-radius: 16px; width:100%; max-width:40rem; max-height:90vh; box-shadow:0 8px 32px rgba(0,0,0,0.15); overflow:hidden; display:flex; flex-direction:column; }
     .pp-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #EEF1F6; }
     .pp-title { font-size:0.875rem; font-weight:600; color:#334155; margin:0; }
     .pp-close { width:28px; height:28px; border-radius: 14px; background:#F8FAFC; border:none; display:flex; align-items:center; justify-content:center; color:#64748B; cursor:pointer; }
-    .pp-preview { overflow-y:auto; max-height:32rem; background:#F8FAFC; padding:0.75rem; display:flex; justify-content:center; }
-    .pp-iframe { width:100%; border-radius: 14px; border:1px solid #EEF1F6; height:500px; }
+    .pp-preview { overflow-y:auto; flex:1; min-height:24rem; background:#F8FAFC; padding:0.75rem; display:flex; justify-content:center; }
+    .pp-iframe { width:100%; border-radius: 14px; border:1px solid #EEF1F6; height:60vh; min-height:24rem; }
     .pp-ticket { font-family:'Courier New',Courier,monospace; font-size:11px; width:260px; background:#fff; padding:12px 10px; border:1px dashed #ccc; line-height:1.5; white-space:pre; }
     .pp-error { margin:0.75rem 1rem 0; background:#FEF2F2; border:1px solid #EF4444; border-radius: 16px; padding:0.75rem; }
     .pp-error-title { font-size:0.75rem; font-weight:700; color:#EF4444; margin:0 0 0.2rem; }

@@ -103,7 +103,7 @@ import { getEstadoSunatLabel, getEstadoSunatColor } from '../../../venta/constan
             </div>
             <div class="sc-meta-row">
               <span style="font-size:0.75rem;color:#94A3B8">Fecha</span>
-              <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ s.fecha }}</span>
+              <span style="font-size:0.75rem;font-weight:600;color:#334155">{{ formatFecha(s.fecha) }}</span>
             </div>
             @if (s.descripcion) {
               <div class="sc-meta-row">
@@ -287,6 +287,19 @@ export class ComprobanteServicioComponent implements OnInit {
   ngOnInit(): void {
     if (!this.servicio()) {
       void this.router.navigate(['/servicios']);
+    }
+  }
+
+  formatFecha(fecha: string): string {
+    if (!fecha) return '';
+    try {
+      const d = new Date(fecha.length === 10 ? fecha + 'T00:00:00' : fecha);
+      return d.toLocaleString('es-PE', {
+        day: 'numeric', month: 'long', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
+    } catch {
+      return fecha;
     }
   }
 

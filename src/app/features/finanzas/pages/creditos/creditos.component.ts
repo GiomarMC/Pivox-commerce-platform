@@ -200,7 +200,10 @@ export class CreditosComponent implements OnInit {
   formatFecha(fecha: string): string {
     if (!fecha) return '';
     try {
-      return new Date(fecha).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+      return new Date(fecha).toLocaleString('es-PE', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
     } catch {
       return fecha;
     }

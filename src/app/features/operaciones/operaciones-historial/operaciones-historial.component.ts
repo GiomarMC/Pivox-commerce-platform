@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, HostListener, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, HostListener, computed, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { OperacionesService } from '../operaciones.service';
@@ -7,6 +7,7 @@ import { getTipoVentaLabel } from '../../venta/constants/tipo-venta';
 import { getMetodoPagoLabel } from '../../venta/constants/metodo-pago';
 import { getEstadoSunatLabel, getEstadoSunatColor } from '../../venta/constants/estado-sunat';
 import { getUnidadMedidaLabel } from '../../inventario/constants/unidad-medida';
+import { CatalogoService } from '../../inventario/catalogo.service';
 import { TiendaService } from '../../tienda/tienda.service';
 import { PrintPreviewComponent } from '../../impresora/print-preview/print-preview.component';
 import { TicketData } from '../../impresora/ticket.converter';
@@ -81,8 +82,8 @@ const NC_VENTA_TIPOS = [
     .oh-t-warning { color:#F59E0B; }
     .oh-t-neutral { color:#94A3B8; }
     /* Bottom sheet modal */
-    .oh-sheet-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:40; display:flex; align-items:flex-end; justify-content:center; }
-    .oh-sheet { background:#fff; width:100%; max-width:32rem; border-radius:1rem 1rem 0 0; max-height:90vh; overflow-y:auto; }
+    .oh-sheet-backdrop { position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:40; display:flex; align-items:center; justify-content:center; padding:1rem; overflow-y:auto; }
+    .oh-sheet { background:#fff; width:100%; max-width:32rem; border-radius:1rem; max-height:90vh; overflow-y:auto; box-shadow:0 8px 32px rgba(0,0,0,0.15); }
     .oh-sheet-header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; border-bottom:1px solid #EEF1F6; position:sticky; top:0; background:#fff; }
     .oh-sheet-title { font-size:0.875rem; font-weight:600; color:#334155; margin:0; }
     .oh-sheet-sub { font-size:0.72rem; color:#94A3B8; margin:0; }
@@ -98,6 +99,7 @@ const NC_VENTA_TIPOS = [
     .oh-product { display:flex; gap:0.75rem; background:#F8FAFC; border-radius: 16px; padding:0.75rem; border:1px solid #EEF1F6; }
     .oh-product.averiado { border-color:#F59E0B; background:#FFFBEB; }
     .oh-product-icon { width:36px; height:36px; border-radius: 14px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .oh-product-img { width:36px; height:36px; border-radius: 14px; object-fit:cover; flex-shrink:0; background:#F8FAFC; border:1px solid #EEF1F6; }
     .oh-product-info { flex:1; min-width:0; }
     .oh-product-name { font-size:0.75rem; font-weight:600; color:#334155; margin:0; line-height:1.3; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
     .oh-product-code { font-size:0.72rem; color:#94A3B8; font-family:monospace; margin:0.15rem 0 0; }
@@ -337,22 +339,29 @@ const NC_VENTA_TIPOS = [
                 <div style="display:flex;flex-direction:column;gap:0.5rem">
                   @for (d of op.detalles; track d.id) {
                     <div class="oh-product" [class.averiado]="d.esAveriado">
-                      <div class="oh-product-icon"
-                        [style.background]="d.esAveriado ? '#FFFBEB' : '#F8FAFC'"
-                        [style.color]="d.esAveriado ? '#F59E0B' : '#94A3B8'"
-                        [style.border]="d.esAveriado ? 'none' : '1px solid #EEF1F6'">
-                        @if (d.esAveriado) {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
-                            <line x1="12" y1="9" x2="12" y2="13"/>
-                          </svg>
-                        } @else {
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-                            <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
-                          </svg>
-                        }
-                      </div>
+                      @if (getImagenProducto(d.productoCodigo) && !hasImgFailed(d.productoCodigo)) {
+                        <img [src]="getImagenProducto(d.productoCodigo)!"
+                             [alt]="d.productoNombre"
+                             class="oh-product-img"
+                             (error)="onImgError(d.productoCodigo)" />
+                      } @else {
+                        <div class="oh-product-icon"
+                          [style.background]="d.esAveriado ? '#FFFBEB' : '#F8FAFC'"
+                          [style.color]="d.esAveriado ? '#F59E0B' : '#94A3B8'"
+                          [style.border]="d.esAveriado ? 'none' : '1px solid #EEF1F6'">
+                          @if (d.esAveriado) {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                              <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3z"/>
+                              <line x1="12" y1="9" x2="12" y2="13"/>
+                            </svg>
+                          } @else {
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                              <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                              <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+                            </svg>
+                          }
+                        </div>
+                      }
                       <div class="oh-product-info">
                         <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:0.5rem">
                           <div style="min-width:0">
@@ -444,7 +453,7 @@ const NC_VENTA_TIPOS = [
             <div class="oh-section">
               <p class="oh-section-title">Registro</p>
               <div class="oh-info-row">
-                <span class="oh-info-label">Fecha</span><span>{{ op.fecha }}</span>
+                <span class="oh-info-label">Fecha</span><span>{{ formatFecha(op.fecha) }}</span>
               </div>
               <div class="oh-info-row">
                 <span class="oh-info-label">Estado</span>
@@ -670,6 +679,7 @@ const NC_VENTA_TIPOS = [
 export class OperacionesHistorialComponent implements OnInit, OnDestroy {
   readonly svc = inject(OperacionesService);
   private readonly tiendaSvc = inject(TiendaService);
+  private readonly catalogoSvc = inject(CatalogoService);
 
   // Filters
   searchText = '';
@@ -731,12 +741,41 @@ export class OperacionesHistorialComponent implements OnInit, OnDestroy {
   readonly getMetodoPagoLabel = getMetodoPagoLabel;
   readonly getEstadoSunatLabel = getEstadoSunatLabel;
 
+  // Imagen de productos (key = codigo único del producto)
+  readonly imgFailed = signal(new Set<string>());
+  readonly productoImagenMap = computed(() => {
+    const map = new Map<string, string>();
+    for (const p of this.catalogoSvc.state().productos) {
+      if (p.imagen) map.set(p.codigo, p.imagen);
+    }
+    return map;
+  });
+
+  getImagenProducto(codigo: string): string | null {
+    return this.productoImagenMap().get(codigo) ?? null;
+  }
+
+  hasImgFailed(codigo: string): boolean {
+    return this.imgFailed().has(codigo);
+  }
+
+  onImgError(codigo: string): void {
+    this.imgFailed.update(set => {
+      const next = new Set(set);
+      next.add(codigo);
+      return next;
+    });
+  }
+
   getUnidadLabel(code: string): string {
     return getUnidadMedidaLabel(code);
   }
 
   ngOnInit(): void {
     void this.svc.cargarHistorial({});
+    if (this.catalogoSvc.state().productos.length === 0) {
+      void this.catalogoSvc.cargarCatalogo();
+    }
   }
 
   ngOnDestroy(): void {
@@ -817,7 +856,10 @@ export class OperacionesHistorialComponent implements OnInit, OnDestroy {
   formatFecha(fecha: string): string {
     if (!fecha) return '';
     try {
-      return new Date(fecha).toLocaleString('es-PE', { dateStyle: 'short', timeStyle: 'short' });
+      return new Date(fecha).toLocaleString('es-PE', {
+        day: 'numeric', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit',
+      });
     } catch {
       return fecha;
     }
