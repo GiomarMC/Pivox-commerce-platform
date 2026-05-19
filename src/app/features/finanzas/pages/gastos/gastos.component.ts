@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { FinanzasService } from '../../finanzas.service';
@@ -175,6 +176,175 @@ type PestanaActiva = 'fijos' | 'variables';
       margin-bottom: 1rem;
     }
     .gs-tabs button { flex: 1; justify-content: center; }
+
+    /* ── Modal ── */
+    .gs-modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      opacity: 1;
+      animation: gs-fade 200ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    @media (min-width: 640px) { .gs-modal-backdrop { align-items: center; } }
+    .gs-modal-sheet {
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+      width: 100%;
+      max-width: 480px;
+      max-height: 92vh;
+      padding: 1.25rem 1.5rem 1.5rem;
+      overflow-y: auto;
+      box-shadow: 0 -8px 32px rgba(15, 23, 42, 0.18);
+      opacity: 1;
+      transform: translateY(0);
+      animation: gs-slide-up 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @media (min-width: 640px) {
+      .gs-modal-sheet {
+        border-radius: var(--radius-xl);
+        animation: gs-pop 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+      }
+    }
+    .gs-modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+    .gs-modal-eyebrow {
+      color: var(--color-ink-3);
+      margin-bottom: 0.2rem;
+    }
+    .gs-modal-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.125rem;
+      color: var(--color-ink-strong);
+      margin: 0;
+      letter-spacing: -0.015em;
+      line-height: 1.2;
+    }
+    .gs-modal-close {
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid var(--color-rule-2);
+      background: var(--color-surface);
+      color: var(--color-ink-2);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 140ms, color 140ms, border-color 140ms;
+    }
+    .gs-modal-close:hover {
+      background: #F5F7FB;
+      color: var(--color-ink-strong);
+      border-color: var(--color-rule-bold);
+    }
+
+    /* Context card */
+    .gs-modal-ctx {
+      border: 1px solid var(--color-rule-2);
+      border-radius: var(--radius-lg);
+      padding: 0.875rem 1rem;
+      background: rgba(248, 250, 252, 0.6);
+      margin-bottom: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+    }
+    .gs-modal-ctx-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 0.5rem;
+      font-size: 0.8125rem;
+    }
+    .gs-modal-ctx-label {
+      color: var(--color-ink-3);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .gs-modal-ctx-value {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      color: var(--color-ink-strong);
+    }
+    .gs-modal-ctx-value-mono {
+      font-family: var(--font-mono);
+      font-feature-settings: 'tnum';
+      font-weight: 600;
+      color: var(--color-ink-strong);
+    }
+    .gs-modal-ctx-divider {
+      border: 0;
+      border-top: 1px dashed var(--color-rule);
+      margin: 0;
+    }
+
+    /* Form */
+    .gs-modal-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .gs-modal-preview {
+      background: var(--color-accent-tint);
+      border-radius: var(--radius-md, 12px);
+      padding: 0.625rem 0.875rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .gs-modal-preview-label {
+      font-family: var(--font-mono);
+      font-size: 0.6875rem;
+      color: var(--color-accent);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .gs-modal-preview-value {
+      font-family: var(--font-mono);
+      font-feature-settings: 'tnum';
+      font-weight: 700;
+      color: var(--color-accent);
+      font-size: 0.875rem;
+    }
+    .gs-modal-help {
+      font-family: var(--font-sans);
+      font-size: 0.7rem;
+      color: var(--color-ink-3);
+      margin: -0.25rem 0 0;
+      line-height: 1.4;
+    }
+    .gs-modal-actions {
+      display: flex;
+      gap: 0.625rem;
+      margin-top: 0.25rem;
+    }
+
+    @keyframes gs-fade { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes gs-slide-up {
+      from { opacity: 0; transform: translateY(8%); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes gs-pop {
+      from { opacity: 0; transform: scale(0.96); }
+      to   { opacity: 1; transform: scale(1); }
+    }
   `],
   template: `
     <div class="page-content gs-wrap">
@@ -340,37 +510,10 @@ type PestanaActiva = 'fijos' | 'variables';
           }
         }
 
-        @if (!mostrarFormFijo()) {
+        @if (!mesCerrado()) {
           <button type="button" (click)="mostrarFormFijo.set(true)" class="btn-secondary w-full" style="margin-top:0.5rem">
             + Agregar gasto fijo
           </button>
-        } @else {
-          <div class="card" style="margin-top:0.5rem">
-            <div style="padding:1rem 1.25rem">
-              <p class="section-title" style="margin-bottom:0.875rem">Nuevo gasto fijo</p>
-              <form [formGroup]="formFijo" (ngSubmit)="guardarFijo()" style="display:flex;flex-direction:column;gap:0.75rem">
-                <div class="field-group">
-                  <label class="field-label">Tipo de gasto</label>
-                  <select formControlName="tipoGasto" class="field-select">
-                    <option value="">Selecciona...</option>
-                    @for (t of svc.state().tiposGasto; track t.valor) {
-                      <option [value]="t.valor">{{ t.etiqueta }}</option>
-                    }
-                  </select>
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Monto (S/)</label>
-                  <input type="number" formControlName="monto" step="0.01" min="0.01" placeholder="0.00" class="field-input" />
-                </div>
-                <div style="display:flex;gap:0.5rem">
-                  <button type="button" (click)="mostrarFormFijo.set(false)" class="btn-secondary" style="flex:1">Cancelar</button>
-                  <button type="submit" [disabled]="svc.state().isSaving || formFijo.invalid" class="btn-primary" style="flex:1">
-                    {{ svc.state().isSaving ? '...' : 'Guardar' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
         }
       }
 
@@ -395,44 +538,172 @@ type PestanaActiva = 'fijos' | 'variables';
           </div>
         }
 
-        @if (!mostrarFormVariable()) {
+        @if (!mesCerrado()) {
           <button type="button" (click)="mostrarFormVariable.set(true)" class="btn-secondary w-full">
             + Agregar gasto variable
           </button>
-        } @else {
-          <div class="card">
-            <div style="padding:1rem 1.25rem">
-              <p class="section-title" style="margin-bottom:0.875rem">Nuevo gasto variable</p>
-              <form [formGroup]="formVariable" (ngSubmit)="guardarVariable()" style="display:flex;flex-direction:column;gap:0.75rem">
-                <div class="field-group">
-                  <label class="field-label">Descripción</label>
-                  <input type="text" formControlName="descripcion" placeholder="Ej: Materiales de limpieza..." class="field-input" />
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Monto (S/)</label>
-                  <input type="number" formControlName="monto" step="0.01" min="0.01" placeholder="0.00" class="field-input" />
-                </div>
-                <div class="field-group">
-                  <label class="field-label">Fecha</label>
-                  <input type="date" formControlName="fecha" class="field-input" />
-                </div>
-                <div style="display:flex;gap:0.5rem">
-                  <button type="button" (click)="mostrarFormVariable.set(false)" class="btn-secondary" style="flex:1">Cancelar</button>
-                  <button type="submit" [disabled]="svc.state().isSaving || formVariable.invalid" class="btn-primary" style="flex:1">
-                    {{ svc.state().isSaving ? '...' : 'Guardar' }}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
         }
       }
     </div>
+
+    <!-- ═══ Modal: nuevo gasto fijo ═══ -->
+    @if (mostrarFormFijo()) {
+      <div class="gs-modal-backdrop" (click)="cerrarFormFijo()">
+        <div class="gs-modal-sheet" (click)="$event.stopPropagation()">
+
+          <div class="gs-modal-head">
+            <div>
+              <p class="text-eyebrow gs-modal-eyebrow">Gastos · Fijos</p>
+              <p class="gs-modal-title">Nuevo gasto fijo</p>
+            </div>
+            <button type="button" (click)="cerrarFormFijo()" class="gs-modal-close" aria-label="Cerrar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gs-modal-ctx">
+            <div class="gs-modal-ctx-row">
+              <span class="gs-modal-ctx-label">Periodo</span>
+              <span class="gs-modal-ctx-value">{{ mesLabel }} {{ anio }}</span>
+            </div>
+            @if (tiendaFijoNombre()) {
+              <div class="gs-modal-ctx-row">
+                <span class="gs-modal-ctx-label">Tienda</span>
+                <span class="gs-modal-ctx-value">{{ tiendaFijoNombre() }}</span>
+              </div>
+            }
+            <hr class="gs-modal-ctx-divider" />
+            <div class="gs-modal-ctx-row">
+              <span class="gs-modal-ctx-label">Total fijos del mes</span>
+              <span class="gs-modal-ctx-value-mono">S/ {{ totalFijos() | number:'1.2-2' }}</span>
+            </div>
+            <div class="gs-modal-ctx-row">
+              <span class="gs-modal-ctx-label">Tipos ya registrados</span>
+              <span class="gs-modal-ctx-value-mono">{{ countTiposFijos() }}</span>
+            </div>
+          </div>
+
+          <form [formGroup]="formFijo" (ngSubmit)="guardarFijo()" class="gs-modal-form">
+            <div class="field-group">
+              <label class="field-label">Tipo de gasto</label>
+              <select formControlName="tipoGasto" class="field-select">
+                <option value="">Selecciona...</option>
+                @for (t of svc.state().tiposGasto; track t.valor) {
+                  <option [value]="t.valor">{{ t.etiqueta }}</option>
+                }
+              </select>
+              <p class="gs-modal-help">
+                Si ya existe un gasto fijo para este tipo en {{ mesLabel }}, el monto se actualizará.
+              </p>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Monto (S/)</label>
+              <input type="number" formControlName="monto" step="0.01" min="0.01" placeholder="0.00" class="field-input" />
+            </div>
+
+            @if (formFijo.value.monto && +formFijo.value.monto! > 0) {
+              <div class="gs-modal-preview">
+                <span class="gs-modal-preview-label">Nuevo total fijos · estimado</span>
+                <span class="gs-modal-preview-value">S/ {{ nuevoTotalFijoPreview() | number:'1.2-2' }}</span>
+              </div>
+            }
+
+            @if (svc.state().errorMessage) {
+              <div class="error-banner" style="font-size:0.75rem">{{ svc.state().errorMessage }}</div>
+            }
+
+            <div class="gs-modal-actions">
+              <button type="button" (click)="cerrarFormFijo()" class="btn-secondary" style="flex:1">Cancelar</button>
+              <button type="submit" [disabled]="svc.state().isSaving || formFijo.invalid" class="btn-primary" style="flex:1">
+                {{ svc.state().isSaving ? 'Guardando...' : 'Guardar gasto' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
+
+    <!-- ═══ Modal: nuevo gasto variable ═══ -->
+    @if (mostrarFormVariable()) {
+      <div class="gs-modal-backdrop" (click)="cerrarFormVariable()">
+        <div class="gs-modal-sheet" (click)="$event.stopPropagation()">
+
+          <div class="gs-modal-head">
+            <div>
+              <p class="text-eyebrow gs-modal-eyebrow">Gastos · Variables</p>
+              <p class="gs-modal-title">Nuevo gasto variable</p>
+            </div>
+            <button type="button" (click)="cerrarFormVariable()" class="gs-modal-close" aria-label="Cerrar">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="gs-modal-ctx">
+            <div class="gs-modal-ctx-row">
+              <span class="gs-modal-ctx-label">Periodo</span>
+              <span class="gs-modal-ctx-value">{{ mesLabel }} {{ anio }}</span>
+            </div>
+            @if (tiendaVariableNombre()) {
+              <div class="gs-modal-ctx-row">
+                <span class="gs-modal-ctx-label">Tienda</span>
+                <span class="gs-modal-ctx-value">{{ tiendaVariableNombre() }}</span>
+              </div>
+            }
+            <hr class="gs-modal-ctx-divider" />
+            <div class="gs-modal-ctx-row">
+              <span class="gs-modal-ctx-label">Total variables del mes</span>
+              <span class="gs-modal-ctx-value-mono">S/ {{ totalVariables() | number:'1.2-2' }}</span>
+            </div>
+          </div>
+
+          <form [formGroup]="formVariable" (ngSubmit)="guardarVariable()" class="gs-modal-form">
+            <div class="field-group">
+              <label class="field-label">Descripción</label>
+              <input type="text" formControlName="descripcion" placeholder="Ej: Materiales de limpieza, repuestos..." class="field-input" />
+              <p class="gs-modal-help">Describe brevemente el gasto para identificarlo después.</p>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Monto (S/)</label>
+              <input type="number" formControlName="monto" step="0.01" min="0.01" placeholder="0.00" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label class="field-label">Fecha</label>
+              <input type="date" formControlName="fecha" class="field-input" />
+            </div>
+
+            @if (formVariable.value.monto && +formVariable.value.monto! > 0) {
+              <div class="gs-modal-preview">
+                <span class="gs-modal-preview-label">Nuevo total variables · estimado</span>
+                <span class="gs-modal-preview-value">S/ {{ nuevoTotalVariablePreview() | number:'1.2-2' }}</span>
+              </div>
+            }
+
+            @if (svc.state().errorMessage) {
+              <div class="error-banner" style="font-size:0.75rem">{{ svc.state().errorMessage }}</div>
+            }
+
+            <div class="gs-modal-actions">
+              <button type="button" (click)="cerrarFormVariable()" class="btn-secondary" style="flex:1">Cancelar</button>
+              <button type="submit" [disabled]="svc.state().isSaving || formVariable.invalid" class="btn-primary" style="flex:1">
+                {{ svc.state().isSaving ? 'Guardando...' : 'Guardar gasto' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    }
   `,
 })
 export class GastosComponent implements OnInit {
   readonly svc = inject(FinanzasService);
   private readonly fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
 
   pestana: PestanaActiva = 'fijos';
   mes = new Date().getMonth() + 1;
@@ -472,6 +743,28 @@ export class GastosComponent implements OnInit {
     !!this.svc.state().gastosFijosResumen?.tiendas?.[0]?.mesCerrado,
   );
 
+  // Helpers para modales
+  readonly tiendaFijoNombre = computed(() =>
+    this.svc.state().gastosFijosResumen?.tiendas?.[0]?.tienda ?? '',
+  );
+  readonly tiendaVariableNombre = computed(() =>
+    this.svc.state().gastosVariablesResumen?.tienda ?? '',
+  );
+  readonly countTiposFijos = computed(() => {
+    const detalle = this.svc.state().gastosFijosResumen?.tiendas?.[0]?.detalle ?? {};
+    return Object.values(detalle).filter(v => parseFloat(v) > 0).length;
+  });
+  nuevoTotalFijoPreview(): number {
+    const monto = Number(this.formFijo.value['monto'] ?? 0);
+    if (!isFinite(monto) || monto <= 0) return this.totalFijos();
+    return this.totalFijos() + monto;
+  }
+  nuevoTotalVariablePreview(): number {
+    const monto = Number(this.formVariable.value['monto'] ?? 0);
+    if (!isFinite(monto) || monto <= 0) return this.totalVariables();
+    return this.totalVariables() + monto;
+  }
+
   // Chart: por tipo de gasto
   readonly tipoItems = computed((): GastoTipoItem[] => {
     const tiendas = this.svc.state().gastosFijosResumen?.tiendas ?? [];
@@ -499,6 +792,10 @@ export class GastosComponent implements OnInit {
   ngOnInit(): void {
     this.recargar();
     void this.svc.cargarTiposGasto();
+    if (this.route.snapshot.queryParamMap.get('accion') === 'registrar') {
+      this.pestana = 'variables';
+      this.mostrarFormVariable.set(true);
+    }
   }
 
   recargar(): void {
@@ -509,6 +806,18 @@ export class GastosComponent implements OnInit {
 
   detalleEntries(detalle: Record<string, string>): { key: string; value: string }[] {
     return Object.entries(detalle).map(([key, value]) => ({ key, value }));
+  }
+
+  cerrarFormFijo(): void {
+    this.mostrarFormFijo.set(false);
+    this.formFijo.reset();
+    this.svc.clearMessages();
+  }
+
+  cerrarFormVariable(): void {
+    this.mostrarFormVariable.set(false);
+    this.formVariable.reset({ fecha: new Date().toISOString().split('T')[0] });
+    this.svc.clearMessages();
   }
 
   async guardarFijo(): Promise<void> {

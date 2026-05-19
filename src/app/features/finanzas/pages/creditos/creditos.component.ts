@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { DecimalPipe } from '@angular/common';
 import { FinanzasService } from '../../finanzas.service';
@@ -6,6 +7,7 @@ import { DeudaCardComponent } from '../../components/deuda-card/deuda-card.compo
 import { PrintPreviewComponent } from '../../../impresora/print-preview/print-preview.component';
 import { EstadoCobranzaChartComponent, EstadoCobranzaItem } from '../../components/estado-cobranza-chart/estado-cobranza-chart.component';
 import { DeudaModel } from '../../models/deuda.model';
+import { getEstadoDeudaLabel } from '../../constants/estados-deuda';
 
 type BusquedaTipo = 'documento' | 'comprobante';
 type TabKey = 'activas' | 'historial';
@@ -25,6 +27,7 @@ type TabKey = 'activas' | 'historial';
 })
 export class CreditosComponent implements OnInit {
   readonly svc = inject(FinanzasService);
+  private readonly route = inject(ActivatedRoute);
 
   readonly tab = signal<TabKey>('activas');
   readonly tipoBusqueda = signal<BusquedaTipo>('documento');
@@ -33,6 +36,22 @@ export class CreditosComponent implements OnInit {
 
   readonly deudaSeleccionada = signal<DeudaModel | null>(null);
   montoPago: number | null = null;
+
+  readonly getEstadoDeudaLabel = getEstadoDeudaLabel;
+
+  readonly montoPagadoSelected = computed(() => {
+    const d = this.deudaSeleccionada();
+    if (!d) return 0;
+    return Math.max(0, parseFloat(d.montoTotal) - parseFloat(d.saldo));
+  });
+
+  readonly porcentajePagadoSelected = computed(() => {
+    const d = this.deudaSeleccionada();
+    if (!d) return 0;
+    const total = parseFloat(d.montoTotal);
+    if (total <= 0) return 0;
+    return Math.min(100, ((total - parseFloat(d.saldo)) / total) * 100);
+  });
 
   readonly mostrarPreview = signal(false);
   readonly previewPdfBlob = signal<Blob | null>(null);
@@ -95,6 +114,10 @@ export class CreditosComponent implements OnInit {
   readonly hayCobranzaItems = computed(() => this.estadoCobranzaItems().length > 0);
 
   ngOnInit(): void {
+    if (this.route.snapshot.queryParamMap.get('accion') === 'pago') {
+      this.tab.set('activas');
+      this.estadoFiltro.set('ACTIVA');
+    }
     void this.svc.cargarDeudasDashboard();
     void this.svc.cargarDeudas({ estado: 'ACTIVA' });
     void this.svc.cargarPagos({});
@@ -151,6 +174,12 @@ export class CreditosComponent implements OnInit {
   cerrarPago(): void {
     this.deudaSeleccionada.set(null);
     this.montoPago = null;
+  }
+
+  pagarTodo(): void {
+    const d = this.deudaSeleccionada();
+    if (!d) return;
+    this.montoPago = parseFloat(d.saldo);
   }
 
   async confirmarPago(): Promise<void> {

@@ -1,0 +1,398 @@
+<div class="page-content eq-wrap">
+
+  <!-- ═══ Header ═══ -->
+  <header class="eq-header">
+    <div>
+      <p class="text-eyebrow eq-eyebrow">Operación</p>
+      <h1 class="eq-title">Equipo</h1>
+      <p class="eq-meta">Miembros, asistencia y control de jornada</p>
+    </div>
+    @if (isDueno()) {
+      <a routerLink="/invitation/new" class="eq-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Invitar
+      </a>
+    }
+  </header>
+
+  <!-- ═══ KPIs ═══ -->
+  <section class="eq-kpis">
+    <div class="eq-kpi eq-kpi-hero">
+      <span class="text-eyebrow eq-kpi-label">Miembros activos</span>
+      <p class="eq-kpi-value">{{ miembrosActivos() }}</p>
+      <span class="eq-kpi-meta">Cuentas habilitadas</span>
+    </div>
+
+    <div class="eq-kpi">
+      <span class="text-eyebrow eq-kpi-label">Presentes hoy</span>
+      <p class="eq-kpi-value-sm">{{ presentesHoy() }} <span class="eq-kpi-pre-sm">/ {{ totalActivosHoy() }}</span></p>
+      <span class="eq-kpi-pill eq-kpi-pill-success">Con entrada</span>
+    </div>
+
+    <div class="eq-kpi">
+      <span class="text-eyebrow eq-kpi-label">Horas del mes</span>
+      <p class="eq-kpi-value-sm">{{ horasDelMes() | number:'1.0-1' }}<span class="eq-kpi-suffix">h</span></p>
+      <span class="eq-kpi-pill eq-kpi-pill-info">Acumulado</span>
+    </div>
+
+    <div class="eq-kpi">
+      <span class="text-eyebrow eq-kpi-label">Invitaciones</span>
+      <p class="eq-kpi-value-sm">{{ invitacionesPendientes() }}</p>
+      <span class="eq-kpi-pill eq-kpi-pill-warn">Pendientes</span>
+    </div>
+  </section>
+
+  <!-- ═══ Tabs ═══ -->
+  <section class="eq-card eq-list-card">
+
+    <div class="eq-tabs">
+      <button type="button" (click)="setTab('miembros')"
+        [class.eq-tab-active]="tab() === 'miembros'" class="eq-tab">
+        <span class="eq-tab-name">Miembros</span>
+        <span class="eq-tab-count">{{ usuariosSvc.state().usuarios.length }}</span>
+      </button>
+      <button type="button" (click)="setTab('asistencia-hoy')"
+        [class.eq-tab-active]="tab() === 'asistencia-hoy'" class="eq-tab">
+        <span class="eq-tab-name">Asistencia hoy</span>
+        <span class="eq-tab-count">{{ totalActivosHoy() }}</span>
+      </button>
+      <button type="button" (click)="setTab('resumen')"
+        [class.eq-tab-active]="tab() === 'resumen'" class="eq-tab">
+        <span class="eq-tab-name">Resumen mensual</span>
+        <span class="eq-tab-count">{{ asistenciaSvc.state().resumen.length }}</span>
+      </button>
+    </div>
+
+    <!-- ═══ TAB MIEMBROS ═══ -->
+    @if (tab() === 'miembros') {
+
+      <div class="eq-filters">
+        <select (change)="onRolChange($event)" class="field-select eq-filter-select">
+          @for (r of roles; track r.value) {
+            <option [value]="r.value ?? ''">{{ r.label }}</option>
+          }
+        </select>
+        <div class="eq-search">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="2" class="eq-search-icon">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" [(ngModel)]="busqueda"
+            placeholder="Buscar por nombre o correo..." class="field-input eq-search-input" />
+        </div>
+      </div>
+
+      @if (usuariosSvc.state().invitationLink) {
+        <div class="eq-banner">
+          <div class="eq-banner-content">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span class="eq-banner-link">{{ usuariosSvc.state().invitationLink }}</span>
+          </div>
+          <button type="button" (click)="copiarLink()" class="btn-primary eq-banner-btn">Copiar</button>
+        </div>
+      }
+
+      @if (usuariosSvc.state().errorMessage) {
+        <div class="error-banner eq-error">{{ usuariosSvc.state().errorMessage }}</div>
+      }
+
+      @if (usuariosSvc.state().isLoading) {
+        <ul class="eq-list">
+          @for (i of [1,2,3,4]; track i) {
+            <li class="eq-card-row eq-skel">
+              <div class="eq-avatar" style="background:#EEF1F6"></div>
+              <div style="flex:1">
+                <div class="eq-skel-line short"></div>
+                <div class="eq-skel-line medium"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else if (usuariosFiltrados.length === 0) {
+        <div class="eq-empty">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <p class="eq-empty-title">Sin miembros</p>
+          <p class="eq-empty-desc">No hay miembros con estos filtros</p>
+        </div>
+      } @else {
+        <ul class="eq-list">
+          @for (u of usuariosFiltrados; track u.id) {
+            <li class="eq-card-row">
+              <div class="eq-avatar" [class.eq-avatar-pending]="esPendiente(u)">
+                {{ (esPendiente(u) ? u.usuarioEmail : u.usuarioNombre)[0]?.toUpperCase() ?? '?' }}
+              </div>
+
+              <div class="eq-info">
+                <p class="eq-name">{{ esPendiente(u) ? u.usuarioEmail : u.usuarioNombre }}</p>
+                <div class="eq-badges">
+                  <span class="badge-primary badge">{{ u.rolDisplay }}</span>
+                  <span [class]="esPendiente(u) ? 'badge-warning badge' : u.usuarioIsActive ? 'badge-success badge' : 'badge-error badge'">
+                    {{ esPendiente(u) ? 'Pendiente' : u.usuarioIsActive ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </div>
+                <p class="eq-tienda">{{ u.tiendaNombre }}</p>
+              </div>
+
+              @if (isDueno() && !esMiCuenta(u)) {
+                <div class="eq-actions">
+                  @if (u.rol !== Roles.dueno) {
+                    <button type="button" class="btn-secondary eq-action-btn" (click)="abrirEdicion(u)">Editar</button>
+                  }
+                  @if (!esPendiente(u)) {
+                    <button type="button" class="btn-secondary eq-action-btn" (click)="toggleEstado(u)">
+                      {{ u.usuarioIsActive ? 'Desactivar' : 'Activar' }}
+                    </button>
+                  }
+                  @if (esPendiente(u)) {
+                    <button type="button" class="btn-secondary eq-action-btn" (click)="reenviarInvitacion(u)">Reenviar</button>
+                  }
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    <!-- ═══ TAB ASISTENCIA HOY ═══ -->
+    @if (tab() === 'asistencia-hoy') {
+
+      @if (asistenciaSvc.state().errorMessage) {
+        <div class="error-banner eq-error">{{ asistenciaSvc.state().errorMessage }}</div>
+      }
+      @if (asistenciaSvc.state().successMessage) {
+        <div class="success-banner eq-error">{{ asistenciaSvc.state().successMessage }}</div>
+      }
+
+      @if (asistenciaSvc.state().isLoading) {
+        <ul class="eq-list">
+          @for (i of [1,2,3]; track i) {
+            <li class="eq-card-row eq-skel">
+              <div class="eq-avatar" style="background:#EEF1F6"></div>
+              <div style="flex:1">
+                <div class="eq-skel-line short"></div>
+                <div class="eq-skel-line medium"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else if (asistenciaSvc.state().usuariosHoy.length === 0) {
+        <div class="eq-empty">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <p class="eq-empty-title">Sin trabajadores activos</p>
+          <p class="eq-empty-desc">No hay trabajadores activos registrados hoy</p>
+        </div>
+      } @else {
+        <ul class="eq-list">
+          @for (item of asistenciaSvc.state().usuariosHoy; track item.usuario.id) {
+            <li class="eq-card-row">
+              <div class="eq-avatar">
+                {{ item.usuario.usuarioNombre[0]?.toUpperCase() ?? '?' }}
+              </div>
+
+              <div class="eq-info">
+                <p class="eq-name">{{ item.usuario.usuarioNombre }}</p>
+                <div class="eq-time-pills">
+                  @if (item.asistencia?.horaEntrada) {
+                    <span class="eq-time-pill eq-time-in">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      {{ item.asistencia!.horaEntrada }}
+                    </span>
+                  }
+                  @if (item.asistencia?.horaSalida) {
+                    <span class="eq-time-pill eq-time-out">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                      </svg>
+                      {{ item.asistencia!.horaSalida }}
+                    </span>
+                  }
+                  @if (!item.asistencia?.horaEntrada && !item.asistencia?.horaSalida) {
+                    <span class="eq-time-pill eq-time-none">Sin registro</span>
+                  }
+                </div>
+              </div>
+
+              <div class="eq-actions">
+                @if (!item.asistencia?.horaEntrada) {
+                  <button type="button" class="eq-btn-entrada" (click)="marcarEntrada(item)" [disabled]="asistenciaSvc.state().isMarking">
+                    Entrada
+                  </button>
+                } @else if (!item.asistencia?.horaSalida) {
+                  <button type="button" class="eq-btn-salida" (click)="abrirSalida(item)" [disabled]="asistenciaSvc.state().isMarking">
+                    Salida
+                  </button>
+                } @else {
+                  <span class="badge-success badge">Completo</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+
+    <!-- ═══ TAB RESUMEN ═══ -->
+    @if (tab() === 'resumen') {
+
+      <div class="eq-resumen-filters">
+        <select [value]="asistenciaSvc.state().mesResumen" (change)="onMesChange($event)" class="field-select">
+          @for (m of mesOpciones; track m.value) {
+            <option [value]="m.value">{{ m.label }}</option>
+          }
+        </select>
+        <select [value]="asistenciaSvc.state().anioResumen" (change)="onAnioChange($event)" class="field-select">
+          @for (a of anioOpciones; track a) {
+            <option [value]="a">{{ a }}</option>
+          }
+        </select>
+      </div>
+
+      @if (asistenciaSvc.state().isLoadingResumen) {
+        <div class="eq-empty">
+          <div class="loading-spinner" style="margin-bottom:0.5rem"></div>
+          Cargando...
+        </div>
+      } @else if (asistenciaSvc.state().resumen.length === 0) {
+        <div class="eq-empty">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <p class="eq-empty-title">Sin datos</p>
+          <p class="eq-empty-desc">No hay registros para este período</p>
+        </div>
+      } @else {
+
+        <!-- ── KPIs del periodo ── -->
+        <div class="eq-period-kpis">
+          <div class="eq-period-kpi">
+            <span class="text-eyebrow eq-period-kpi-label">Días equipo</span>
+            <p class="eq-period-kpi-value">{{ resumenTotalDias() }}</p>
+          </div>
+          <div class="eq-period-kpi">
+            <span class="text-eyebrow eq-period-kpi-label">Horas mes</span>
+            <p class="eq-period-kpi-value">{{ resumenTotalHoras() | number:'1.0-1' }}<span class="eq-period-kpi-suffix">h</span></p>
+          </div>
+          <div class="eq-period-kpi">
+            <span class="text-eyebrow eq-period-kpi-label">Promedio</span>
+            <p class="eq-period-kpi-value">{{ resumenPromedioHoras() | number:'1.0-1' }}<span class="eq-period-kpi-suffix">h</span></p>
+          </div>
+          <div class="eq-period-kpi">
+            <span class="text-eyebrow eq-period-kpi-label">Top</span>
+            <p class="eq-period-kpi-value eq-period-kpi-top">{{ resumenTopPerformer()?.usuarioNombre ?? '—' }}</p>
+          </div>
+        </div>
+
+        <!-- ── Ranking ── -->
+        <ul class="eq-ranking">
+          @for (r of resumenRanking(); track r.usuarioTiendaId; let i = $index) {
+            <li class="eq-rank-row">
+              <span class="eq-rank-pos">{{ i + 1 }}</span>
+              <div class="eq-rank-avatar">{{ r.usuarioNombre[0]?.toUpperCase() ?? '?' }}</div>
+              <div class="eq-rank-info">
+                <p class="eq-rank-name">{{ r.usuarioNombre }}</p>
+                <p class="eq-rank-stats">
+                  <span class="eq-rank-stat"><strong>{{ r.diasTrabajados }}</strong>d</span>
+                  <span class="eq-rank-sep">·</span>
+                  <span class="eq-rank-stat"><strong>{{ r.horasTotales | number:'1.0-1' }}</strong>h</span>
+                </p>
+              </div>
+              <div class="eq-rank-sparkbar" aria-hidden="true">
+                <div class="eq-rank-sparkbar-fill" [style.width.%]="porcentajeHoras(r.horasTotales)"></div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+</div>
+
+<!-- ═══ Dialog: editar miembro ═══ -->
+@if (editando; as ed) {
+  <div class="eq-modal-backdrop" (click)="editando = null">
+    <div class="eq-modal-sheet" (click)="$event.stopPropagation()">
+      <div class="eq-modal-head">
+        <div>
+          <p class="text-eyebrow eq-modal-eyebrow">Miembro</p>
+          <p class="eq-modal-title">{{ ed.usuarioNombre || ed.usuarioEmail }}</p>
+        </div>
+        <button type="button" class="eq-modal-close" (click)="editando = null" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      @if (ed.rol !== Roles.dueno) {
+        <div class="field-group">
+          <label class="field-label">Rol</label>
+          <select [(ngModel)]="editRol" class="field-select">
+            <option value="ADMINISTRADOR">Administrador</option>
+            <option value="TRABAJADOR">Trabajador</option>
+          </select>
+        </div>
+      }
+
+      <div class="field-group">
+        <label class="field-label">Salario</label>
+        <input type="number" [(ngModel)]="editSalario" placeholder="ej: 1500.00" step="0.01" class="field-input" />
+      </div>
+
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-secondary" style="flex:1" (click)="editando = null">Cancelar</button>
+        <button type="button" class="btn-primary" style="flex:1" (click)="guardarEdicion()" [disabled]="usuariosSvc.state().isEditing">
+          {{ usuariosSvc.state().isEditing ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ═══ Dialog: registrar salida ═══ -->
+@if (dialogSalida; as ds) {
+  <div class="eq-modal-backdrop" (click)="dialogSalida = null">
+    <div class="eq-modal-sheet" (click)="$event.stopPropagation()">
+      <div class="eq-modal-head">
+        <div>
+          <p class="text-eyebrow eq-modal-eyebrow">Asistencia</p>
+          <p class="eq-modal-title">Registrar salida</p>
+        </div>
+        <button type="button" class="eq-modal-close" (click)="dialogSalida = null" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="eq-modal-body">
+        ¿Registrar salida para <strong>{{ ds.usuario.usuarioNombre }}</strong>?
+      </p>
+
+      <label class="eq-checkbox">
+        <input type="checkbox" [(ngModel)]="almuerzo" style="accent-color: var(--color-ink-strong)" />
+        <span>Incluye tiempo de almuerzo</span>
+      </label>
+
+      <div class="eq-modal-actions">
+        <button type="button" class="btn-secondary" style="flex:1" (click)="dialogSalida = null">Cancelar</button>
+        <button type="button" class="btn-primary" style="flex:1" (click)="confirmarSalida()">Confirmar salida</button>
+      </div>
+    </div>
+  </div>
+}

@@ -301,14 +301,14 @@
   gap: 0.625rem;
 }
 .fh-shortcut {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  padding: 0.75rem 0.875rem;
+  padding: 0.875rem 1rem;
   background: var(--color-surface);
   border: 1px solid var(--color-rule);
   border-radius: 12px;
-  text-decoration: none;
   color: var(--color-ink-strong);
   transition: border-color 160ms, box-shadow 160ms, transform 100ms;
 }
@@ -316,6 +316,21 @@
   border-color: var(--color-rule-bold);
   box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
   transform: translateY(-2px);
+}
+.fh-sc-main {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex: 1;
+  min-width: 0;
+  text-decoration: none;
+  color: inherit;
+}
+.fh-sc-main::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
 }
 .fh-sc-icon {
   width: 32px; height: 32px;
@@ -326,8 +341,6 @@
   flex-shrink: 0;
 }
 .fh-sc-icon-indigo { background: var(--color-accent-tint); color: var(--color-accent); }
-.fh-sc-icon-violet { background: #F5F3FF; color: #8B5CF6; }
-.fh-sc-icon-cyan   { background: #ECFEFF; color: #06B6D4; }
 .fh-sc-icon-amber  { background: var(--color-warning-tint); color: var(--color-warning); }
 
 .fh-sc-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
@@ -343,6 +356,36 @@
   font-size: 0.6875rem;
   color: var(--color-ink-2);
   letter-spacing: 0.02em;
+}
+
+.fh-sc-cta {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.625rem;
+  border: 1px solid var(--color-rule-2);
+  border-radius: 999px;
+  background: var(--color-surface);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-accent);
+  text-decoration: none;
+  transition: border-color 140ms, color 140ms, background 140ms;
+}
+.fh-sc-cta:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-tint);
+}
+.fh-sc-cta-amber {
+  color: var(--color-warning);
+}
+.fh-sc-cta-amber:hover {
+  border-color: var(--color-warning);
+  background: var(--color-warning-tint);
 }
 
 /* Mobile: 1 columna en bar row */

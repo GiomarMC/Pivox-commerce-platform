@@ -201,20 +201,105 @@
 </div>
 
 <!-- ═══ Modal pago ═══ -->
-@if (deudaSeleccionada()) {
+@if (deudaSeleccionada(); as deuda) {
   <div class="cr-modal-backdrop" (click)="cerrarPago()">
     <div class="cr-modal-sheet" (click)="$event.stopPropagation()">
-      <p class="cr-modal-title">Registrar pago</p>
-      <p class="cr-modal-sub">
-        Saldo pendiente: <span class="cr-modal-saldo">S/ {{ +deudaSeleccionada()!.saldo | number:'1.2-2' }}</span>
-      </p>
-      <div class="field-group" style="margin-bottom:1rem">
-        <label class="field-label">Monto (S/)</label>
-        <input type="number" [(ngModel)]="montoPago" step="0.01" min="0.01" [max]="+deudaSeleccionada()!.saldo" placeholder="0.00" class="field-input" />
+
+      <div class="cr-modal-head">
+        <div>
+          <p class="text-eyebrow cr-modal-eyebrow">Cobranza</p>
+          <p class="cr-modal-title">Registrar pago</p>
+        </div>
+        <button type="button" (click)="cerrarPago()" class="cr-modal-close" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
       </div>
+
+      <div class="cr-modal-deuda">
+        <div class="cr-modal-deuda-head">
+          <div class="cr-modal-deuda-id">
+            <span class="cr-modal-deuda-icon"
+              [class.cr-modal-deuda-icon-venta]="deuda.tipoOrigen === 'venta'"
+              [class.cr-modal-deuda-icon-servicio]="deuda.tipoOrigen !== 'venta'">
+              @if (deuda.tipoOrigen === 'venta') {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+              } @else {
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+                </svg>
+              }
+            </span>
+            <div class="cr-modal-deuda-text">
+              @if (deuda.numeroComprobante) {
+                <p class="cr-modal-deuda-comp">{{ deuda.numeroComprobante }}</p>
+              }
+              <p class="cr-modal-deuda-tipo">
+                {{ deuda.tipoOrigen === 'venta' ? 'Venta' : 'Servicio' }} a crédito
+              </p>
+            </div>
+          </div>
+          <span [class]="deuda.estado === 'ACTIVA' ? 'badge badge-warning' : 'badge badge-success'">
+            {{ getEstadoDeudaLabel(deuda.estado) }}
+          </span>
+        </div>
+
+        <div class="cr-modal-breakdown">
+          <div class="cr-modal-row">
+            <span class="cr-modal-row-label">Total</span>
+            <span class="cr-modal-row-value">S/ {{ +deuda.montoTotal | number:'1.2-2' }}</span>
+          </div>
+          <div class="cr-modal-row">
+            <span class="cr-modal-row-label">Pagado</span>
+            <span class="cr-modal-row-value cr-modal-row-paid">S/ {{ montoPagadoSelected() | number:'1.2-2' }}</span>
+          </div>
+          <div class="cr-modal-row cr-modal-row-saldo">
+            <span>Saldo pendiente</span>
+            <span class="cr-modal-saldo">S/ {{ +deuda.saldo | number:'1.2-2' }}</span>
+          </div>
+          <div class="cr-modal-progress">
+            <div class="cr-modal-progress-bar"
+              [style.width.%]="porcentajePagadoSelected()"
+              [class.cr-modal-progress-pagada]="deuda.estado === 'PAGADA'"></div>
+          </div>
+          <p class="cr-modal-progress-text">{{ porcentajePagadoSelected() | number:'1.0-0' }}% pagado</p>
+        </div>
+      </div>
+
+      @if (deuda.pagos.length > 0) {
+        <div class="cr-modal-pagos">
+          <p class="text-eyebrow cr-modal-pagos-label">Pagos anteriores · {{ deuda.pagos.length }}</p>
+          <div class="cr-modal-pagos-list">
+            @for (p of deuda.pagos; track $index) {
+              <div class="cr-modal-pago">
+                <span class="cr-modal-pago-fecha">{{ formatFecha(p.fecha) }}</span>
+                <span class="cr-modal-pago-monto">S/ {{ +p.monto | number:'1.2-2' }}</span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <div class="field-group cr-modal-input">
+        <label class="field-label">Monto a pagar (S/)</label>
+        <div class="cr-modal-input-row">
+          <input type="number" [(ngModel)]="montoPago" step="0.01" min="0.01"
+            [max]="+deuda.saldo" placeholder="0.00" class="field-input" />
+          <button type="button" (click)="pagarTodo()" class="cr-modal-saldar">
+            Saldar todo
+          </button>
+        </div>
+      </div>
+
       @if (svc.state().errorMessage) {
         <div class="error-banner" style="margin-bottom:0.75rem;font-size:0.75rem">{{ svc.state().errorMessage }}</div>
       }
+
       <div class="cr-modal-actions">
         <button type="button" (click)="cerrarPago()" class="btn-secondary" style="flex:1">Cancelar</button>
         <button type="button" (click)="confirmarPago()" [disabled]="svc.state().isSaving || !montoPago" class="btn-primary" style="flex:1">

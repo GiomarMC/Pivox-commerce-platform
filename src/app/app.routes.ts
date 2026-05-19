@@ -169,19 +169,15 @@ export const routes: Routes = [
       { path: 'finanzas/deudas',       redirectTo: 'finanzas/creditos',  pathMatch: 'full' },
       { path: 'finanzas/pago-resumen', redirectTo: 'finanzas/creditos',  pathMatch: 'full' },
 
-      // Usuarios y asistencia
+      // Equipo (absorbe usuarios + asistencia)
       {
-        path: 'usuarios',
+        path: 'equipo',
         loadComponent: () =>
-          import('./features/usuarios/usuarios.component').then(m => m.UsuariosComponent),
+          import('./features/equipo/equipo.component').then(m => m.EquipoComponent),
         canActivate: [adminGuard],
       },
-      {
-        path: 'asistencia',
-        loadComponent: () =>
-          import('./features/asistencia/asistencia.component').then(m => m.AsistenciaComponent),
-        canActivate: [adminGuard],
-      },
+      { path: 'usuarios',   redirectTo: 'equipo', pathMatch: 'full' },
+      { path: 'asistencia', redirectTo: 'equipo', pathMatch: 'full' },
 
       // Tiendas
       {
