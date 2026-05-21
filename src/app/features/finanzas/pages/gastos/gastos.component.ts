@@ -698,6 +698,38 @@ type PestanaActiva = 'fijos' | 'variables';
         </div>
       </div>
     }
+
+    @if (confirmarCierre()) {
+      <div class="gs-modal-backdrop" (click)="confirmarCierre.set(false)">
+        <div class="gs-modal-sheet" style="max-width:420px" (click)="$event.stopPropagation()">
+          <div class="gs-modal-head">
+            <div>
+              <p class="text-eyebrow gs-modal-eyebrow">Gastos · Cierre</p>
+              <p class="gs-modal-title">¿Cerrar el mes {{ mesLabel }} {{ anio }}?</p>
+            </div>
+            <button type="button" (click)="confirmarCierre.set(false)" class="gs-modal-close" aria-label="Cancelar">✕</button>
+          </div>
+          <div style="padding:1.25rem 1.5rem;border-bottom:1px solid var(--color-rule)">
+            <p style="font-family:var(--font-sans);font-size:0.875rem;color:var(--color-ink-2);line-height:1.5;margin:0">
+              Una vez cerrado, el mes queda en <strong style="color:var(--color-ink)">solo lectura</strong>
+              y no podrás registrar ni modificar gastos.
+              Esta acción no se puede deshacer.
+            </p>
+            @if (totalMes() > 0) {
+              <p style="font-family:var(--font-mono);font-size:0.8125rem;color:var(--color-ink-3);margin:0.875rem 0 0">
+                Total a cerrar: <strong style="color:var(--color-ink)">S/ {{ totalMes() | number:'1.2-2' }}</strong>
+              </p>
+            }
+          </div>
+          <div class="gs-modal-actions">
+            <button type="button" class="btn-secondary" (click)="confirmarCierre.set(false)">Cancelar</button>
+            <button type="button" class="btn-primary" [disabled]="svc.state().isSaving" (click)="ejecutarCierre()">
+              {{ svc.state().isSaving ? 'Cerrando…' : 'Confirmar cierre' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   `,
 })
 export class GastosComponent implements OnInit {
@@ -711,6 +743,7 @@ export class GastosComponent implements OnInit {
 
   readonly mostrarFormFijo = signal(false);
   readonly mostrarFormVariable = signal(false);
+  readonly confirmarCierre = signal(false);
 
   readonly meses = [
     { valor: 1, label: 'Enero' }, { valor: 2, label: 'Febrero' }, { valor: 3, label: 'Marzo' },
@@ -851,8 +884,12 @@ export class GastosComponent implements OnInit {
     }
   }
 
-  async cerrarMes(): Promise<void> {
-    if (!confirm(`¿Cerrar el mes ${this.mes}/${this.anio}? Esta acción no se puede deshacer.`)) return;
+  cerrarMes(): void {
+    this.confirmarCierre.set(true);
+  }
+
+  async ejecutarCierre(): Promise<void> {
+    this.confirmarCierre.set(false);
     this.svc.clearMessages();
     await this.svc.cerrarMesGastos(this.mes, this.anio);
   }
