@@ -17,17 +17,17 @@
     </div>
   </app-editorial-page-header>
 
-  <!-- KPI strip — display serif numbers -->
-  <section class="ti-kpi-strip anim-fade-up anim-delay-1">
-    <div class="ti-kpi">
-      <app-hero-number
-        label="Sucursales registradas"
-        [value]="totalTiendas()"
-        size="lg" />
+  <!-- KPI grid -->
+  <section class="ti-kpis anim-fade-up anim-delay-1">
+    <div class="ti-kpi ti-kpi-hero">
+      <span class="ti-kpi-label text-eyebrow">Sucursales registradas</span>
+      <p class="ti-kpi-value">{{ totalTiendas() }}</p>
+      <span class="ti-kpi-meta">sedes activas</span>
     </div>
-    <div class="ti-kpi ti-kpi-rule">
-      <span class="text-eyebrow">Sede activa</span>
+    <div class="ti-kpi">
+      <span class="ti-kpi-label text-eyebrow">Sede activa</span>
       <p class="ti-active-name">{{ tiendaActivaNombre() }}</p>
+      <span class="ti-kpi-badge">operando</span>
     </div>
   </section>
 

@@ -39,8 +39,7 @@ export class TiendaFormComponent implements OnInit {
   readonly modoLabel = computed(() => this.esEdicion ? 'Editando sede' : 'Nueva sede');
 
   ngOnInit(): void {
-    const nav = this.router.getCurrentNavigation();
-    const tienda = nav?.extras?.state?.['tienda'] as StoreModel | undefined;
+    const tienda = (history.state as { tienda?: StoreModel }).tienda;
     if (tienda) {
       this.tiendaExistente = tienda;
       this.form.patchValue({

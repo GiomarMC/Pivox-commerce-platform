@@ -5,8 +5,6 @@ import { TiendaService } from '../../tienda.service';
 import { StoreModel } from '../../../../core/models/store.model';
 import { EditorialPageHeaderComponent } from '../../../../shared/components/editorial-page-header/editorial-page-header.component';
 import { EditorialSectionComponent } from '../../../../shared/components/editorial-section/editorial-section.component';
-import { HeroNumberComponent } from '../../../../shared/components/hero-number/hero-number.component';
-
 @Component({
   selector: 'app-tiendas',
   standalone: true,
@@ -14,7 +12,6 @@ import { HeroNumberComponent } from '../../../../shared/components/hero-number/h
     RouterLink,
     EditorialPageHeaderComponent,
     EditorialSectionComponent,
-    HeroNumberComponent,
   ],
   templateUrl: './tiendas.component.html',
   styleUrl: './tiendas.component.css',
