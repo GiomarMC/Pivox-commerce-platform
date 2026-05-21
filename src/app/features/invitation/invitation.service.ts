@@ -5,12 +5,15 @@ import { environment } from '../../../environments/environment';
 import { extractApiError } from '../../core/http/api-error.handler';
 
 export type InvitationStatus = 'idle' | 'success' | 'error';
+export type TokenStatus = 'idle' | 'validating' | 'valid' | 'invalid';
 
 export interface InvitationState {
   isLoading: boolean;
   errorMessage: string | null;
   successMessage: string | null;
   status: InvitationStatus;
+  tokenStatus: TokenStatus;
+  usuarioNombre: string | null;
   invitationLink: string | null;
   roles: { valor: string; etiqueta: string }[];
   tiendas: { id: number; nombre: string }[];
@@ -21,6 +24,8 @@ const INITIAL: InvitationState = {
   errorMessage: null,
   successMessage: null,
   status: 'idle',
+  tokenStatus: 'idle',
+  usuarioNombre: null,
   invitationLink: null,
   roles: [],
   tiendas: [],
@@ -54,27 +59,43 @@ export class InvitationService {
     }
   }
 
-  async aceptarInvitacion(
-    token: string,
-    firstName: string,
-    lastName: string,
-    password: string,
-  ): Promise<boolean> {
-    this._state.update(s => ({ ...s, isLoading: true, errorMessage: null, successMessage: null }));
+  async validarToken(token: string): Promise<void> {
+    this._state.update(s => ({ ...s, tokenStatus: 'validating', errorMessage: null }));
+    try {
+      const res = await firstValueFrom(
+        this.http.post<{ mensaje: string; usuario: string }>(
+          `${this.base}auth/invitacion/validar/`, { token },
+        ),
+      );
+      this._state.update(s => ({
+        ...s,
+        tokenStatus: 'valid',
+        usuarioNombre: res.usuario ?? null,
+      }));
+    } catch (err: unknown) {
+      this._state.update(s => ({
+        ...s,
+        tokenStatus: 'invalid',
+        errorMessage: extractApiError(err as HttpErrorResponse),
+      }));
+    }
+  }
+
+  async completarInvitacion(token: string, password: string, confirmarPassword: string): Promise<boolean> {
+    this._state.update(s => ({ ...s, isLoading: true, errorMessage: null }));
     try {
       await firstValueFrom(
-        this.http.post(`${this.base}auth/register/`, {
+        this.http.post(`${this.base}auth/invitacion/completar/`, {
           token,
-          first_name: firstName,
-          last_name: lastName,
           password,
+          confirmar_password: confirmarPassword,
         }),
       );
       this._state.update(s => ({
         ...s,
         isLoading: false,
         status: 'success',
-        successMessage: 'Cuenta creada correctamente. Ya puedes iniciar sesión.',
+        successMessage: 'Contraseña establecida exitosamente. Ya puedes iniciar sesión.',
       }));
       return true;
     } catch (err: unknown) {

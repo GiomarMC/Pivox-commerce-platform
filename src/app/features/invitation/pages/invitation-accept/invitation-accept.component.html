@@ -1,0 +1,247 @@
+<div class="ia-bg">
+
+  <!-- Animated gradient mesh -->
+  <div class="ia-mesh" aria-hidden="true">
+    <div class="ia-blob ia-blob-1"></div>
+    <div class="ia-blob ia-blob-2"></div>
+    <div class="ia-blob ia-blob-3"></div>
+    <div class="ia-blob ia-blob-4"></div>
+  </div>
+  <div class="ia-dots" aria-hidden="true"></div>
+
+  <div class="ia-wrap">
+
+    <!-- Left: brand + steps (desktop only) -->
+    <aside class="ia-marketing">
+
+      <div class="ia-brand-block">
+        <span class="ia-mark">
+          <span class="ia-mark-dot"></span>
+          Pivox
+        </span>
+
+        <h1 class="ia-headline">Únete al <em>equipo</em>.</h1>
+
+        <p class="ia-tagline">
+          Has sido invitado a gestionar operaciones. Crea tu contraseña para activar tu acceso al sistema.
+        </p>
+
+        <div class="ia-trust-tags">
+          <span class="ia-tag">
+            <span class="ia-tag-dot ia-tag-dot-success"></span>
+            Enlace de un solo uso
+          </span>
+          <span class="ia-tag">
+            <span class="ia-tag-dot ia-tag-dot-indigo"></span>
+            Acceso por roles
+          </span>
+          <span class="ia-tag">
+            <span class="ia-tag-dot ia-tag-dot-violet"></span>
+            Datos cifrados
+          </span>
+        </div>
+      </div>
+
+      <!-- Steps flow -->
+      <ol class="ia-steps">
+        <li class="ia-step" [class.ia-step-active]="svc.state().tokenStatus !== 'invalid' && svc.state().status !== 'success'">
+          <span class="ia-step-num">01</span>
+          <span class="ia-step-label">Contraseña</span>
+          <span class="ia-step-desc">Crea tu acceso seguro</span>
+        </li>
+        <li class="ia-step" [class.ia-step-active]="svc.state().status === 'success'">
+          <span class="ia-step-num">02</span>
+          <span class="ia-step-label">Perfil</span>
+          <span class="ia-step-desc">Completa tus datos</span>
+        </li>
+        <li class="ia-step">
+          <span class="ia-step-num">03</span>
+          <span class="ia-step-label">Acceso</span>
+          <span class="ia-step-desc">Opera el sistema</span>
+        </li>
+      </ol>
+
+    </aside>
+
+    <!-- Right: form card -->
+    <main class="ia-main">
+
+      @if (!token()) {
+
+        <!-- Sin token en la URL -->
+        <div class="ia-card">
+          <header class="ia-card-head">
+            <span class="ia-mark ia-mark-sm">
+              <span class="ia-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="ia-card-title ia-title-error">Enlace inválido.</h2>
+            <p class="ia-card-sub">No se proporcionó un token de invitación.</p>
+          </header>
+          <div class="error-banner">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+              <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>Pide al administrador que te genere un nuevo enlace de invitación.</span>
+          </div>
+        </div>
+
+      } @else if (svc.state().tokenStatus === 'idle' || svc.state().tokenStatus === 'validating') {
+
+        <!-- Validando token -->
+        <div class="ia-card ia-card-loading">
+          <span class="loading-spinner ia-loading-spinner"></span>
+          <p class="ia-loading-text">Verificando enlace de invitación…</p>
+        </div>
+
+      } @else if (svc.state().tokenStatus === 'invalid') {
+
+        <!-- Token inválido / expirado -->
+        <div class="ia-card">
+          <header class="ia-card-head">
+            <span class="ia-mark ia-mark-sm">
+              <span class="ia-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="ia-card-title ia-title-error">Enlace inválido.</h2>
+            <p class="ia-card-sub">Este enlace ha expirado, ya fue usado o no es válido.</p>
+          </header>
+          <div class="error-banner">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+              <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <span>
+              @if (svc.state().errorMessage) {
+                {{ svc.state().errorMessage }}
+              } @else {
+                Pide al administrador que te genere un nuevo enlace de invitación.
+              }
+            </span>
+          </div>
+        </div>
+
+      } @else if (svc.state().status === 'success') {
+
+        <!-- Éxito -->
+        <div class="ia-card ia-card-success">
+          <div class="ia-success-icon">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <h2 class="ia-card-title">¡Cuenta activada!</h2>
+          <p class="ia-card-sub" style="margin-bottom: 1.5rem;">
+            Tu acceso ha sido creado correctamente. Inicia sesión para continuar con la configuración de tu perfil.
+          </p>
+          <button type="button" (click)="irAlLogin()" class="btn-primary ia-submit">
+            Ir al inicio de sesión
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/>
+              <polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+
+      } @else {
+
+        <!-- Formulario principal -->
+        <div class="ia-card">
+          <header class="ia-card-head">
+            <span class="ia-mark ia-mark-sm">
+              <span class="ia-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="ia-card-title">Crea tu contraseña.</h2>
+            <p class="ia-card-sub">
+              @if (svc.state().usuarioNombre) {
+                Usuario: <strong>{{ svc.state().usuarioNombre }}</strong>
+              } @else {
+                Define una contraseña segura para activar tu cuenta.
+              }
+            </p>
+          </header>
+
+          <form [formGroup]="form" (ngSubmit)="submit()" class="ia-form">
+
+            <div class="field-group">
+              <label class="field-label">Contraseña</label>
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="••••••••"
+                autocomplete="new-password"
+                class="field-input"
+              />
+
+              <!-- Barra de seguridad -->
+              @if (passwordVal()) {
+                <div class="ia-strength-wrap">
+                  <div class="ia-strength-track">
+                    <div
+                      class="ia-strength-bar"
+                      [style.width.%]="passwordStrength()"
+                      [style.background-color]="strengthColor()"
+                    ></div>
+                  </div>
+                  <span class="ia-strength-label" [style.color]="strengthColor()">
+                    {{ strengthLabel() }}
+                  </span>
+                </div>
+              }
+
+              <!-- Requisitos -->
+              <ul class="ia-req-list">
+                @for (req of passwordReqs(); track req.label) {
+                  <li class="ia-req" [class.is-ok]="req.ok">
+                    <span class="ia-req-mark">{{ req.ok ? '✓' : '·' }}</span>
+                    <span>{{ req.label }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Confirmar contraseña</label>
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                placeholder="••••••••"
+                autocomplete="new-password"
+                class="field-input"
+              />
+              @if (form.hasError('passwordsMismatch') && form.get('confirmPassword')?.touched) {
+                <p class="field-error">Las contraseñas no coinciden.</p>
+              }
+            </div>
+
+            @if (svc.state().errorMessage) {
+              <div class="error-banner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+                  <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>{{ svc.state().errorMessage }}</span>
+              </div>
+            }
+
+            <button type="submit" [disabled]="svc.state().isLoading" class="btn-primary ia-submit">
+              @if (svc.state().isLoading) {
+                <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 13px; height: 13px;"></span>
+                Activando cuenta…
+              } @else {
+                Activar cuenta
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              }
+            </button>
+
+          </form>
+        </div>
+
+      }
+
+    </main>
+
+  </div>
+</div>
