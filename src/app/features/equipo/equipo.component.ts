@@ -1,7 +1,6 @@
 import { Component, OnInit, computed, effect, inject, signal, untracked } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { FormsModule, FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../core/auth/auth.service';
 import { UsuariosService } from '../usuarios/usuarios.service';
 import { TiendaService } from '../tienda/tienda.service';
@@ -9,27 +8,46 @@ import { UsuarioTiendaModel } from '../usuarios/models/usuario-tienda.model';
 import { AsistenciaService } from '../asistencia/asistencia.service';
 import { AsistenciaResumenModel, UsuarioConAsistencia } from '../asistencia/models/asistencia.model';
 import { Roles } from '../../core/auth/auth.models';
+import { InvitationService } from '../invitation/invitation.service';
+import { CopyLinkButtonComponent } from '../../shared/components/copy-link-button/copy-link-button.component';
 
 type TabKey = 'miembros' | 'asistencia-hoy' | 'resumen';
 
 @Component({
   selector: 'app-equipo',
   standalone: true,
-  imports: [FormsModule, RouterLink, DecimalPipe],
+  imports: [FormsModule, ReactiveFormsModule, DecimalPipe, CopyLinkButtonComponent],
   templateUrl: './equipo.component.html',
   styleUrl: './equipo.component.css',
 })
 export class EquipoComponent implements OnInit {
   readonly usuariosSvc = inject(UsuariosService);
   readonly asistenciaSvc = inject(AsistenciaService);
+  readonly invSvc = inject(InvitationService);
   private readonly tiendaSvc = inject(TiendaService);
   private readonly auth = inject(AuthService);
+  private readonly invFb = inject(FormBuilder);
 
   readonly isDueno = this.auth.isDueno;
   readonly userMe = this.auth.userMe;
   readonly Roles = Roles;
 
   readonly tab = signal<TabKey>('miembros');
+
+  // ── Modal de invitación ──
+  dialogInvitar = signal(false);
+
+  invForm = this.invFb.group({
+    email:    ['', [Validators.required, Validators.email]],
+    rol:      ['', Validators.required],
+    tiendaId: [null as number | null],
+    salario:  [null as number | null],
+  });
+
+  readonly invRequiereTienda = computed(() => {
+    const rol = this.invForm.get('rol')?.value;
+    return !!rol && rol !== Roles.dueno;
+  });
 
   // ── Filtros miembros ──
   readonly roles = [
@@ -204,6 +222,41 @@ export class EquipoComponent implements OnInit {
   onAnioChange(event: Event): void {
     const anio = +(event.target as HTMLSelectElement).value;
     this.asistenciaSvc.cargarResumen(this.asistenciaSvc.state().mesResumen, anio);
+  }
+
+  abrirInvitar(): void {
+    this.invSvc.clearMessages();
+    this.invForm.reset();
+    void this.invSvc.cargarRolesYTiendas();
+    this.dialogInvitar.set(true);
+  }
+
+  cerrarInvitar(): void {
+    this.dialogInvitar.set(false);
+    this.invSvc.reset();
+    this.invForm.reset();
+  }
+
+  async submitInvitar(): Promise<void> {
+    this.invForm.markAllAsTouched();
+    if (this.invForm.invalid) return;
+    const { email, rol, tiendaId, salario } = this.invForm.value;
+    await this.invSvc.crearInvitacion(
+      email!,
+      rol!,
+      tiendaId ?? undefined,
+      salario ?? undefined,
+    );
+  }
+
+  nuevaInvitacion(): void {
+    this.invSvc.reset();
+    this.invForm.reset();
+  }
+
+  formatHora(hora: string | null): string {
+    if (!hora) return '';
+    return hora.slice(0, 5);
   }
 
   private nombreMes(n: number): string {

@@ -8,12 +8,12 @@
       <p class="eq-meta">Miembros, asistencia y control de jornada</p>
     </div>
     @if (isDueno()) {
-      <a routerLink="/invitation/new" class="eq-cta">
+      <button type="button" (click)="abrirInvitar()" class="eq-cta">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
         Invitar
-      </a>
+      </button>
     }
   </header>
 
@@ -208,7 +208,7 @@
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                       </svg>
-                      {{ item.asistencia!.horaEntrada }}
+                      {{ formatHora(item.asistencia!.horaEntrada) }}
                     </span>
                   }
                   @if (item.asistencia?.horaSalida) {
@@ -216,7 +216,7 @@
                       <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
                       </svg>
-                      {{ item.asistencia!.horaSalida }}
+                      {{ formatHora(item.asistencia!.horaSalida) }}
                     </span>
                   }
                   @if (!item.asistencia?.horaEntrada && !item.asistencia?.horaSalida) {
@@ -250,12 +250,12 @@
       <div class="eq-resumen-filters">
         <select [value]="asistenciaSvc.state().mesResumen" (change)="onMesChange($event)" class="field-select">
           @for (m of mesOpciones; track m.value) {
-            <option [value]="m.value">{{ m.label }}</option>
+            <option [value]="m.value" [selected]="m.value === asistenciaSvc.state().mesResumen">{{ m.label }}</option>
           }
         </select>
         <select [value]="asistenciaSvc.state().anioResumen" (change)="onAnioChange($event)" class="field-select">
           @for (a of anioOpciones; track a) {
-            <option [value]="a">{{ a }}</option>
+            <option [value]="a" [selected]="a === asistenciaSvc.state().anioResumen">{{ a }}</option>
           }
         </select>
       </div>
@@ -359,6 +359,148 @@
           {{ usuariosSvc.state().isEditing ? 'Guardando...' : 'Guardar' }}
         </button>
       </div>
+    </div>
+  </div>
+}
+
+<!-- ═══ Dialog: invitar miembro ═══ -->
+@if (dialogInvitar()) {
+  <div class="eq-modal-backdrop" (click)="cerrarInvitar()">
+    <div class="eq-modal-sheet eq-inv-sheet" (click)="$event.stopPropagation()">
+
+      <div class="eq-modal-head">
+        <div>
+          <p class="text-eyebrow eq-modal-eyebrow">Equipo · Invitaciones</p>
+          <p class="eq-modal-title">Invitar a un miembro</p>
+        </div>
+        <button type="button" class="eq-modal-close" (click)="cerrarInvitar()" aria-label="Cerrar">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="eq-inv-body">
+
+        <!-- Columna izquierda: formulario o estado éxito -->
+        <div class="eq-inv-main">
+
+          @if (invSvc.state().status === 'success' && invSvc.state().invitationLink) {
+            <p class="eq-inv-success-label">Invitación creada</p>
+            <p class="eq-inv-success-text">Comparte este enlace con tu invitado.</p>
+            <app-copy-link-button
+              [link]="invSvc.state().invitationLink ?? ''"
+              label="Enlace de invitación" />
+            <div class="eq-inv-form-actions" style="margin-top: 1.5rem;">
+              <button type="button" class="btn-secondary" (click)="nuevaInvitacion()">Crear otra</button>
+              <button type="button" class="btn-ghost" (click)="cerrarInvitar()">Cerrar</button>
+            </div>
+
+          } @else {
+            <form [formGroup]="invForm" (ngSubmit)="submitInvitar()" class="eq-inv-form">
+
+              <div class="field-group">
+                <label class="field-label">Correo electrónico</label>
+                <input type="email" formControlName="email" placeholder="usuario@ejemplo.com" class="field-input" />
+                @if (invForm.get('email')?.invalid && invForm.get('email')?.touched) {
+                  <p class="field-error">Ingresa un correo válido.</p>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Rol</label>
+                <select formControlName="rol" class="field-select">
+                  <option value="">Selecciona un rol…</option>
+                  @for (r of invSvc.state().roles; track r.valor) {
+                    <option [value]="r.valor">{{ r.etiqueta }}</option>
+                  }
+                </select>
+                @if (invForm.get('rol')?.invalid && invForm.get('rol')?.touched) {
+                  <p class="field-error">Selecciona un rol.</p>
+                }
+              </div>
+
+              @if (invRequiereTienda()) {
+                <div class="field-group">
+                  <label class="field-label">Tienda</label>
+                  <select formControlName="tiendaId" class="field-select">
+                    <option [ngValue]="null">Selecciona una tienda…</option>
+                    @for (t of invSvc.state().tiendas; track t.id) {
+                      <option [ngValue]="t.id">{{ t.nombre }}</option>
+                    }
+                  </select>
+                </div>
+              }
+
+              <div class="field-group">
+                <label class="field-label">
+                  Salario mensual
+                  <span style="text-transform:none; font-style:normal; color:var(--color-ink-3);">opcional</span>
+                </label>
+                <input type="number" formControlName="salario" step="0.01" min="0" placeholder="0.00"
+                  class="field-input" style="font-family: var(--font-mono);" />
+              </div>
+
+              @if (invSvc.state().errorMessage) {
+                <div class="error-banner">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+                    <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <span>{{ invSvc.state().errorMessage }}</span>
+                </div>
+              }
+
+              <div class="eq-inv-form-actions">
+                <button type="button" class="btn-ghost" (click)="cerrarInvitar()">Cancelar</button>
+                <button type="submit" class="btn-primary" [disabled]="invSvc.state().isLoading">
+                  @if (invSvc.state().isLoading) {
+                    <span class="loading-spinner" style="border-color:rgba(255,255,255,0.3); border-top-color:#fff; width:12px; height:12px;"></span>
+                    Generando…
+                  } @else {
+                    Generar invitación
+                  }
+                </button>
+              </div>
+
+            </form>
+          }
+        </div>
+
+        <!-- Columna derecha: panel informativo -->
+        <aside class="eq-inv-aside">
+
+          <div class="eq-inv-aside-block">
+            <span class="text-eyebrow" style="color: var(--color-accent)">Cómo funciona</span>
+            <h3 class="eq-inv-aside-title">Un enlace, una sola vez.</h3>
+            <p class="eq-inv-aside-text">
+              El enlace generado caduca al ser usado. Si el invitado no lo activa, puedes reenviar uno nuevo desde el listado de miembros.
+            </p>
+          </div>
+
+          <div class="eq-inv-aside-block eq-inv-aside-rule">
+            <span class="text-eyebrow" style="color: var(--color-accent)">Roles disponibles</span>
+            <h3 class="eq-inv-aside-title">¿Qué permisos asignar?</h3>
+            <ul class="eq-inv-role-list">
+              <li>
+                <span class="eq-inv-role-tag">DUENO</span>
+                <span>Acceso completo, incluye gastos y configuración.</span>
+              </li>
+              <li>
+                <span class="eq-inv-role-tag">ADMIN</span>
+                <span>Gestión de usuarios, asistencia y operativa diaria.</span>
+              </li>
+              <li>
+                <span class="eq-inv-role-tag">TRAB.</span>
+                <span>Operativa diaria: ventas, servicios, inventario.</span>
+              </li>
+            </ul>
+          </div>
+
+        </aside>
+
+      </div>
+
     </div>
   </div>
 }
