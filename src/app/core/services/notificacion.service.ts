@@ -2,9 +2,10 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { AuthService } from '../auth/auth.service';
 
 export interface NotifItem {
-  tipo: 'sin-stock' | 'stock-bajo' | 'deuda';
+  tipo: 'sin-stock' | 'stock-bajo' | 'deuda' | 'cierre-mes';
   titulo: string;
   detalle: string;
   ruta: string;
@@ -20,6 +21,7 @@ interface NotifState {
 @Injectable({ providedIn: 'root' })
 export class NotificacionService {
   private readonly http = inject(HttpClient);
+  private readonly auth = inject(AuthService);
   private readonly api = environment.apiBaseUrl;
 
   private readonly _state = signal<NotifState>({
@@ -32,37 +34,99 @@ export class NotificacionService {
     if (this._state().isLoading) return;
     this._state.update(s => ({ ...s, isLoading: true, error: null }));
 
-    const tiendaQ = tiendaId ? `?tienda_id=${tiendaId}` : '';
-
-    const [stockResult, deudasResult] = await Promise.allSettled([
-      firstValueFrom(this.http.get<unknown>(`${this.api}inventory/stock/${tiendaQ}`)),
-      firstValueFrom(this.http.get<unknown>(`${this.api}finances/deudas/?estado=ACTIVA&page_size=1`)),
-    ]);
+    const hoy = new Date();
+    const diasEnMes = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 0).getDate();
+    // TEST: forzar ultimaSemana = true para probar la notificación de cierre de mes
+    const ultimaSemana = (diasEnMes - hoy.getDate()) <= 7;
 
     const items: NotifItem[] = [];
     let hayError = false;
+    const canViewDeudas = this.auth.canViewUsuarios();
+    const esDueno = this.auth.isDueno();
 
-    if (stockResult.status === 'fulfilled') {
-      for (const p of this.toArray(stockResult.value)) {
-        const cant = parseFloat(String(p['cantidadDisponible'] ?? '0'));
-        const nombre = String(p['productoNombre'] ?? p['nombre'] ?? 'Producto');
-        if (cant <= 0) {
-          items.push({ tipo: 'sin-stock', titulo: 'Sin stock', detalle: nombre, ruta: '/inventario' });
-        } else if (cant <= 5) {
-          items.push({ tipo: 'stock-bajo', titulo: 'Stock bajo', detalle: `${nombre} — ${cant} u.`, ruta: '/inventario' });
+    // — Stock y lotes: solo si hay tienda seleccionada —
+    if (tiendaId != null) {
+      const [stockResult, lotesResult] = await Promise.allSettled([
+        firstValueFrom(this.http.get<unknown>(`${this.api}inventory/stock/?tienda=${tiendaId}`)),
+        firstValueFrom(this.http.get<unknown>(`${this.api}inventory/lotes/?tienda=${tiendaId}&page_size=500`)),
+      ]);
+
+      // Construir mapa productoId → cantidadInicialTotal desde lotes activos
+      const inicialMap = new Map<number, number>();
+      if (lotesResult.status === 'fulfilled' && lotesResult.value != null) {
+        for (const lote of this.toArray(lotesResult.value)) {
+          if (!(lote['is_active'] as boolean)) continue;
+          const productos = (lote['productos'] as Record<string, unknown>[] | undefined) ?? [];
+          for (const p of productos) {
+            const pid = p['producto'] as number;
+            const ini = parseFloat(String(p['cantidad_inicial'] ?? '0'));
+            if (!isNaN(ini)) inicialMap.set(pid, (inicialMap.get(pid) ?? 0) + ini);
+          }
         }
       }
-    } else { hayError = true; }
 
-    if (deudasResult.status === 'fulfilled') {
-      const deudasCount = this.toCount(deudasResult.value);
-      if (deudasCount > 0) {
-        items.push({ tipo: 'deuda', titulo: 'Créditos pendientes', detalle: `${deudasCount} deuda(s) activa(s)`, ruta: '/finanzas/deudas' });
+      if (stockResult.status === 'fulfilled') {
+        for (const p of this.toArray(stockResult.value)) {
+          const pid = p['producto_id'] as number;
+          const cant = parseFloat(String(p['cantidad_disponible'] ?? '0'));
+          const nombre = String(p['producto_nombre'] ?? p['nombre'] ?? 'Producto');
+          const total = inicialMap.get(pid) ?? 0;
+          const pct = total > 0 ? cant / total : null;
+
+          if (cant <= 0) {
+            items.push({ tipo: 'sin-stock', titulo: 'Sin stock', detalle: nombre, ruta: '/inventario' });
+          } else if (pct !== null ? pct <= 0.10 : cant <= 20) {
+            const label = pct !== null
+              ? `${nombre} — ${Math.round(pct * 100)}% restante`
+              : `${nombre} — ${cant} u.`;
+            items.push({ tipo: 'stock-bajo', titulo: 'Stock bajo', detalle: label, ruta: '/inventario' });
+          }
+        }
+      } else {
+        console.warn('[Notificaciones] Stock falló:', (stockResult as PromiseRejectedResult).reason);
+        hayError = true;
       }
-    } else { hayError = true; }
+    }
 
-    const error = hayError ? 'Algunas alertas no se pudieron cargar' : null;
-    this._state.set({ items, isLoading: false, error, cargado: true });
+    // — Deudas (ADMINISTRADOR+) y cierre de mes (DUENO) —
+    const [deudasResult, gastosResult] = await Promise.allSettled([
+      canViewDeudas
+        ? firstValueFrom(this.http.get<unknown>(`${this.api}finances/deudas/?estado=ACTIVA&page_size=1`))
+        : Promise.resolve(null),
+      ultimaSemana && tiendaId != null && esDueno
+        ? firstValueFrom(this.http.get<unknown>(
+            `${this.api}finances/gastos/resumen/?tienda_id=${tiendaId}&mes=${hoy.getMonth() + 1}&anio=${hoy.getFullYear()}`,
+          ))
+        : Promise.resolve(null),
+    ]);
+
+    if (canViewDeudas) {
+      if (deudasResult.status === 'fulfilled' && deudasResult.value != null) {
+        const count = this.toCount(deudasResult.value);
+        if (count > 0)
+          items.push({ tipo: 'deuda', titulo: 'Créditos pendientes', detalle: `${count} deuda(s) activa(s)`, ruta: '/finanzas/creditos' });
+      } else if (deudasResult.status === 'rejected') {
+        console.warn('[Notificaciones] Deudas falló:', (deudasResult as PromiseRejectedResult).reason);
+        hayError = true;
+      }
+    }
+
+    // — Cierre de mes (solo DUENO, últimos 7 días) —
+    if (esDueno && ultimaSemana && gastosResult.status === 'fulfilled' && gastosResult.value != null) {
+      const raw = gastosResult.value as Record<string, unknown>;
+      if (!(raw['mes_cerrado'] as boolean)) {
+        const totalStr = String(raw['total_general'] ?? '0');
+        const hayGastos = parseFloat(totalStr) > 0;
+        items.push({
+          tipo: 'cierre-mes',
+          titulo: 'Cierre de mes pendiente',
+          detalle: hayGastos ? `S/ ${totalStr} en gastos registrados` : 'Sin gastos fijos registrados aún',
+          ruta: '/finanzas/gastos',
+        });
+      }
+    }
+
+    this._state.set({ items, isLoading: false, error: hayError ? 'Algunas alertas no se pudieron cargar' : null, cargado: true });
   }
 
   dismiss(index: number): void {

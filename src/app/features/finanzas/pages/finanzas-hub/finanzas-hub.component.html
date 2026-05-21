@@ -17,7 +17,7 @@
   </header>
 
   <!-- ═══ KPIs ═══ -->
-  <section class="fh-kpis">
+  <section class="fh-kpis" [class.fh-kpis--3]="!canViewDeudas()">
     <div class="fh-kpi fh-kpi-hero">
       <span class="text-eyebrow fh-kpi-label">Total del día</span>
       <p class="fh-kpi-value">
@@ -42,17 +42,19 @@
       <span class="fh-kpi-pill fh-kpi-pill-warn">Por cobrar hoy</span>
     </div>
 
-    <div class="fh-kpi">
-      <span class="text-eyebrow fh-kpi-label">Deudas activas</span>
-      <p class="fh-kpi-value-sm">
-        <span class="fh-kpi-pre-sm">S/</span>{{ totalDeudas() | number:'1.2-2' }}
-      </p>
-      <span class="fh-kpi-pill fh-kpi-pill-error">{{ countDeudas() }} pendiente(s)</span>
-    </div>
+    @if (canViewDeudas()) {
+      <div class="fh-kpi">
+        <span class="text-eyebrow fh-kpi-label">Deudas activas</span>
+        <p class="fh-kpi-value-sm">
+          <span class="fh-kpi-pre-sm">S/</span>{{ totalDeudas() | number:'1.2-2' }}
+        </p>
+        <span class="fh-kpi-pill fh-kpi-pill-error">{{ countDeudas() }} pendiente(s)</span>
+      </div>
+    }
   </section>
 
   <!-- ═══ Charts ═══ -->
-  <section class="fh-charts">
+  <section class="fh-charts" [class.fh-charts--single]="!isDueno()">
 
     <!-- Donut métodos de pago -->
     <article class="fh-card fh-chart-card">
@@ -130,24 +132,47 @@
       </header>
 
       <div class="fh-shortcuts-grid">
-        <div class="fh-shortcut">
-          <a routerLink="/finanzas/creditos" class="fh-sc-main">
-            <span class="fh-sc-icon fh-sc-icon-indigo">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="5" width="20" height="14" rx="2"/>
-                <line x1="2" y1="10" x2="22" y2="10"/>
-              </svg>
-            </span>
-            <span class="fh-sc-text">
-              <span class="fh-sc-name">Créditos</span>
-              <span class="fh-sc-meta">{{ countDeudas() }} activas · historial</span>
-            </span>
-          </a>
-          <a routerLink="/finanzas/creditos" [queryParams]="{ accion: 'pago' }" class="fh-sc-cta">
-            + Pago
-          </a>
-        </div>
 
+        <!-- Slot 1: Créditos (admin+) | Nueva venta (trabajador) -->
+        @if (canViewDeudas()) {
+          <div class="fh-shortcut">
+            <a routerLink="/finanzas/creditos" class="fh-sc-main">
+              <span class="fh-sc-icon fh-sc-icon-indigo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="2" y="5" width="20" height="14" rx="2"/>
+                  <line x1="2" y1="10" x2="22" y2="10"/>
+                </svg>
+              </span>
+              <span class="fh-sc-text">
+                <span class="fh-sc-name">Créditos</span>
+                <span class="fh-sc-meta">{{ countDeudas() }} activas · historial</span>
+              </span>
+            </a>
+            <a routerLink="/finanzas/creditos" [queryParams]="{ accion: 'pago' }" class="fh-sc-cta">
+              + Pago
+            </a>
+          </div>
+        } @else {
+          <div class="fh-shortcut">
+            <a routerLink="/ventas" class="fh-sc-main">
+              <span class="fh-sc-icon fh-sc-icon-indigo">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+              </span>
+              <span class="fh-sc-text">
+                <span class="fh-sc-name">Nueva venta</span>
+                <span class="fh-sc-meta">Iniciar flujo de venta</span>
+              </span>
+            </a>
+            <a routerLink="/ventas" class="fh-sc-cta">
+              Ir →
+            </a>
+          </div>
+        }
+
+        <!-- Slot 2: Gastos (dueño) | Equipo (admin) | Operaciones (trabajador) -->
         @if (isDueno()) {
           <div class="fh-shortcut">
             <a routerLink="/finanzas/gastos" class="fh-sc-main">
@@ -168,7 +193,46 @@
               + Gasto
             </a>
           </div>
+        } @else if (canViewDeudas()) {
+          <div class="fh-shortcut">
+            <a routerLink="/equipo" class="fh-sc-main">
+              <span class="fh-sc-icon fh-sc-icon-green">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                  <circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </span>
+              <span class="fh-sc-text">
+                <span class="fh-sc-name">Equipo</span>
+                <span class="fh-sc-meta">Usuarios · asistencia</span>
+              </span>
+            </a>
+            <a routerLink="/equipo" class="fh-sc-cta fh-sc-cta-green">
+              Ir →
+            </a>
+          </div>
+        } @else {
+          <div class="fh-shortcut">
+            <a routerLink="/operaciones" class="fh-sc-main">
+              <span class="fh-sc-icon fh-sc-icon-slate">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </span>
+              <span class="fh-sc-text">
+                <span class="fh-sc-name">Operaciones</span>
+                <span class="fh-sc-meta">Historial del día</span>
+              </span>
+            </a>
+            <a routerLink="/operaciones" class="fh-sc-cta fh-sc-cta-slate">
+              Ir →
+            </a>
+          </div>
         }
+
       </div>
     </article>
   </section>

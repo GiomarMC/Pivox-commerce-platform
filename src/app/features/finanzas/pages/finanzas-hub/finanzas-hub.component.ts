@@ -24,6 +24,7 @@ export class FinanzasHubComponent implements OnInit {
   private readonly auth = inject(AuthService);
   readonly svc = inject(FinanzasService);
   readonly isDueno = this.auth.isDueno;
+  readonly canViewDeudas = this.auth.canViewUsuarios;
 
   readonly modalCierre = signal(false);
 
@@ -80,7 +81,9 @@ export class FinanzasHubComponent implements OnInit {
 
   ngOnInit(): void {
     void this.svc.cargarCajaResumen();
-    void this.svc.cargarDeudasDashboard();
+    if (this.canViewDeudas()) {
+      void this.svc.cargarDeudasDashboard();
+    }
     if (this.isDueno()) {
       void this.svc.cargarTendenciaGastos(6);
     }
