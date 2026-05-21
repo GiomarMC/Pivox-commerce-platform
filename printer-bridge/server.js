@@ -1,67 +1,23 @@
+'use strict';
+
 const express = require('express');
-const net = require('net');
-const https = require('https');
-const http = require('http');
-const path = require('path');
-const cors = require('cors');
-const Canvas = require('canvas');
+const net     = require('net');
+const cors    = require('cors');
+const Jimp    = require('jimp');
 
-// Polyfills requeridos por pdfjs-dist en Node.js (canvas@2.x los provee, canvas@3.x solo DOMMatrix)
-if (!global.DOMMatrix) global.DOMMatrix = Canvas.DOMMatrix;
-if (!global.Path2D) {
-  global.Path2D = class Path2D {
-    constructor(d) { this._d = d || ''; }
-    addPath() {}
-    closePath() {}
-    moveTo() {}
-    lineTo() {}
-    bezierCurveTo() {}
-    quadraticCurveTo() {}
-    arc() {}
-    arcTo() {}
-    ellipse() {}
-    rect() {}
-  };
-}
-
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
-const CMAP_URL = path.join(__dirname, 'node_modules/pdfjs-dist/cmaps/');
-const STANDARD_FONT_DATA_URL = path.join(__dirname, 'node_modules/pdfjs-dist/standard_fonts/');
-const PRINTER_WIDTH = 576; // 80mm @ 203dpi
-
-// Canvas factory requerido por pdfjs-dist en Node.js
-class NodeCanvasFactory {
-  create(width, height) {
-    const canvas = Canvas.createCanvas(width, height);
-    return { canvas, context: canvas.getContext('2d') };
-  }
-  reset(cc, width, height) {
-    cc.canvas.width = width;
-    cc.canvas.height = height;
-  }
-  destroy(cc) {
-    cc.canvas.width = 0;
-    cc.canvas.height = 0;
-    cc.canvas = null;
-    cc.context = null;
-  }
-}
+const PRINTER_WIDTH = 576; // 80mm @ 203 dpi
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
 
 // ── POST /test-printer ─────────────────────────────────────────────────────
 app.post('/test-printer', (req, res) => {
   const { ip, puerto } = req.body;
   const client = new net.Socket();
   client.setTimeout(3000);
-  client.connect(puerto, ip, () => {
-    client.destroy();
-    res.json({ success: true });
-  });
-  client.on('error', () => { client.destroy(); res.status(500).json({ success: false }); });
+  client.connect(puerto, ip, () => { client.destroy(); res.json({ success: true }); });
+  client.on('error',   () => { client.destroy(); res.status(500).json({ success: false }); });
   client.on('timeout', () => { client.destroy(); res.status(500).json({ success: false, error: 'timeout' }); });
 });
 
@@ -70,160 +26,90 @@ app.post('/print', (req, res) => {
   const { ip, puerto, contenido } = req.body;
   const client = new net.Socket();
   client.connect(puerto, ip, () => {
-    client.write(Buffer.from(contenido, 'binary'), () => {
-      client.destroy();
-      res.json({ success: true });
-    });
+    client.write(Buffer.from(contenido, 'binary'), () => { client.destroy(); res.json({ success: true }); });
   });
   client.on('error', err => { client.destroy(); res.status(500).json({ success: false, error: err.message }); });
 });
 
-// ── POST /print-pdf ────────────────────────────────────────────────────────
-// Body: { url: string, ip: string, puerto: number }
-app.post('/print-pdf', async (req, res) => {
-  const { url, ip, puerto } = req.body;
-  if (!url || !ip) return res.status(400).json({ success: false, error: 'url e ip son requeridos' });
-
-  try {
-    const escData = await pdfAEscPos(url);
-    await enviarTcp(ip, puerto || 9100, escData);
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Error /print-pdf:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// ── POST /print-pdf-raw ────────────────────────────────────────────────────
-// Body: { data: '<base64 PDF>', ip: string, puerto: number }
-app.post('/print-pdf-raw', async (req, res) => {
+// ── POST /print-image ──────────────────────────────────────────────────────
+// Body: { data: base64PNG, ip: string, puerto: number }
+// El rendering del PDF se hace en el navegador; el bridge recibe solo la imagen.
+app.post('/print-image', async (req, res) => {
   const { data, ip, puerto } = req.body;
-  if (!data || !ip) return res.status(400).json({ success: false, error: 'data e ip son requeridos' });
-
+  if (!data || !ip) return res.status(400).json({ error: 'data e ip son requeridos' });
   try {
-    const pdfBytes = Buffer.from(data, 'base64');
-    const escData = await pdfAEscPosFromBuffer(pdfBytes);
+    const escData = await imageToEscPos(data);
     await enviarTcp(ip, puerto || 9100, escData);
     res.json({ success: true });
   } catch (err) {
-    console.error('Error /print-pdf-raw:', err.message);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// ── GET /render-pdf?url=... ────────────────────────────────────────────────
-// Simulación: renderiza pág 1 y devuelve PNG para verificar sin impresora
-app.get('/render-pdf', async (req, res) => {
-  const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'url requerida' });
-
-  try {
-    const pdfBytes = await descargarUrl(url);
-    const pdf = await cargarPdf(pdfBytes);
-    const page = await pdf.getPage(1);
-    const cc = await renderizarPagina(page);
-    res.setHeader('Content-Type', 'image/png');
-    cc.canvas.createPNGStream().pipe(res);
-  } catch (err) {
+    console.error('Error /print-image:', err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ── Helpers ────────────────────────────────────────────────────────────────
-
-async function pdfAEscPos(url) {
-  const pdfBytes = await descargarUrl(url);
-  return pdfAEscPosFromBuffer(pdfBytes);
-}
-
-async function pdfAEscPosFromBuffer(pdfBytes, maxPages = 1) {
-  const pdf = await cargarPdf(pdfBytes);
-
-  const buffers = [];
-  buffers.push(Buffer.from([0x1B, 0x40]));       // ESC @ — init
-  buffers.push(Buffer.from([0x1B, 0x61, 0x01])); // ESC a 1 — centrar
-
-  for (let pageNum = 1; pageNum <= Math.min(pdf.numPages, maxPages); pageNum++) {
-    const page = await pdf.getPage(pageNum);
-    const cc = await renderizarPagina(page);
-    const { canvas, context: ctx } = cc;
-    const pxW = canvas.width;
-    const pxH = canvas.height;
-
-    // Convertir a bitmap 1-bit
-    const imgData = ctx.getImageData(0, 0, pxW, pxH);
-    const widthBytes = Math.ceil(pxW / 8);
-    const bitmap = Buffer.alloc(widthBytes * pxH, 0x00);
-
-    for (let y = 0; y < pxH; y++) {
-      for (let x = 0; x < pxW; x++) {
-        const i = (y * pxW + x) * 4;
-        const lum = (imgData.data[i] * 299 + imgData.data[i + 1] * 587 + imgData.data[i + 2] * 114) / 1000;
-        if (lum < 128) {
-          bitmap[y * widthBytes + Math.floor(x / 8)] |= (0x80 >> (x % 8));
-        }
+// ── GET /discover-printer ──────────────────────────────────────────────────
+// Escanea la red local buscando impresoras ESC/POS (puerto 9100)
+app.get('/discover-printer', async (req, res) => {
+  const os = require('os');
+  const prefixes = new Set();
+  for (const [name, addrs] of Object.entries(os.networkInterfaces())) {
+    if (/^(lo|docker|br-|veth|virbr|zt|tun|tap)/.test(name)) continue;
+    for (const addr of addrs) {
+      if (addr.family === 'IPv4' && !addr.internal) {
+        prefixes.add(addr.address.split('.').slice(0, 3).join('.'));
       }
     }
-
-    // GS v 0 — raster image
-    const xL = widthBytes & 0xFF;
-    const xH = (widthBytes >> 8) & 0xFF;
-    const yL = pxH & 0xFF;
-    const yH = (pxH >> 8) & 0xFF;
-    buffers.push(Buffer.from([0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH]));
-    buffers.push(bitmap);
   }
 
+  const found = [];
+  for (const prefix of prefixes) {
+    const promises = Array.from({ length: 254 }, (_, i) =>
+      tcpProbe(`${prefix}.${i + 1}`, 9100, 500).then(ok => ok ? `${prefix}.${i + 1}` : null)
+    );
+    const results = (await Promise.all(promises)).filter(Boolean);
+    found.push(...results);
+  }
+
+  res.json(found.length > 0
+    ? { found: true, ip: found[0], todas: found, puerto: 9100 }
+    : { found: false }
+  );
+});
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+async function imageToEscPos(base64) {
+  const buffer = Buffer.from(base64, 'base64');
+  const img    = await Jimp.read(buffer);
+
+  img.resize(PRINTER_WIDTH, Jimp.AUTO).grayscale();
+
+  const pxW       = img.bitmap.width;
+  const pxH       = img.bitmap.height;
+  const widthBytes = Math.ceil(pxW / 8);
+
+  const buffers = [
+    Buffer.from([0x1B, 0x40]),       // ESC @ — init
+    Buffer.from([0x1B, 0x61, 0x01]), // ESC a 1 — centrar
+  ];
+
+  const bitmap = Buffer.alloc(widthBytes * pxH, 0x00);
+  for (let y = 0; y < pxH; y++) {
+    for (let x = 0; x < pxW; x++) {
+      const rgba = Jimp.intToRGBA(img.getPixelColor(x, y));
+      const lum  = (rgba.r * 299 + rgba.g * 587 + rgba.b * 114) / 1000;
+      if (lum < 128) bitmap[y * widthBytes + Math.floor(x / 8)] |= (0x80 >> (x % 8));
+    }
+  }
+
+  const xL = widthBytes & 0xFF, xH = (widthBytes >> 8) & 0xFF;
+  const yL = pxH & 0xFF,        yH = (pxH >> 8) & 0xFF;
+  buffers.push(Buffer.from([0x1D, 0x76, 0x30, 0x00, xL, xH, yL, yH]));
+  buffers.push(bitmap);
   buffers.push(Buffer.from([0x1B, 0x64, 0x05]));       // ESC d 5 — avanzar
   buffers.push(Buffer.from([0x1D, 0x56, 0x41, 0x00])); // GS V A  — cortar
 
   return Buffer.concat(buffers);
-}
-
-async function cargarPdf(pdfBytes) {
-  return pdfjsLib.getDocument({
-    data: new Uint8Array(pdfBytes),
-    cMapUrl: CMAP_URL,
-    cMapPacked: true,
-    standardFontDataUrl: STANDARD_FONT_DATA_URL,
-  }).promise;
-}
-
-async function renderizarPagina(page) {
-  const viewport = page.getViewport({ scale: 1 });
-  const scale = PRINTER_WIDTH / viewport.width;
-  const scaledViewport = page.getViewport({ scale });
-  const pxW = Math.floor(scaledViewport.width);
-  const pxH = Math.floor(scaledViewport.height);
-
-  const canvasFactory = new NodeCanvasFactory();
-  const cc = canvasFactory.create(pxW, pxH);
-  cc.context.fillStyle = '#FFFFFF';
-  cc.context.fillRect(0, 0, pxW, pxH);
-
-  await page.render({
-    canvasContext: cc.context,
-    viewport: scaledViewport,
-    canvasFactory,
-  }).promise;
-
-  return cc;
-}
-
-function descargarUrl(url) {
-  return new Promise((resolve, reject) => {
-    const protocol = url.startsWith('https') ? https : http;
-    const chunks = [];
-    const req = protocol.get(url, (resp) => {
-      if (resp.statusCode >= 300 && resp.statusCode < 400 && resp.headers.location) {
-        return descargarUrl(resp.headers.location).then(resolve).catch(reject);
-      }
-      resp.on('data', chunk => chunks.push(chunk));
-      resp.on('end', () => resolve(Buffer.concat(chunks)));
-      resp.on('error', reject);
-    });
-    req.on('error', reject);
-  });
 }
 
 function enviarTcp(ip, puerto, data) {
@@ -235,5 +121,31 @@ function enviarTcp(ip, puerto, data) {
     client.on('error', err => { client.destroy(); reject(err); });
   });
 }
+
+function tcpProbe(ip, port, timeoutMs) {
+  return new Promise(resolve => {
+    const socket = new net.Socket();
+    let resolved = false;
+    const done = (ok) => { if (!resolved) { resolved = true; socket.destroy(); resolve(ok); } };
+    socket.setTimeout(timeoutMs);
+    socket.connect(port, ip, () => done(true));
+    socket.on('error',   () => done(false));
+    socket.on('timeout', () => done(false));
+  });
+}
+
+// ── GET /proxy-pdf?url=... ─────────────────────────────────────────────────
+// Descarga el PDF server-side para evitar el bloqueo CORS del navegador
+app.get('/proxy-pdf', (req, res) => {
+  const { url } = req.query;
+  if (!url) return res.status(400).json({ error: 'url es requerida' });
+  const protocol = url.startsWith('https') ? require('https') : require('http');
+  protocol.get(url, (pdfRes) => {
+    res.set('Content-Type', 'application/pdf');
+    pdfRes.pipe(res);
+  }).on('error', (err) => {
+    res.status(500).json({ error: err.message });
+  });
+});
 
 app.listen(3000, () => console.log('Printer bridge corriendo en http://localhost:3000'));
