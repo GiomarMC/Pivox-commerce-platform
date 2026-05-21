@@ -1,8 +1,7 @@
-import { Component, inject, signal, HostListener } from '@angular/core';
+import { Component, computed, inject, signal, effect, untracked, HostListener } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { LowerCasePipe } from '@angular/common';
 import { AuthService } from '../../core/auth/auth.service';
-import { TiendaService } from '../../features/tienda/tienda.service';
 import { NotificacionService } from '../../core/services/notificacion.service';
 
 @Component({
@@ -13,19 +12,33 @@ import { NotificacionService } from '../../core/services/notificacion.service';
   styleUrl: './main-shell.component.css',
 })
 export class MainShellComponent {
-  private readonly auth      = inject(AuthService);
-  private readonly router    = inject(Router);
-  private readonly tiendaSvc = inject(TiendaService);
-  readonly notifSvc          = inject(NotificacionService);
+  private readonly auth  = inject(AuthService);
+  private readonly router = inject(Router);
+  readonly notifSvc       = inject(NotificacionService);
 
-  readonly canViewUsuarios = this.auth.canViewUsuarios;
-  readonly isDueno         = this.auth.isDueno;
-  readonly userMe          = this.auth.userMe;
-  readonly tiendaActiva    = this.tiendaSvc.tiendaActiva;
+  readonly canViewUsuarios   = this.auth.canViewUsuarios;
+  readonly isDueno           = this.auth.isDueno;
+  readonly userMe            = this.auth.userMe;
+  readonly tiendaActivaNombre = computed((): string | null => {
+    const selectedId = this.auth.selectedTiendaId();
+    if (!selectedId) return null;
+    const tiendas = this.auth.userMe()?.tiendas ?? [];
+    return tiendas.find(t => t.tiendaId === selectedId)?.tiendaNombre ?? null;
+  });
 
   readonly menuOpen    = signal(false);
   readonly profileOpen = signal(false);
   readonly panelNotifs = signal(false);
+
+  constructor() {
+    effect(() => {
+      const tiendaId = this.auth.selectedTiendaId();
+      untracked(() => {
+        this.notifSvc.limpiar();
+        if (tiendaId != null) void this.notifSvc.cargar(tiendaId);
+      });
+    });
+  }
 
   @HostListener('document:keydown', ['$event'])
   onKeydown(e: KeyboardEvent): void {
@@ -44,8 +57,7 @@ export class MainShellComponent {
     this.panelNotifs.set(opening);
     this.profileOpen.set(false);
     if (opening && !this.notifSvc.state().cargado) {
-      const tienda = this.tiendaActiva() as { id?: number } | null;
-      void this.notifSvc.cargar(tienda?.id);
+      void this.notifSvc.cargar(this.auth.selectedTiendaId() ?? undefined);
     }
   }
 

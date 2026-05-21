@@ -17,6 +17,9 @@
       <span class="ms-brand-meta">
         <span class="text-mono-s">v1.0</span>
       </span>
+      @if (tiendaActivaNombre()) {
+        <span class="ms-brand-tienda text-mono-s">{{ tiendaActivaNombre() }}</span>
+      }
     </div>
 
     <!-- Nueva venta CTA -->
@@ -89,12 +92,14 @@
           </a>
         </li>
       }
-      <li>
-        <a routerLink="/tiendas" routerLinkActive="is-active" class="ms-nav-link" (click)="closeMenu()">
-          <span class="ms-nav-mark">08</span>
-          <span class="ms-nav-name">Sucursales</span>
-        </a>
-      </li>
+      @if (isDueno()) {
+        <li>
+          <a routerLink="/tiendas" routerLinkActive="is-active" class="ms-nav-link" (click)="closeMenu()">
+            <span class="ms-nav-mark">08</span>
+            <span class="ms-nav-name">Sucursales</span>
+          </a>
+        </li>
+      }
 
       @if (isDueno()) {
         <li class="ms-nav-section ms-nav-section-rule">
@@ -129,10 +134,10 @@
           </svg>
         </button>
 
-        @if (tiendaActiva()) {
+        @if (tiendaActivaNombre()) {
           <div class="ms-tienda">
             <span class="text-eyebrow ms-tienda-eyebrow">Sede activa</span>
-            <span class="ms-tienda-name">{{ tiendaActiva()!.nombreSede }}</span>
+            <span class="ms-tienda-name">{{ tiendaActivaNombre() }}</span>
           </div>
         }
       </div>
@@ -173,6 +178,7 @@
                   <span class="ms-notif-item-tag text-mono-s">
                     @if (n.tipo === 'sin-stock') { 0× }
                     @else if (n.tipo === 'stock-bajo') { ↓ }
+                    @else if (n.tipo === 'cierre-mes') { ⚠ }
                     @else { S/ }
                   </span>
                   <div class="ms-notif-body">

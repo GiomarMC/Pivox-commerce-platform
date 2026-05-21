@@ -64,6 +64,7 @@ export const routes: Routes = [
           import('./features/inventario/pages/lote-form/lote-form.component').then(
             m => m.LoteFormComponent,
           ),
+        canActivate: [duenioGuard],
       },
       {
         path: 'inventario/lotes/:id',
@@ -153,6 +154,7 @@ export const routes: Routes = [
           import('./features/finanzas/pages/creditos/creditos.component').then(
             m => m.CreditosComponent,
           ),
+        canActivate: [adminGuard],
       },
       {
         path: 'finanzas/gastos',
@@ -186,6 +188,7 @@ export const routes: Routes = [
           import('./features/tienda/pages/tiendas/tiendas.component').then(
             m => m.TiendasComponent,
           ),
+        canActivate: [duenioGuard],
       },
       {
         path: 'tiendas/form',
@@ -193,6 +196,7 @@ export const routes: Routes = [
           import('./features/tienda/pages/tienda-form/tienda-form.component').then(
             m => m.TiendaFormComponent,
           ),
+        canActivate: [duenioGuard],
       },
 
       // Config impresora
@@ -202,6 +206,7 @@ export const routes: Routes = [
           import('./features/impresora/impresora-config/impresora-config.component').then(
             m => m.ImpresoraConfigComponent,
           ),
+        canActivate: [duenioGuard],
       },
 
       { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -214,7 +219,7 @@ export const routes: Routes = [
       import('./features/invitation/pages/invitation-form/invitation-form.component').then(
         m => m.InvitationFormComponent,
       ),
-    canActivate: [authGuard],
+    canActivate: [duenioGuard],
   },
 
   { path: '**', redirectTo: '/login' },
