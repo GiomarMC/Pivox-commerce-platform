@@ -1,0 +1,139 @@
+<div class="pc-bg">
+
+  <!-- Animated gradient mesh -->
+  <div class="pc-mesh" aria-hidden="true">
+    <div class="pc-blob pc-blob-1"></div>
+    <div class="pc-blob pc-blob-2"></div>
+    <div class="pc-blob pc-blob-3"></div>
+    <div class="pc-blob pc-blob-4"></div>
+  </div>
+  <div class="pc-dots" aria-hidden="true"></div>
+
+  <div class="pc-wrap">
+
+    <!-- Left: contexto + steps (desktop only) -->
+    <aside class="pc-marketing">
+
+      <div class="pc-brand-block">
+        <span class="pc-mark">
+          <span class="pc-mark-dot"></span>
+          Pivox
+        </span>
+
+        <h1 class="pc-headline">Ya casi. <em>Cuéntanos</em> quién eres.</h1>
+
+        <p class="pc-tagline">
+          Tu cuenta está activa. Solo necesitamos tu nombre para personalizar tu experiencia en el sistema.
+        </p>
+
+        <div class="pc-trust-tags">
+          <span class="pc-tag">
+            <span class="pc-tag-dot pc-tag-dot-success"></span>
+            Datos seguros
+          </span>
+          <span class="pc-tag">
+            <span class="pc-tag-dot pc-tag-dot-indigo"></span>
+            Perfil personalizado
+          </span>
+          <span class="pc-tag">
+            <span class="pc-tag-dot pc-tag-dot-violet"></span>
+            Toma 1 minuto
+          </span>
+        </div>
+      </div>
+
+      <!-- Steps flow -->
+      <ol class="pc-steps">
+        <li class="pc-step pc-step-done">
+          <span class="pc-step-num">01</span>
+          <span class="pc-step-label">Contraseña</span>
+          <span class="pc-step-desc">Acceso creado</span>
+        </li>
+        <li class="pc-step pc-step-active">
+          <span class="pc-step-num">02</span>
+          <span class="pc-step-label">Perfil</span>
+          <span class="pc-step-desc">Completa tus datos</span>
+        </li>
+        <li class="pc-step">
+          <span class="pc-step-num">03</span>
+          <span class="pc-step-label">Acceso</span>
+          <span class="pc-step-desc">Opera el sistema</span>
+        </li>
+      </ol>
+
+    </aside>
+
+    <!-- Right: form card -->
+    <main class="pc-main">
+
+      <div class="pc-card">
+        <header class="pc-card-head">
+          <span class="pc-mark pc-mark-sm">
+            <span class="pc-mark-dot"></span>
+            Pivox
+          </span>
+          <h2 class="pc-card-title">¿Cómo te llamas?</h2>
+          <p class="pc-card-sub">Solo necesitamos tu nombre y apellido para personalizar tu experiencia.</p>
+        </header>
+
+        <form [formGroup]="form" (ngSubmit)="submit()" class="pc-form">
+
+          <div class="pc-row">
+            <div class="field-group">
+              <label class="field-label">Nombre</label>
+              <input
+                type="text"
+                formControlName="firstName"
+                placeholder="Juan"
+                autocomplete="given-name"
+                class="field-input"
+              />
+              @if (form.get('firstName')?.invalid && form.get('firstName')?.touched) {
+                <p class="field-error">Requerido.</p>
+              }
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Apellido</label>
+              <input
+                type="text"
+                formControlName="lastName"
+                placeholder="Pérez"
+                autocomplete="family-name"
+                class="field-input"
+              />
+              @if (form.get('lastName')?.invalid && form.get('lastName')?.touched) {
+                <p class="field-error">Requerido.</p>
+              }
+            </div>
+          </div>
+
+          @if (svc.state().errorMessage) {
+            <div class="error-banner">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+                <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+              <span>{{ svc.state().errorMessage }}</span>
+            </div>
+          }
+
+          <button type="submit" [disabled]="svc.state().isLoading" class="btn-primary pc-submit">
+            @if (svc.state().isLoading) {
+              <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 13px; height: 13px;"></span>
+              Guardando…
+            } @else {
+              Continuar
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"/>
+                <polyline points="12 5 19 12 12 19"/>
+              </svg>
+            }
+          </button>
+
+        </form>
+      </div>
+
+    </main>
+
+  </div>
+</div>

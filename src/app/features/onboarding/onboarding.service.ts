@@ -32,13 +32,16 @@ export class OnboardingService {
   async completarPerfil(firstName: string, lastName: string): Promise<boolean> {
     this._state.update(s => ({ ...s, isLoading: true, errorMessage: null }));
     try {
-      const data = await firstValueFrom(
-        this.http.patch<Record<string, unknown>>(`${this.base}auth/profile/`, {
+      await firstValueFrom(
+        this.http.patch(`${this.base}auth/profile/complete/`, {
           first_name: firstName,
           last_name: lastName,
         }),
       );
-      this.auth.updateUserMe(this.mapUserMe(data));
+      const me = await firstValueFrom(
+        this.http.get<Record<string, unknown>>(`${this.base}auth/me/`),
+      );
+      this.auth.updateUserMe(this.mapUserMe(me));
       this._state.update(s => ({ ...s, isLoading: false }));
       return true;
     } catch (err: unknown) {
