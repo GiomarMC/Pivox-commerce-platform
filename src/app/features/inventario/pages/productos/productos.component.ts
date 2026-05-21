@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, signal, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, signal, computed, HostListener } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { CatalogoService } from '../../catalogo.service';
@@ -22,6 +22,14 @@ export class ProductosComponent implements OnInit, OnDestroy {
 
   readonly productoSeleccionado = signal<ProductoCatalogoModel | null>(null);
   readonly tiposIgv = TIPO_IGV_VALUES.map(v => ({ value: v, label: getTipoIgvLabel(v) }));
+
+  readonly totalCargados = computed(() => this.catalogoSvc.state().productos.length);
+  readonly conStockCount = computed(() =>
+    this.catalogoSvc.state().productos.filter(p => parseFloat(p.cantidadDisponible) > 0).length
+  );
+  readonly sinStockCount = computed(() =>
+    this.catalogoSvc.state().productos.filter(p => parseFloat(p.cantidadDisponible) <= 0).length
+  );
 
   busqueda = '';
   editTipoIgv = '';

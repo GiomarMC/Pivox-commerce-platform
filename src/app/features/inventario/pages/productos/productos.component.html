@@ -1,14 +1,40 @@
-<div class="page-content">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Productos y Stock</h1>
-      <p class="page-subtitle">Catálogo disponible · precios del lote FIFO actual</p>
-    </div>
-  </div>
+<div class="page-content pr-wrap">
+
+  <!-- Header editorial -->
+  <header class="pr-header">
+    <p class="text-eyebrow pr-eyebrow">Inventario</p>
+    <h1 class="pr-title">Catálogo</h1>
+    <p class="pr-subtitle">Stock disponible · precios del lote FIFO actual</p>
+  </header>
+
+  <!-- KPI grid -->
+  @if (totalCargados() > 0) {
+    <section class="pr-kpis">
+      <div class="pr-kpi pr-kpi-hero">
+        <span class="text-eyebrow pr-kpi-label">Productos cargados</span>
+        <p class="pr-kpi-val">{{ totalCargados() }}</p>
+        <span class="pr-kpi-pill">Catálogo activo</span>
+      </div>
+      <div class="pr-kpi">
+        <span class="text-eyebrow pr-kpi-label">Con stock</span>
+        <p class="pr-kpi-val-sm pr-kpi-ok">{{ conStockCount() }}</p>
+        <span class="pr-kpi-pill pr-kpi-pill-ok">Disponibles</span>
+      </div>
+      <div class="pr-kpi">
+        <span class="text-eyebrow pr-kpi-label">Sin stock</span>
+        <p class="pr-kpi-val-sm" [class.pr-kpi-warn]="sinStockCount() > 0">{{ sinStockCount() }}</p>
+        <span class="pr-kpi-pill" [class.pr-kpi-pill-warn]="sinStockCount() > 0">
+          {{ sinStockCount() > 0 ? 'Requieren reposición' : 'Sin alertas' }}
+        </span>
+      </div>
+    </section>
+  }
+
+  <div class="pr-rule"></div>
 
   <!-- Search bar -->
-  <div class="search-wrap">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2" class="search-icon">
+  <div class="pr-search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="search-icon" style="color:var(--color-ink-3)">
       <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
     </svg>
     <input

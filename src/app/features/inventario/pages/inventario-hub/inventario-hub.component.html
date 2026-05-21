@@ -1,51 +1,74 @@
-<div class="page-content">
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Inventario</h1>
-      <p class="page-subtitle">Productos, stock y recepciones</p>
+<div class="page-content ih-wrap">
+
+  <!-- Header editorial -->
+  <header class="ih-header">
+    <div class="ih-header-text">
+      <p class="text-eyebrow ih-eyebrow">Inventario</p>
+      <h1 class="ih-title">Stock &amp; Recepciones</h1>
+      <p class="ih-subtitle">Gestiona el catálogo de productos, niveles de stock y recepciones de mercadería.</p>
     </div>
     @if (isDueno()) {
-      <a routerLink="/inventario/lotes/nuevo" class="btn-primary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <a routerLink="/inventario/lotes/nuevo" class="btn-primary ih-cta">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square">
           <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
         </svg>
         Nuevo lote
       </a>
     }
-  </div>
+  </header>
 
-  <div class="hub-grid">
-    <a routerLink="/inventario/productos" class="hub-card">
-      <div class="hub-icon-wrap" style="background:#FFFBEB">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="1.75">
-          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-          <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+  <!-- Divider rule -->
+  <div class="ih-rule"></div>
+
+  <!-- Navigation cards -->
+  <div class="ih-grid">
+
+    <!-- Productos y Stock — featured -->
+    <a routerLink="/inventario/productos" class="ih-card ih-card-featured">
+      <div class="ih-card-top">
+        <span class="ih-card-index text-mono-s">01</span>
+        <div class="ih-icon-wrap ih-icon-amber">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ih-card-body">
+        <p class="ih-card-title">Productos y Stock</p>
+        <p class="ih-card-desc">Catálogo completo con disponibilidad, precios FIFO y estado SUNAT de cada producto.</p>
+      </div>
+      <div class="ih-card-foot">
+        <span class="ih-card-action text-mono-s">Ver catálogo</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>
         </svg>
       </div>
-      <div class="hub-info">
-        <p class="hub-title">Productos y Stock</p>
-        <p class="hub-desc">Catálogo con disponibilidad y precios actuales</p>
-      </div>
-      <svg class="hub-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
     </a>
 
-    <a routerLink="/inventario/lotes" class="hub-card">
-      <div class="hub-icon-wrap" style="background:#EEF2FF">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#334155" stroke-width="1.75">
-          <rect x="1" y="3" width="15" height="13" rx="2"/>
-          <path d="M16 8h4l3 3v5h-7V8zM5 19h7M18 19h2"/>
-          <circle cx="8.5" cy="19" r="1.5"/><circle cx="20.5" cy="19" r="1.5"/>
+    <!-- Lotes -->
+    <a routerLink="/inventario/lotes" class="ih-card">
+      <div class="ih-card-top">
+        <span class="ih-card-index text-mono-s">02</span>
+        <div class="ih-icon-wrap ih-icon-indigo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <path d="M16 8h4l3 3v5h-7V8zM5 19h7M18 19h2"/>
+            <circle cx="8.5" cy="19" r="1.5"/><circle cx="20.5" cy="19" r="1.5"/>
+          </svg>
+        </div>
+      </div>
+      <div class="ih-card-body">
+        <p class="ih-card-title">Lotes</p>
+        <p class="ih-card-desc">Historial de recepciones de mercadería. Consulta costos, fechas y productos por lote.</p>
+      </div>
+      <div class="ih-card-foot">
+        <span class="ih-card-action text-mono-s">Ver lotes</span>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square">
+          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="13 6 19 12 13 18"/>
         </svg>
       </div>
-      <div class="hub-info">
-        <p class="hub-title">Lotes</p>
-        <p class="hub-desc">Historial de recepciones de mercadería</p>
-      </div>
-      <svg class="hub-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="9 18 15 12 9 6"/>
-      </svg>
     </a>
+
   </div>
 </div>
