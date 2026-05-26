@@ -14,7 +14,11 @@ export const authGuard: CanActivateFn = (_route, state) => {
     return path === '/login' ? true : router.createUrlTree(['/login']);
   }
 
-  const user = auth.userMe()!;
+  const user = auth.userMe();
+  if (!user) {
+    auth.logout();
+    return router.createUrlTree(['/login']);
+  }
   const tiendas = user.tiendas;
   const isDueno = checkDueno(user);
   const esAdmin = user.rol === Roles.administrador;

@@ -79,6 +79,41 @@ export class AuthService {
     this._state.set(INITIAL_STATE);
   }
 
+  /**
+   * Restaura la sesión al cargar la app si hay tokens válidos en storage.
+   * Se invoca desde APP_INITIALIZER. En SSR `storage.getToken()` devuelve null
+   * (StorageService es SSR-safe), por lo que es un no-op en servidor.
+   */
+  async restoreSession(): Promise<void> {
+    const token = this.storage.getToken();
+    if (!token) return;
+
+    try {
+      const refresh = this.storage.getRefreshToken() ?? '';
+      const raw = await firstValueFrom(
+        this.http.get<Record<string, unknown>>(`${this.base}auth/me/`),
+      );
+      const userMe = this.mapUserMe(raw);
+
+      let selectedTiendaId: number | null = null;
+      if (userMe.tiendas.length > 0) {
+        const lastId = this.storage.getLastTiendaId();
+        const existe = userMe.tiendas.some(t => t.tiendaId === lastId);
+        selectedTiendaId = existe ? lastId : userMe.tiendas[0].tiendaId;
+      }
+
+      this._state.set({
+        isLoading: false,
+        errorMessage: null,
+        authData: { access: token, refresh },
+        userMe,
+        selectedTiendaId,
+      });
+    } catch {
+      this.storage.clearAuthTokens();
+    }
+  }
+
   selectTienda(tiendaId: number): void {
     this.storage.setLastTiendaId(tiendaId);
     this._state.update(s => ({ ...s, selectedTiendaId: tiendaId }));

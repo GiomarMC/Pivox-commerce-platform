@@ -2,6 +2,23 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ Pre-deploy checklist
+
+Antes del primer build/deploy a producción, verifica:
+
+1. **`src/environments/environment.prod.ts`** — reemplazar `tu-dominio.com` por el dominio real:
+   - `apiBaseUrl` debe apuntar al backend real con HTTPS
+   - `inviteBaseUrl` debe ser la URL pública del frontend
+2. **`src/server.ts`** — en el CSP de `helmet`, actualizar `connectSrc` con el host real del backend.
+3. **`angular.json`** — añadir el dominio real a `architect.build.options.security.allowedHosts` (anti-SSRF en SSR).
+4. **Variables de entorno del servidor SSR** — si `PORT` distinto a 4000, configurarlo en el host.
+5. **Backend complementario** — confirmar que:
+   - Mensajes de error del login son genéricos (sin user enumeration)
+   - JWT con expiración corta y refresh rotation
+   - Rate limiting en `/auth/login/` y `/auth/refresh/`
+   - CORS restringido al dominio del frontend
+6. **`pnpm audit`** — sin CVEs críticos en dependencias antes del build.
+
 ## Commands
 
 ```bash
