@@ -83,7 +83,9 @@ export class NotificacionService {
           }
         }
       } else {
-        console.warn('[Notificaciones] Stock falló:', (stockResult as PromiseRejectedResult).reason);
+        if (!environment.production) {
+          console.warn('[Notificaciones] Stock falló:', (stockResult as PromiseRejectedResult).reason);
+        }
         hayError = true;
       }
     }
@@ -106,7 +108,9 @@ export class NotificacionService {
         if (count > 0)
           items.push({ tipo: 'deuda', titulo: 'Créditos pendientes', detalle: `${count} deuda(s) activa(s)`, ruta: '/finanzas/creditos' });
       } else if (deudasResult.status === 'rejected') {
-        console.warn('[Notificaciones] Deudas falló:', (deudasResult as PromiseRejectedResult).reason);
+        if (!environment.production) {
+          console.warn('[Notificaciones] Deudas falló:', (deudasResult as PromiseRejectedResult).reason);
+        }
         hayError = true;
       }
     }

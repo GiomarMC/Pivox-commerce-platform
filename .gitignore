@@ -44,3 +44,17 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Secrets / env files
+.env
+.env.*
+!.env.example
+*.local
+
+# Keys / certs
+*.pem
+*.key
+*.cert
+*.crt
+id_rsa
+id_rsa.pub
