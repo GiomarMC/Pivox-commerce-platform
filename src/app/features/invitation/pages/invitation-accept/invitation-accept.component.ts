@@ -7,7 +7,7 @@ import { InvitationService } from '../../invitation.service';
 function passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
   const v: string = control.value ?? '';
   const ok =
-    v.length >= 8 &&
+    v.length >= 12 &&
     /[A-Z]/.test(v) &&
     /[a-z]/.test(v) &&
     /[0-9]/.test(v) &&
@@ -52,7 +52,7 @@ export class InvitationAcceptComponent implements OnInit {
   readonly passwordReqs = computed(() => {
     const v: string = this.passwordVal() ?? '';
     return [
-      { label: 'Mínimo 8 caracteres', ok: v.length >= 8 },
+      { label: 'Mínimo 12 caracteres', ok: v.length >= 12 },
       { label: 'Una letra mayúscula', ok: /[A-Z]/.test(v) },
       { label: 'Una letra minúscula', ok: /[a-z]/.test(v) },
       { label: 'Un número', ok: /[0-9]/.test(v) },

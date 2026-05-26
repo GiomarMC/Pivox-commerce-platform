@@ -1,5 +1,5 @@
 import { Injectable, signal, computed, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { StorageService } from '../storage/storage.service';
@@ -65,13 +65,25 @@ export class AuthService {
 
       this._state.set({ isLoading: false, errorMessage: null, authData, userMe, selectedTiendaId });
     } catch (err: unknown) {
-      const error = err as { error?: { detail?: string; non_field_errors?: string[] } };
-      const msg =
-        error?.error?.detail ??
-        error?.error?.non_field_errors?.[0] ??
-        'Error al iniciar sesión';
+      const msg = this.extractLoginError(err);
       this._state.update(s => ({ ...s, isLoading: false, errorMessage: msg }));
     }
+  }
+
+  private extractLoginError(err: unknown): string {
+    if (err instanceof HttpErrorResponse && err.status === 429) {
+      const retryAfter = err.headers?.get('Retry-After');
+      const seconds = retryAfter ? parseInt(retryAfter, 10) : NaN;
+      return isFinite(seconds) && seconds > 0
+        ? `Demasiados intentos. Reintenta en ${seconds} segundos.`
+        : 'Demasiados intentos. Espera unos minutos antes de reintentar.';
+    }
+    const error = err as { error?: { detail?: string; non_field_errors?: string[] } };
+    return (
+      error?.error?.detail ??
+      error?.error?.non_field_errors?.[0] ??
+      'Error al iniciar sesión'
+    );
   }
 
   logout(): void {

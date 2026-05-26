@@ -35,6 +35,10 @@ export class ProductosComponent implements OnInit, OnDestroy {
   editTipoIgv = '';
   editIsActive = true;
   editImagenFile: File | null = null;
+  readonly editImagenError = signal<string | null>(null);
+
+  private static readonly IMG_MAX_BYTES = 2 * 1024 * 1024;
+  private static readonly IMG_EXT_ALLOWED = ['jpg', 'jpeg', 'png', 'webp'];
 
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -69,20 +73,46 @@ export class ProductosComponent implements OnInit, OnDestroy {
     this.editTipoIgv = p.tipoIgv;
     this.editIsActive = p.isActive;
     this.editImagenFile = null;
+    this.editImagenError.set(null);
   }
 
   cerrarPanel(): void {
     this.productoSeleccionado.set(null);
+    this.editImagenError.set(null);
   }
 
   onImagenChange(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    this.editImagenFile = file ?? null;
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+
+    if (!file) {
+      this.editImagenFile = null;
+      this.editImagenError.set(null);
+      return;
+    }
+
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    if (!ProductosComponent.IMG_EXT_ALLOWED.includes(ext)) {
+      this.editImagenFile = null;
+      this.editImagenError.set('Formato no permitido. Usa JPG, PNG o WEBP.');
+      input.value = '';
+      return;
+    }
+
+    if (file.size > ProductosComponent.IMG_MAX_BYTES) {
+      this.editImagenFile = null;
+      this.editImagenError.set('La imagen excede el tamaño máximo permitido (2 MB).');
+      input.value = '';
+      return;
+    }
+
+    this.editImagenFile = file;
+    this.editImagenError.set(null);
   }
 
   async guardarProducto(): Promise<void> {
     const p = this.productoSeleccionado();
-    if (!p) return;
+    if (!p || this.editImagenError()) return;
     await this.inventarioSvc.actualizarProducto(
       p.productoId,
       { tipoIgv: this.editTipoIgv, isActive: this.editIsActive },

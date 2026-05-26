@@ -293,7 +293,15 @@
 
               <div class="field-group">
                 <label class="field-label">Imagen del producto</label>
-                <input type="file" accept="image/*" (change)="onImagenChange($event)" class="field-input" style="padding:0.4rem 0.75rem" />
+                <input type="file" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" (change)="onImagenChange($event)" class="field-input" style="padding:0.4rem 0.75rem" />
+                <p class="field-hint" style="font-size:0.75rem;color:#64748b;margin-top:0.35rem">
+                  Formatos: JPG, PNG o WEBP · Máx 2 MB.
+                </p>
+                @if (editImagenError()) {
+                  <p class="field-error" style="font-size:0.78rem;color:#dc2626;margin-top:0.35rem">
+                    {{ editImagenError() }}
+                  </p>
+                }
               </div>
 
               @if (inventarioSvc.state().errorMessage) {
