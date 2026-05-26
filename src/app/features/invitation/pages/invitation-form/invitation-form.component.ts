@@ -187,13 +187,13 @@ import { CopyLinkButtonComponent } from '../../../../shared/components/copy-link
                     }
                   </select>
                 </div>
-              }
 
-              <div class="field-group">
-                <label class="field-label">Salario mensual <span style="text-transform: none; font-style: normal; color: var(--color-ink-3);">opcional</span></label>
-                <input type="number" formControlName="salario" step="0.01" min="0" placeholder="0.00"
-                  class="field-input" style="font-family: var(--font-mono);" />
-              </div>
+                <div class="field-group">
+                  <label class="field-label">Salario mensual <span style="text-transform: none; font-style: normal; color: var(--color-ink-3);">opcional</span></label>
+                  <input type="number" formControlName="salario" step="0.01" min="0" placeholder="0.00"
+                    class="field-input" style="font-family: var(--font-mono);" />
+                </div>
+              }
 
               @if (svc.state().errorMessage) {
                 <div class="error-banner">
@@ -273,11 +273,12 @@ export class InvitationFormComponent implements OnInit {
     this.svc.clearMessages();
 
     const { email, rol, tiendaId, salario } = this.form.value;
+    const esDueno = rol === Roles.dueno;
     await this.svc.crearInvitacion(
       email!,
       rol!,
-      tiendaId ?? undefined,
-      salario ?? undefined,
+      esDueno ? undefined : (tiendaId ?? undefined),
+      esDueno ? undefined : (salario ?? undefined),
     );
   }
 

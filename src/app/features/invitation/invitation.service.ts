@@ -125,6 +125,15 @@ export class InvitationService {
         this.http.post<Record<string, unknown>>(`${this.base}auth/invite/`, body),
       );
       const link = String(resp['link'] ?? resp['invitation_link'] ?? resp['url'] ?? '');
+      if (!link) {
+        this._state.update(s => ({
+          ...s,
+          isLoading: false,
+          status: 'error',
+          errorMessage: 'No se pudo generar el enlace de invitación. Intenta de nuevo o contacta a soporte.',
+        }));
+        return false;
+      }
       this._state.update(s => ({
         ...s,
         isLoading: false,
