@@ -6,18 +6,20 @@ import { AuthService } from '../../core/auth/auth.service';
 import { extractApiError } from '../../core/http/api-error.handler';
 import { UserMeModel } from '../../core/auth/auth.models';
 
-export type SetupStep = 'empresa' | 'tienda';
+export type SetupStep = 'empresa' | 'tienda' | 'equipo';
 
 export interface OnboardingState {
   isLoading: boolean;
   errorMessage: string | null;
   setupStep: SetupStep;
+  tiendaIdRecienCreada: number | null;
 }
 
 const INITIAL: OnboardingState = {
   isLoading: false,
   errorMessage: null,
   setupStep: 'empresa',
+  tiendaIdRecienCreada: null,
 };
 
 @Injectable({ providedIn: 'root' })
@@ -86,8 +88,8 @@ export class OnboardingService {
   ): Promise<boolean> {
     this._state.update(s => ({ ...s, isLoading: true, errorMessage: null }));
     try {
-      await firstValueFrom(
-        this.http.post(`${this.base}store/`, {
+      const created = await firstValueFrom(
+        this.http.post<Record<string, unknown>>(`${this.base}store/`, {
           nombre,
           direccion,
           ubigeo,
@@ -99,8 +101,25 @@ export class OnboardingService {
       const me = await firstValueFrom(
         this.http.get<Record<string, unknown>>(`${this.base}auth/me/`),
       );
-      this.auth.updateUserMe(this.mapUserMe(me));
-      this._state.update(s => ({ ...s, isLoading: false }));
+      const userMe = this.mapUserMe(me);
+      this.auth.updateUserMe(userMe);
+
+      const idFromResponse = created['id'];
+      const tiendaIdRecienCreada =
+        typeof idFromResponse === 'number'
+          ? idFromResponse
+          : userMe.tiendas.at(-1)?.tiendaId ?? null;
+
+      if (tiendaIdRecienCreada != null) {
+        this.auth.selectTienda(tiendaIdRecienCreada);
+      }
+
+      this._state.update(s => ({
+        ...s,
+        isLoading: false,
+        setupStep: 'equipo',
+        tiendaIdRecienCreada,
+      }));
       return true;
     } catch (err: unknown) {
       this._state.update(s => ({

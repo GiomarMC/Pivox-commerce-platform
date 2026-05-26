@@ -1,0 +1,316 @@
+<div class="su-bg">
+
+  <!-- Animated gradient mesh -->
+  <div class="su-mesh" aria-hidden="true">
+    <div class="su-blob su-blob-1"></div>
+    <div class="su-blob su-blob-2"></div>
+    <div class="su-blob su-blob-3"></div>
+    <div class="su-blob su-blob-4"></div>
+  </div>
+  <div class="su-dots" aria-hidden="true"></div>
+
+  <div class="su-wrap">
+
+    <!-- Left: contexto + steps (desktop only) -->
+    <aside class="su-marketing">
+
+      <div class="su-brand-block">
+        <span class="su-mark">
+          <span class="su-mark-dot"></span>
+          Pivox
+        </span>
+
+        @switch (svc.state().setupStep) {
+          @case ('empresa') {
+            <h1 class="su-headline">Comencemos por tu <em>empresa</em>.</h1>
+            <p class="su-tagline">Estos datos aparecerán en tus comprobantes electrónicos SUNAT.</p>
+          }
+          @case ('tienda') {
+            <h1 class="su-headline">Ahora tu <em>sede</em> principal.</h1>
+            <p class="su-tagline">Tu primera sucursal con series de comprobante listas para emitir.</p>
+          }
+          @case ('equipo') {
+            <h1 class="su-headline">Invita a tu <em>equipo</em>.</h1>
+            <p class="su-tagline">
+              Comparte un enlace con tu primer colaborador. Podrás invitar más miembros luego desde la sección <strong>Equipo</strong>.
+            </p>
+          }
+        }
+
+        <div class="su-trust-tags">
+          @switch (svc.state().setupStep) {
+            @case ('empresa') {
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-success"></span>Datos SUNAT</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-indigo"></span>Solo lo esencial</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-violet"></span>Editable luego</span>
+            }
+            @case ('tienda') {
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-success"></span>Series listas</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-indigo"></span>Ubigeo INEI</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-violet"></span>Más sedes después</span>
+            }
+            @case ('equipo') {
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-success"></span>Enlace único</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-indigo"></span>Roles por miembro</span>
+              <span class="su-tag"><span class="su-tag-dot su-tag-dot-violet"></span>Invita después también</span>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Steps flow -->
+      <ol class="su-steps">
+        <li class="su-step"
+          [class.su-step-active]="svc.state().setupStep === 'empresa'"
+          [class.su-step-done]="svc.state().setupStep !== 'empresa'">
+          <span class="su-step-num">01</span>
+          <span class="su-step-label">Empresa</span>
+          <span class="su-step-desc">Razón social y RUC</span>
+        </li>
+        <li class="su-step"
+          [class.su-step-active]="svc.state().setupStep === 'tienda'"
+          [class.su-step-done]="svc.state().setupStep === 'equipo'">
+          <span class="su-step-num">02</span>
+          <span class="su-step-label">Sede principal</span>
+          <span class="su-step-desc">Dirección y series de comprobante</span>
+        </li>
+        <li class="su-step"
+          [class.su-step-active]="svc.state().setupStep === 'equipo'">
+          <span class="su-step-num">03</span>
+          <span class="su-step-label">Equipo</span>
+          <span class="su-step-desc">Invita ahora o más tarde</span>
+        </li>
+      </ol>
+
+    </aside>
+
+    <!-- Right: form card -->
+    <main class="su-main">
+
+      @if (svc.state().setupStep === 'empresa') {
+        <div class="su-card">
+          <header class="su-card-head">
+            <span class="su-mark su-mark-sm">
+              <span class="su-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="su-card-title">¿Cómo se llama tu empresa?</h2>
+            <p class="su-card-sub">Razón social y RUC tal como aparecerán en tus comprobantes.</p>
+          </header>
+
+          <form [formGroup]="formEmpresa" (ngSubmit)="submitEmpresa()" class="su-form">
+
+            <div class="field-group">
+              <label class="field-label">Razón social</label>
+              <input type="text" formControlName="nombre" placeholder="Mi Empresa S.A.C." class="field-input" />
+              @if (formEmpresa.get('nombre')?.invalid && formEmpresa.get('nombre')?.touched) {
+                <p class="field-error">Requerido.</p>
+              }
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">RUC</label>
+              <input type="text" formControlName="ruc" placeholder="20123456789" maxlength="11"
+                class="field-input" style="font-family: var(--font-mono); letter-spacing: 0.05em;" />
+              @if (formEmpresa.get('ruc')?.invalid && formEmpresa.get('ruc')?.touched) {
+                <p class="field-error">RUC de 11 dígitos requerido.</p>
+              }
+            </div>
+
+            @if (svc.state().errorMessage) {
+              <div class="error-banner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+                  <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>{{ svc.state().errorMessage }}</span>
+              </div>
+            }
+
+            <button type="submit" [disabled]="svc.state().isLoading" class="btn-primary su-submit">
+              @if (svc.state().isLoading) {
+                <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 13px; height: 13px;"></span>
+                Guardando…
+              } @else {
+                Continuar
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              }
+            </button>
+
+          </form>
+        </div>
+      }
+
+      @if (svc.state().setupStep === 'tienda') {
+        <div class="su-card">
+          <header class="su-card-head">
+            <span class="su-mark su-mark-sm">
+              <span class="su-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="su-card-title">Tu sede principal.</h2>
+            <p class="su-card-sub">La primera sucursal donde emitirás comprobantes.</p>
+          </header>
+
+          <form [formGroup]="formTienda" (ngSubmit)="submitTienda()" class="su-form">
+
+            <div class="field-group">
+              <label class="field-label">Nombre de la sede</label>
+              <input type="text" formControlName="nombre" placeholder="Sede Central" class="field-input" />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Dirección</label>
+              <input type="text" formControlName="direccion" placeholder="Av. Principal 123" class="field-input" />
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Ubigeo</label>
+              <input type="text" formControlName="ubigeo" placeholder="150101" maxlength="6"
+                class="field-input" style="font-family: var(--font-mono); letter-spacing: 0.05em;" />
+              <p class="field-hint">Código INEI de 6 dígitos.</p>
+            </div>
+
+            <p class="su-section-eyebrow">Series de comprobantes</p>
+
+            <div class="su-series-row">
+              <div class="field-group">
+                <label class="field-label">Factura</label>
+                <input type="text" formControlName="serieFactura" class="field-input"
+                  style="font-family: var(--font-mono);" maxlength="4" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Boleta</label>
+                <input type="text" formControlName="serieBoleta" class="field-input"
+                  style="font-family: var(--font-mono);" maxlength="4" />
+              </div>
+              <div class="field-group">
+                <label class="field-label">Ticket</label>
+                <input type="text" formControlName="serieTicket" class="field-input"
+                  style="font-family: var(--font-mono);" maxlength="4" />
+              </div>
+            </div>
+
+            @if (svc.state().errorMessage) {
+              <div class="error-banner">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+                  <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+                <span>{{ svc.state().errorMessage }}</span>
+              </div>
+            }
+
+            <button type="submit" [disabled]="svc.state().isLoading" class="btn-primary su-submit">
+              @if (svc.state().isLoading) {
+                <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 13px; height: 13px;"></span>
+                Creando sede…
+              } @else {
+                Continuar
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                  <polyline points="12 5 19 12 12 19"/>
+                </svg>
+              }
+            </button>
+
+          </form>
+        </div>
+      }
+
+      @if (svc.state().setupStep === 'equipo') {
+        <div class="su-card">
+          <header class="su-card-head">
+            <span class="su-mark su-mark-sm">
+              <span class="su-mark-dot"></span>
+              Pivox
+            </span>
+            <h2 class="su-card-title">Invita a tu primer colaborador.</h2>
+            <p class="su-card-sub">Opcional · puedes hacerlo ahora o más tarde desde Equipo.</p>
+          </header>
+
+          @if (inviteSvc.state().status === 'success' && inviteSvc.state().invitationLink) {
+            <div class="su-invite-success">
+              <p class="su-invite-success-eyebrow">Invitación creada</p>
+              <h3 class="su-invite-success-title">Comparte este enlace con tu colaborador.</h3>
+
+              <app-copy-link-button
+                [link]="inviteSvc.state().invitationLink ?? ''"
+                label="Enlace de invitación">
+              </app-copy-link-button>
+
+              <div class="su-invite-actions">
+                <button type="button" class="btn-secondary" (click)="nuevaInvitacion()">
+                  Invitar a otro
+                </button>
+                <button type="button" class="btn-primary" (click)="irAlPanel()">
+                  Ir a mi panel
+                </button>
+              </div>
+            </div>
+          } @else {
+            <form [formGroup]="formInvitacion" (ngSubmit)="submitInvitacion()" class="su-form">
+
+              <div class="field-group">
+                <label class="field-label">Correo electrónico</label>
+                <input type="email" formControlName="email" placeholder="colaborador@empresa.com" class="field-input" />
+                @if (formInvitacion.get('email')?.invalid && formInvitacion.get('email')?.touched) {
+                  <p class="field-error">Ingresa un correo válido.</p>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Rol</label>
+                <select formControlName="rol" class="field-select">
+                  <option value="">Selecciona un rol…</option>
+                  <option [value]="Roles.administrador">Administrador</option>
+                  <option [value]="Roles.trabajador">Trabajador</option>
+                </select>
+                @if (formInvitacion.get('rol')?.invalid && formInvitacion.get('rol')?.touched) {
+                  <p class="field-error">Selecciona un rol.</p>
+                }
+              </div>
+
+              <div class="field-group">
+                <label class="field-label">Salario mensual <span style="text-transform: none; font-style: normal; color: var(--color-ink-3);">opcional</span></label>
+                <input type="number" formControlName="salario" step="0.01" min="0" placeholder="0.00"
+                  class="field-input" style="font-family: var(--font-mono);" />
+              </div>
+
+              @if (inviteSvc.state().errorMessage) {
+                <div class="error-banner">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="square" style="flex-shrink:0;margin-top:1px">
+                    <line x1="12" y1="8" x2="12" y2="14"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                  </svg>
+                  <span>{{ inviteSvc.state().errorMessage }}</span>
+                </div>
+              }
+
+              <button type="submit" [disabled]="inviteSvc.state().isLoading" class="btn-primary su-submit">
+                @if (inviteSvc.state().isLoading) {
+                  <span class="loading-spinner" style="border-color: rgba(255,255,255,0.3); border-top-color: #fff; width: 13px; height: 13px;"></span>
+                  Generando…
+                } @else {
+                  Generar invitación
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="5" y1="12" x2="19" y2="12"/>
+                    <polyline points="12 5 19 12 12 19"/>
+                  </svg>
+                }
+              </button>
+            </form>
+
+            <div class="su-skip-row">
+              <button type="button" class="su-skip" (click)="irAlPanel()">
+                Continuar sin invitar
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+    </main>
+
+  </div>
+</div>
